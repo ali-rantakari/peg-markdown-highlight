@@ -80,14 +80,17 @@ VerbatimChunk = a:StartList
                 ( NonblankIndentedLine )+
 
 Verbatim =     a:StartList ( VerbatimChunk )+
+                 { $$ = mk_element(VERBATIM, a->pos, yyendoffset); add($$); }
 
-HorizontalRule = NonindentSpace
+HorizontalRule = < NonindentSpace
                  ( '*' Sp '*' Sp '*' (Sp '*')*
                  | '-' Sp '-' Sp '-' (Sp '-')*
                  | '_' Sp '_' Sp '_' (Sp '_')*)
-                 Sp Newline BlankLine+
+                 Sp Newline BlankLine+ >
+                 { $$ = elem(HRULE); add($$); }
 
-Bullet = !HorizontalRule NonindentSpace ('+' | '*' | '-') Spacechar+
+Bullet = < !HorizontalRule NonindentSpace ('+' | '*' | '-') Spacechar+ >
+         { $$ = elem(BULLETLIST); add($$); }
 
 BulletList = &Bullet (ListTight | ListLoose)
 
@@ -111,7 +114,8 @@ ListContinuationBlock = a:StartList
                         ( < BlankLine* > )
                         ( Indent ListBlock )+
 
-Enumerator = NonindentSpace [0-9]+ '.' Spacechar+
+Enumerator = < NonindentSpace [0-9]+ '.' Spacechar+ >
+             { $$ = elem(ORDEREDLIST); add($$); }
 
 OrderedList = &Enumerator (ListTight | ListLoose)
 
@@ -417,18 +421,19 @@ RefTitleParens = '(' < ( !(')' Sp Newline | Newline) . )* > ')'
 References = a:StartList
              ( b:Reference | SkipBlock )*
 
-Ticks1 = "`" !'`'
-Ticks2 = "``" !'`'
-Ticks3 = "```" !'`'
-Ticks4 = "````" !'`'
-Ticks5 = "`````" !'`'
+Ticks1 = "`" !'`' { $$ = elem(CODE); }
+Ticks2 = "``" !'`' { $$ = elem(CODE); }
+Ticks3 = "```" !'`' { $$ = elem(CODE); }
+Ticks4 = "````" !'`' { $$ = elem(CODE); }
+Ticks5 = "`````" !'`' { $$ = elem(CODE); }
 
-Code = ( Ticks1 Sp < ( ( !'`' Nonspacechar )+ | !Ticks1 '`'+ | !( Sp Ticks1 ) ( Spacechar | Newline !BlankLine ) )+ > Sp Ticks1
-       | Ticks2 Sp < ( ( !'`' Nonspacechar )+ | !Ticks2 '`'+ | !( Sp Ticks2 ) ( Spacechar | Newline !BlankLine ) )+ > Sp Ticks2
-       | Ticks3 Sp < ( ( !'`' Nonspacechar )+ | !Ticks3 '`'+ | !( Sp Ticks3 ) ( Spacechar | Newline !BlankLine ) )+ > Sp Ticks3
-       | Ticks4 Sp < ( ( !'`' Nonspacechar )+ | !Ticks4 '`'+ | !( Sp Ticks4 ) ( Spacechar | Newline !BlankLine ) )+ > Sp Ticks4
-       | Ticks5 Sp < ( ( !'`' Nonspacechar )+ | !Ticks5 '`'+ | !( Sp Ticks5 ) ( Spacechar | Newline !BlankLine ) )+ > Sp Ticks5
-       )
+Code = < ( s:Ticks1 Sp < ( ( !'`' Nonspacechar )+ | !Ticks1 '`'+ | !( Sp Ticks1 ) ( Spacechar | Newline !BlankLine ) )+ > Sp Ticks1
+       | s:Ticks2 Sp < ( ( !'`' Nonspacechar )+ | !Ticks2 '`'+ | !( Sp Ticks2 ) ( Spacechar | Newline !BlankLine ) )+ > Sp Ticks2
+       | s:Ticks3 Sp < ( ( !'`' Nonspacechar )+ | !Ticks3 '`'+ | !( Sp Ticks3 ) ( Spacechar | Newline !BlankLine ) )+ > Sp Ticks3
+       | s:Ticks4 Sp < ( ( !'`' Nonspacechar )+ | !Ticks4 '`'+ | !( Sp Ticks4 ) ( Spacechar | Newline !BlankLine ) )+ > Sp Ticks4
+       | s:Ticks5 Sp < ( ( !'`' Nonspacechar )+ | !Ticks5 '`'+ | !( Sp Ticks5 ) ( Spacechar | Newline !BlankLine ) )+ > Sp Ticks5
+       ) >
+       { $$ = mk_element(CODE, s->pos, yyendoffset); add($$); }
 
 RawHtml =   < (HtmlComment | HtmlTag) >
 

@@ -79,9 +79,13 @@ void applyHighlighting(NSMutableAttributedString *attrStr, element *elem[])
 				case H4:
 				case H5:
 				case H6:		fgColor = [NSColor blueColor]; break;
-				case EMPH:		fgColor = [NSColor cyanColor]; break;
-				case STRONG:	fgColor = [NSColor redColor]; break;
+				case EMPH:		fgColor = [NSColor yellowColor]; break;
+				case STRONG:	fgColor = [NSColor magentaColor]; break;
+				case CODE:
 				case VERBATIM:	fgColor = [NSColor greenColor]; break;
+				case HRULE:		fgColor = [NSColor cyanColor]; break;
+				case ORDEREDLIST:
+				case BULLETLIST:fgColor = [NSColor magentaColor]; break;
 			}
 			
 			if (fgColor != nil)
