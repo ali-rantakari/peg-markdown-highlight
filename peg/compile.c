@@ -364,7 +364,7 @@ static char *preamble= "\
 \n\
 #ifndef YY_PART\n\
 \n\
-typedef void (*yyaction)(char *yytext, int yyleng);\n\
+typedef void (*yyaction)(char *yytext, int yystartoffset, int yyendoffset, int yyleng);\n\
 typedef struct _yythunk { int begin, end;  yyaction  action;  struct _yythunk *next; } yythunk;\n\
 \n\
 YY_VARIABLE(char *   ) yybuf= 0;\n\
@@ -489,7 +489,7 @@ YY_LOCAL(void) yyDone(void)\n\
       yythunk *thunk= &yythunks[pos];\n\
       int yyleng= thunk->end ? yyText(thunk->begin, thunk->end) : thunk->begin;\n\
       yyprintf((stderr, \"DO [%d] %p %s\\n\", pos, thunk->action, yytext));\n\
-      thunk->action(yytext, yyleng);\n\
+      thunk->action(yytext, thunk->begin, thunk->end, yyleng);\n\
     }\n\
   yythunkpos= 0;\n\
 }\n\
@@ -520,9 +520,9 @@ YY_LOCAL(int) yyAccept(int tp0)\n\
   return 1;\n\
 }\n\
 \n\
-YY_LOCAL(void) yyPush(char *text, int count)	{ yyval += count; }\n\
-YY_LOCAL(void) yyPop(char *text, int count)	{ yyval -= count; }\n\
-YY_LOCAL(void) yySet(char *text, int count)	{ yyval[count]= yy; }\n\
+YY_LOCAL(void) yyPush(char *text, int yystartoffset, int yyendoffset, int count)	{ yyval += count; }\n\
+YY_LOCAL(void) yyPop(char *text, int yystartoffset, int yyendoffset, int count)	{ yyval -= count; }\n\
+YY_LOCAL(void) yySet(char *text, int yystartoffset, int yyendoffset, int count)	{ yyval[count]= yy; }\n\
 \n\
 #endif /* YY_PART */\n\
 \n\
@@ -664,7 +664,7 @@ void Rule_compile_c(Node *node)
   fprintf(output, "\n");
   for (n= actions;  n;  n= n->action.list)
     {
-      fprintf(output, "YY_ACTION(void) yy%s(char *yytext, int yyleng)\n{\n", n->action.name);
+      fprintf(output, "YY_ACTION(void) yy%s(char *yytext, int yystartoffset, int yyendoffset, int yyleng)\n{\n", n->action.name);
       defineVariables(n->action.rule->rule.variables);
       fprintf(output, "  yyprintf((stderr, \"do yy%s\\n\"));\n", n->action.name);
       fprintf(output, "  %s;\n", n->action.text);
