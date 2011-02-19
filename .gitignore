@@ -1,0 +1,5 @@
+*.o
+peg/leg
+peg/peg
+markdown_parser.c
+tester
