@@ -440,7 +440,7 @@ Source  = ( '<' SourceContents '>' | SourceContents )
 SourceContents = ( ( !'(' !')' !'>' Nonspacechar )+ | '(' SourceContents ')')*
                  | ""
 
-Title = ( TitleSingle | TitleDouble | < "" > )
+Title = ( TitleSingle | TitleDouble | "" )
        
 
 TitleSingle = '\'' ( !( '\'' Sp ( ')' | Newline ) ) . )* '\''
@@ -513,7 +513,7 @@ AlphanumericAscii = [A-Za-z0-9]
 Digit = [0-9]
 
 HexEntity =     '&' '#' [Xx] [0-9a-fA-F]+ ';'
-DecEntity =     '&' '#' [0-9]+ > ';'
+DecEntity =     '&' '#' [0-9]+ ';'
 CharEntity =    '&' [A-Za-z0-9]+ ';'
 
 NonindentSpace =    "   " | "  " | " " | ""
