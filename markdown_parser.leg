@@ -26,6 +26,7 @@
 #define elem(x)			mk_element(x, yystartoffset, yyendoffset)
 #define add_elem(x)		add_element(x, yystartoffset, yyendoffset)
 #define add_elem_s(x)	add_element(x, s->pos, yyendoffset)
+#define add_this_raw	add_raw(yystartoffset, yyendoffset)
 
 %}
 
@@ -69,12 +70,14 @@ SetextBottom1 = "===" '='* Newline
 SetextBottom2 = "---" '-'* Newline
 
 SetextHeading1 =  &(RawLine SetextBottom1)
-                  < s:LocMarker ( !Endline Inline )+ Newline
+                  s:LocMarker
+                  < ( !Endline Inline )+ Newline
                   SetextBottom1 >
 	              { add_elem_s(H1); }
 
 SetextHeading2 =  &(RawLine SetextBottom2)
-                  < s:LocMarker ( !Endline Inline )+ Newline
+                  s:LocMarker
+                  < ( !Endline Inline )+ Newline
                   SetextBottom2 >
 	              { add_elem_s(H2); }
 
@@ -82,7 +85,8 @@ Heading = AtxHeading | SetextHeading
 
 BlockQuote = BlockQuoteRaw
 
-BlockQuoteRaw =  (( '>' ' '? Line )
+BlockQuoteRaw =  s:LocMarker
+                 (( '>' ' '? Line )
                   ( !'>' !BlankLine Line )*
                   ( BlankLine )*
                  )+
@@ -117,15 +121,19 @@ ListLoose = ( ListItem BlankLine* )+
            
 
 ListItem =  ( Bullet | Enumerator )
+            < s:LocMarker
             ListBlock
-            ( ListContinuationBlock )*
+            ( ListContinuationBlock )* >
+            { add_raw(s->pos, yyendoffset); }
 
 ListItemTight =
             ( Bullet | Enumerator )
+            < s:LocMarker
             ListBlock
             ( !BlankLine
               ListContinuationBlock )*
-            !ListContinuationBlock
+            !ListContinuationBlock >
+            { add_raw(s->pos, yyendoffset); }
 
 ListBlock = !BlankLine Line
             ( ListBlockLine )*
@@ -402,7 +410,7 @@ OneUlClose =  !Spacechar !Newline Inline !StrongUl < '_' > !Alphanumeric { $$ = 
 EmphUl =    s:OneUlOpen
             ( !OneUlClose Inline )*
             OneUlClose
-            { add_elem_s(EMPH); }
+            { add_elem_s(EMPH); printf("emphul: %i - %i\n", s->pos, yyendoffset); }
 
 Strong = StrongStar | StrongUl
 

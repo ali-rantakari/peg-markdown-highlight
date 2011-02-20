@@ -1,6 +1,9 @@
 
 #include "markdown_parser.h"
 
+static long parsing_offset = 0;
+
+
 /* extension = returns true if extension is selected */
 bool extension(int ext)
 {
@@ -16,9 +19,16 @@ element * mk_element(int type, long pos, long end)
     result->pos = pos;
     result->end = end;
     result->next = NULL;
+    
+    if (type != NO_TYPE)
+    {
+    	result->pos += parsing_offset;
+    	result->end += parsing_offset;
+    }
+	printf("  mk_element: %i [%ld - %ld] + %ld\n", type, pos, end, parsing_offset);
+	
     return result;
 }
-
 
 element* head_elements[33];
 
@@ -31,6 +41,7 @@ void add(element *elem)
 		elem->next = head_elements[elem->type];
 		head_elements[elem->type] = elem;
 	}
+	printf("  add: %i [%ld - %ld]\n", elem->type, elem->pos, elem->end);
 }
 
 element * add_element(int type, long pos, long end)
@@ -40,6 +51,10 @@ element * add_element(int type, long pos, long end)
 	return new_element;
 }
 
+void add_raw(long pos, long end)
+{
+	element *elem = add_element(RAW, pos, end);
+}
 
 
 
