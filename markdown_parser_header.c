@@ -33,6 +33,12 @@ void add(element *elem)
 	}
 }
 
+element * add_element(int type, long pos, long end)
+{
+	element *new_element = mk_element(type, pos, end);
+	add(new_element);
+	return new_element;
+}
 
 
 
