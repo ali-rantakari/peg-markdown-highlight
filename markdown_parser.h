@@ -13,6 +13,7 @@ enum markdown_extensions {
 /* Types of semantic values returned by parsers. */ 
 enum types
 {
+	NO_TYPE,
 	LIST,   /* A generic list of values.  For ordered and bullet lists, see below. */
 	RAW,    /* Raw markdown to be processed further */
 	SPACE,
