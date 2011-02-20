@@ -57,10 +57,10 @@ Plain =     Inlines
 
 AtxInline = !Newline !(Sp? '#'* Sp Newline) Inline
 
-AtxStart =  < ( "######" | "#####" | "####" | "###" | "##" | "#" ) > { $$ = elem(NO_TYPE); }
+AtxStart =  < ( "######" | "#####" | "####" | "###" | "##" | "#" ) > { $$ = elem(H1 + (strlen(yytext) - 1)); }
 
 AtxHeading = < s:AtxStart Sp? ( AtxInline )+ (Sp? '#'* Sp)? > Newline
-            { $$ = add_elem_s(H1 + (strlen(yytext) - 1)); }
+            { $$ = add_elem_s(s->type); }
 
 SetextHeading = SetextHeading1 | SetextHeading2
 
@@ -382,12 +382,12 @@ Symbol =    SpecialChar
 # This keeps the parser from getting bogged down on long strings of '*' or '_',
 # or strings of '*' or '_' with space on each side:
 UlOrStarLine =  (UlLine | StarLine)
-StarLine =      "****" '*'* > | < Spacechar '*'+ &Spacechar
-UlLine   =      "____" '_'* > | < Spacechar '_'+ &Spacechar
+StarLine =      "****" '*'* | Spacechar '*'+ &Spacechar
+UlLine   =      "____" '_'* | Spacechar '_'+ &Spacechar
 
 Emph =      EmphStar | EmphUl
 
-OneStarOpen  =  !StarLine '*' !Spacechar !Newline { $$ = elem(NO_TYPE); }
+OneStarOpen  =  !StarLine < '*' > !Spacechar !Newline { $$ = elem(NO_TYPE); }
 OneStarClose =  !Spacechar !Newline Inline !StrongStar < '*' > { $$ = elem(NO_TYPE); }
 
 EmphStar =  s:OneStarOpen
@@ -396,7 +396,7 @@ EmphStar =  s:OneStarOpen
             { $$ = add_elem_s(EMPH); }
            
 
-OneUlOpen  =  !UlLine '_' !Spacechar !Newline { $$ = elem(NO_TYPE); }
+OneUlOpen  =  !UlLine < '_' > !Spacechar !Newline { $$ = elem(NO_TYPE); }
 OneUlClose =  !Spacechar !Newline Inline !StrongUl < '_' > !Alphanumeric { $$ = elem(NO_TYPE); }
 
 EmphUl =    s:OneUlOpen
@@ -406,7 +406,7 @@ EmphUl =    s:OneUlOpen
 
 Strong = StrongStar | StrongUl
 
-TwoStarOpen =   !StarLine "**" !Spacechar !Newline { $$ = elem(NO_TYPE); }
+TwoStarOpen =   !StarLine < "**" > !Spacechar !Newline { $$ = elem(NO_TYPE); }
 TwoStarClose =  !Spacechar !Newline Inline < "**" > { $$ = elem(NO_TYPE); }
 
 StrongStar =    s:TwoStarOpen
@@ -414,7 +414,7 @@ StrongStar =    s:TwoStarOpen
                 TwoStarClose
                 { $$ = add_elem_s(STRONG); }
 
-TwoUlOpen =     !UlLine "__" !Spacechar !Newline { $$ = elem(NO_TYPE); }
+TwoUlOpen =     !UlLine < "__" > !Spacechar !Newline { $$ = elem(NO_TYPE); }
 TwoUlClose =    !Spacechar !Newline Inline < "__" > !Alphanumeric { $$ = elem(NO_TYPE); }
 
 StrongUl =  s:TwoUlOpen
