@@ -410,7 +410,7 @@ OneUlClose =  !Spacechar !Newline Inline !StrongUl < '_' > !Alphanumeric { $$ = 
 EmphUl =    s:OneUlOpen
             ( !OneUlClose Inline )*
             OneUlClose
-            { add_elem_s(EMPH); printf("emphul: %i - %i\n", s->pos, yyendoffset); }
+            { add_elem_s(EMPH); }
 
 Strong = StrongStar | StrongUl
 

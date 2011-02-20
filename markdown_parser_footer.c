@@ -2,8 +2,10 @@
 
 int yyparse(void);
 
-element ** parse_markdown(char *string, long offset, int extensions)
+element ** parse_markdown(char *string, long offset, int max_chars, int extensions)
 {
+	counter = max_chars;
+	useCounter = (counter != -1);
 	parsing_offset = offset;
 	
     char *oldcharbuf;

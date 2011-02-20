@@ -59,5 +59,5 @@ struct Element
 typedef struct Element element;
 
 
-element ** parse_markdown(char *string, long offset, int extensions);
+element ** parse_markdown(char *string, long offset, int max_chars, int extensions);
 

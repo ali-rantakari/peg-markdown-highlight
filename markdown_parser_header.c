@@ -20,11 +20,6 @@ element * mk_element(int type, long pos, long end)
     result->end = end;
     result->next = NULL;
     
-    if (type != NO_TYPE)
-    {
-    	result->pos += parsing_offset;
-    	result->end += parsing_offset;
-    }
 	printf("  mk_element: %i [%ld - %ld] + %ld\n", type, pos, end, parsing_offset);
 	
     return result;
@@ -41,6 +36,12 @@ void add(element *elem)
 		elem->next = head_elements[elem->type];
 		head_elements[elem->type] = elem;
 	}
+	
+    if (elem->type != NO_TYPE)
+    {
+    	elem->pos += parsing_offset;
+    	elem->end += parsing_offset;
+    }
 	printf("  add: %i [%ld - %ld]\n", elem->type, elem->pos, elem->end);
 }
 
@@ -58,7 +59,8 @@ void add_raw(long pos, long end)
 
 
 
-
+static bool useCounter = false;
+static int counter = 0;
 static char *charbuf = "";     /* Buffer of characters to be parsed. */
 
 /**********************************************************************
@@ -77,12 +79,13 @@ static char *charbuf = "";     /* Buffer of characters to be parsed. */
 #define YY_INPUT(buf, result, max_size)              \
 {                                                    \
     int yyc;                                         \
-    if (charbuf && *charbuf != '\0') {               \
+    if ((!useCounter || counter > 0) && charbuf && *charbuf != '\0') {               \
         yyc= *charbuf++;                             \
     } else {                                         \
         yyc= EOF;                                    \
     }                                                \
     result= (EOF == yyc) ? 0 : (*(buf)= yyc, 1);     \
+    if (useCounter) counter--;\
 }
 
 
