@@ -103,7 +103,7 @@ HorizontalRule = < NonindentSpace
                  Sp Newline BlankLine+ >
                  { $$ = add_elem(HRULE); }
 
-Bullet = < !HorizontalRule NonindentSpace < ('+' | '*' | '-') > Spacechar+ >
+Bullet = !HorizontalRule NonindentSpace < ('+' | '*' | '-') > Spacechar+
          { $$ = add_elem(BULLETLIST); }
 
 BulletList = &Bullet (ListTight | ListLoose)
@@ -113,7 +113,7 @@ ListTight = ( ListItemTight )+
             BlankLine* !(Bullet | Enumerator)
            
 
-ListLoose = ( b:ListItem BlankLine* )+
+ListLoose = ( ListItem BlankLine* )+
            
 
 ListItem =  ( Bullet | Enumerator )
@@ -334,7 +334,7 @@ StyleBlock =    InStyleTags
                 BlankLine*
 
 Inlines  =  ( !Endline Inline
-              | c:Endline &Inline )+ Endline?
+              | Endline &Inline )+ Endline?
            
 
 Inline  = Str
@@ -388,7 +388,7 @@ UlLine   =      "____" '_'* > | < Spacechar '_'+ &Spacechar
 Emph =      EmphStar | EmphUl
 
 OneStarOpen  =  !StarLine '*' !Spacechar !Newline { $$ = elem(NO_TYPE); }
-OneStarClose =  !Spacechar !Newline a:Inline !StrongStar < '*' > { $$ = elem(NO_TYPE); }
+OneStarClose =  !Spacechar !Newline Inline !StrongStar < '*' > { $$ = elem(NO_TYPE); }
 
 EmphStar =  s:OneStarOpen
             ( !OneStarClose Inline )*
@@ -397,7 +397,7 @@ EmphStar =  s:OneStarOpen
            
 
 OneUlOpen  =  !UlLine '_' !Spacechar !Newline { $$ = elem(NO_TYPE); }
-OneUlClose =  !Spacechar !Newline a:Inline !StrongUl < '_' > !Alphanumeric { $$ = elem(NO_TYPE); }
+OneUlClose =  !Spacechar !Newline Inline !StrongUl < '_' > !Alphanumeric { $$ = elem(NO_TYPE); }
 
 EmphUl =    s:OneUlOpen
             ( !OneUlClose Inline )*
@@ -407,7 +407,7 @@ EmphUl =    s:OneUlOpen
 Strong = StrongStar | StrongUl
 
 TwoStarOpen =   !StarLine "**" !Spacechar !Newline { $$ = elem(NO_TYPE); }
-TwoStarClose =  !Spacechar !Newline a:Inline < "**" > { $$ = elem(NO_TYPE); }
+TwoStarClose =  !Spacechar !Newline Inline < "**" > { $$ = elem(NO_TYPE); }
 
 StrongStar =    s:TwoStarOpen
                 ( !TwoStarClose Inline )*
@@ -415,7 +415,7 @@ StrongStar =    s:TwoStarOpen
                 { $$ = add_elem_s(STRONG); }
 
 TwoUlOpen =     !UlLine "__" !Spacechar !Newline { $$ = elem(NO_TYPE); }
-TwoUlClose =    !Spacechar !Newline a:Inline < "__" > !Alphanumeric { $$ = elem(NO_TYPE); }
+TwoUlClose =    !Spacechar !Newline Inline < "__" > !Alphanumeric { $$ = elem(NO_TYPE); }
 
 StrongUl =  s:TwoUlOpen
             ( !TwoUlClose Inline )*
@@ -428,11 +428,11 @@ Link =  ExplicitLink | ReferenceLink | AutoLink
 
 ReferenceLink = ReferenceLinkDouble | ReferenceLinkSingle
 
-ReferenceLinkDouble =  a:Label Spnl !"[]" b:Label
+ReferenceLinkDouble =  Label Spnl !"[]" Label
 
-ReferenceLinkSingle =  a:Label (Spnl "[]")?
+ReferenceLinkSingle =  Label (Spnl "[]")?
 
-ExplicitLink =  l:Label Spnl '(' Sp s:Source Spnl t:Title Sp ')'
+ExplicitLink =  Label Spnl '(' Sp Source Spnl Title Sp ')'
 
 Source  = ( '<' SourceContents '>' | SourceContents )
          
@@ -454,7 +454,7 @@ AutoLinkUrl =   '<' [A-Za-z]+ "://" ( !Newline !'>' . )+ '>'
 
 AutoLinkEmail = '<' [-A-Za-z0-9+_]+ '@' ( !Newline !'>' . )+ '>'
 
-Reference = NonindentSpace !"[]" l:Label ':' Spnl s:RefSrc Spnl t:RefTitle BlankLine*
+Reference = NonindentSpace !"[]" Label ':' Spnl RefSrc Spnl RefTitle BlankLine*
 
 Label = '[' ( !'^' &{ extension(EXT_NOTES) } | &. &{ !extension(EXT_NOTES) } )
         ( !']' Inline )*
@@ -474,7 +474,7 @@ RefTitleDouble = '"' ( !('"' Sp Newline | Newline) . )* '"'
 
 RefTitleParens = '(' ( !(')' Sp Newline | Newline) . )* ')'
 
-References = ( b:Reference | SkipBlock )*
+References = ( Reference | SkipBlock )*
             
 
 Ticks1 = "`" !'`' { $$ = elem(NO_TYPE); }
@@ -556,7 +556,7 @@ SingleQuoteStart = '\'' ![)!\],.;:-? \t\n] !( ( "s" | "t" | "m" | "ve" | "ll" | 
 SingleQuoteEnd = '\'' !Alphanumeric
 
 SingleQuoted = SingleQuoteStart
-               ( !SingleQuoteEnd b:Inline )+
+               ( !SingleQuoteEnd Inline )+
                SingleQuoteEnd
               
 
@@ -565,18 +565,18 @@ DoubleQuoteStart = '"'
 DoubleQuoteEnd = '"'
 
 DoubleQuoted =  DoubleQuoteStart
-                ( !DoubleQuoteEnd b:Inline )+
+                ( !DoubleQuoteEnd Inline )+
                 DoubleQuoteEnd
                
 
 NoteReference = &{ extension(EXT_NOTES) }
-                ref:RawNoteReference
+                RawNoteReference
 
 RawNoteReference = "[^" ( !Newline !']' . )+ ']'
                   
 
 Note =          &{ extension(EXT_NOTES) }
-                NonindentSpace ref:RawNoteReference ':' Sp
+                NonindentSpace RawNoteReference ':' Sp
                 ( RawNoteBlock )
                 ( &Indent RawNoteBlock )*
 
@@ -585,7 +585,7 @@ InlineNote =    &{ extension(EXT_NOTES) }
                 ( !']' Inline )+
                 ']'
 
-Notes =         ( b:Note | SkipBlock )*
+Notes =         ( Note | SkipBlock )*
                
 
 RawNoteBlock =  ( !BlankLine OptionallyIndentedLine )+
