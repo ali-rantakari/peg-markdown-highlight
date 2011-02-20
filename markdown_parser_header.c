@@ -3,6 +3,48 @@
 
 static long parsing_offset = 0;
 
+char *typeName(int type)
+{
+	switch (type)
+	{
+		case NO_TYPE:			 return "NO TYPE"; break;
+		case LIST:               return "LIST"; break;
+		case RAW:                return "RAW"; break;
+		case SPACE:              return "SPACE"; break;
+		case LINEBREAK:          return "LINEBREAK"; break;
+		case ELLIPSIS:           return "ELLIPSIS"; break;
+		case EMDASH:             return "EMDASH"; break;
+		case ENDASH:             return "ENDASH"; break;
+		case APOSTROPHE:         return "APOSTROPHE"; break;
+		case SINGLEQUOTED:       return "SINGLEQUOTED"; break;
+		case DOUBLEQUOTED:       return "DOUBLEQUOTED"; break;
+		case STR:                return "STR"; break;
+		case LINK:               return "LINK"; break;
+		case IMAGE:              return "IMAGE"; break;
+		case CODE:               return "CODE"; break;
+		case HTML:               return "HTML"; break;
+		case EMPH:               return "EMPH"; break;
+		case STRONG:             return "STRONG"; break;
+		case PLAIN:              return "PLAIN"; break;
+		case PARA:               return "PARA"; break;
+		case LISTITEM:           return "LISTITEM"; break;
+		case BULLETLIST:         return "BULLETLIST"; break;
+		case ORDEREDLIST:        return "ORDEREDLIST"; break;
+		case H1:                 return "H1"; break;
+		case H2:                 return "H2"; break;
+		case H3:                 return "H3"; break;
+		case H4:                 return "H4"; break;
+		case H5:                 return "H5"; break;
+		case H6:                 return "H6"; break;
+		case BLOCKQUOTE:         return "BLOCKQUOTE"; break;
+		case VERBATIM:           return "VERBATIM"; break;
+		case HTMLBLOCK:          return "HTMLBLOCK"; break;
+		case HRULE:              return "HRULE"; break;
+		case REFERENCE:          return "REFERENCE"; break;
+		case NOTE:               return "NOTE"; break;
+		default:                 return "?";
+	}
+}
 
 /* extension = returns true if extension is selected */
 bool extension(int ext)
@@ -20,7 +62,7 @@ element * mk_element(int type, long pos, long end)
     result->end = end;
     result->next = NULL;
     
-	printf("  mk_element: %i [%ld - %ld] + %ld\n", type, pos, end, parsing_offset);
+	printf("  mk_element: %i (%s) [%ld - %ld] + %ld\n", type, typeName(type), pos, end, parsing_offset);
 	
     return result;
 }
@@ -42,7 +84,7 @@ void add(element *elem)
     	elem->pos += parsing_offset;
     	elem->end += parsing_offset;
     }
-	printf("  add: %i [%ld - %ld]\n", elem->type, elem->pos, elem->end);
+	printf("  add: %i (%s) [%ld - %ld]\n", elem->type, typeName(elem->type), elem->pos, elem->end);
 }
 
 element * add_element(int type, long pos, long end)

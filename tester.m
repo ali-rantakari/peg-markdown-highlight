@@ -38,6 +38,19 @@ static element * process_raw_blocks2(element *input, int extensions, element *re
 }
 */
 
+void printStr(char *str, int max_chars)
+{
+	char *c = str;
+	int i = max_chars;
+	printf("'");
+	while (i > 0 && *c != EOF)
+	{
+		putchar(*c);
+		i--; c++;
+	}
+	printf("'\n");
+}
+
 element ** process_raw_blocks(char *text, element *elem[], int extensions)
 {
 	while (elem[RAW] != NULL)
@@ -50,7 +63,8 @@ element ** process_raw_blocks(char *text, element *elem[], int extensions)
 			//char *rawtext = malloc((len + 1) * sizeof(char));
 			//strncat(rawtext, text+cursor->pos, len);
 			
-			printf("process: (len %i, pos %ld)\n", len, cursor->pos);
+			printf("process: (len %ld, pos %ld) ", len, cursor->pos);
+			printStr(text+cursor->pos, len);
 			elem = parse_markdown(text+cursor->pos, cursor->pos, len, extensions);
 			
 			//free(rawtext);
