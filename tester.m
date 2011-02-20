@@ -103,7 +103,7 @@ void applyHighlighting(NSMutableAttributedString *attrStr, element *elem[])
 NSAttributedString *highlight(NSString *str)
 {
 	element **result;
-	markdown_to_tree([str UTF8String], &result);
+	markdown_to_tree((char *)[str UTF8String], &result);
 	
 	NSMutableAttributedString *attrStr = [[[NSMutableAttributedString alloc] initWithString:str] autorelease];
 	applyHighlighting(attrStr, result);
@@ -133,7 +133,7 @@ int main(int argc, char * argv[])
 	if (strcmp(argv[1], "-d") == 0)
 	{
 		element **result;
-		markdown_to_tree([contents UTF8String], &result);
+		markdown_to_tree((char *)[contents UTF8String], &result);
 		print_result(result);
 	}
 	else
