@@ -50,7 +50,7 @@ void printStr(char *str, int max_chars)
 	}
 	printf("'\n");
 }
-
+/*
 element ** process_raw_blocks(char *text, element *elem[], int extensions)
 {
 	while (elem[RAW] != NULL)
@@ -83,14 +83,16 @@ void print_raw_blocks(element *elem[])
 		cursor = cursor->next;
 	}
 }
+*/
 
 void markdown_to_tree(char *text, int extensions, element **out[])
 {
-    element **result = parse_markdown(text, 0, -1, extensions);
-    
-    print_raw_blocks(result);
-    result = process_raw_blocks(text, result, extensions);
-	
+	element *parsing_elem = malloc(sizeof(element));
+	parsing_elem->pos = 0;
+	parsing_elem->end = strlen(text)-1;
+	parsing_elem->next = NULL;
+    element **result = parse_markdown(text, parsing_elem, extensions);
+    free(parsing_elem);
     *out = result;
 }
 
@@ -155,7 +157,7 @@ void applyHighlighting(NSMutableAttributedString *attrStr, element *elem[])
 		if (i == RAW)
 			continue;
 		
-		printf("applyHighlighting: %i\n", i);
+		//printf("applyHighlighting: %i\n", i);
 		
 		element *cursor = elem[i];
 		while (cursor != NULL)
@@ -179,7 +181,7 @@ void applyHighlighting(NSMutableAttributedString *attrStr, element *elem[])
 				case BULLETLIST:fgColor = [NSColor magentaColor]; break;
 			}
 			
-			printf("  %i-%i\n", cursor->pos, cursor->end);
+			//printf("  %i-%i\n", cursor->pos, cursor->end);
 			if (fgColor != nil)
 				[attrStr
 					addAttribute:NSForegroundColorAttributeName

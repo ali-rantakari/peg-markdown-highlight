@@ -1,8 +1,6 @@
 
 #include "markdown_parser.h"
 
-static long parsing_offset = 0;
-
 char *typeName(int type)
 {
 	switch (type)
@@ -62,7 +60,7 @@ element * mk_element(int type, long pos, long end)
     result->end = end;
     result->next = NULL;
     
-	printf("  mk_element: %i (%s) [%ld - %ld] + %ld\n", type, typeName(type), pos, end, parsing_offset);
+	printf("  mk_element: %i (%s) [%ld - %ld]\n", type, typeName(type), pos, end);
 	
     return result;
 }
@@ -79,11 +77,6 @@ void add(element *elem)
 		head_elements[elem->type] = elem;
 	}
 	
-    if (elem->type != NO_TYPE)
-    {
-    	elem->pos += parsing_offset;
-    	elem->end += parsing_offset;
-    }
 	printf("  add: %i (%s) [%ld - %ld]\n", elem->type, typeName(elem->type), elem->pos, elem->end);
 }
 
@@ -101,9 +94,12 @@ void add_raw(long pos, long end)
 
 
 
-static bool useCounter = false;
-static int counter = 0;
 static char *charbuf = "";     /* Buffer of characters to be parsed. */
+
+// linked list of (start, end) offset pairs determining which parts
+// of charbuf to parse
+static element *p_elem;
+static int p_offset; // current parsing offset
 
 /**********************************************************************
 
@@ -120,15 +116,30 @@ static char *charbuf = "";     /* Buffer of characters to be parsed. */
 
 #define YY_INPUT(buf, result, max_size)              \
 {                                                    \
+    if (p_elem == NULL) {              \
+    	result = 0;                    \
+    } else {                           \
+    	*(buf) = *(charbuf+p_offset);  \
+    	result = 1;                    \
+		p_offset++;                    \
+		if (p_offset > p_elem->end) {  \
+			p_elem = p_elem->next;     \
+			if (p_elem != NULL) p_offset = p_elem->pos;\
+		}                              \
+	}                                  \
+}
+
+/*
+#define YY_INPUT(buf, result, max_size)              \
+{                                                    \
     int yyc;                                         \
-    if ((!useCounter || counter > 0) && charbuf && *charbuf != '\0') {               \
+    if (charbuf && *charbuf != '\0') {               \
         yyc= *charbuf++;                             \
     } else {                                         \
         yyc= EOF;                                    \
     }                                                \
     result= (EOF == yyc) ? 0 : (*(buf)= yyc, 1);     \
-    if (useCounter) counter--;\
 }
-
+*/
 
 

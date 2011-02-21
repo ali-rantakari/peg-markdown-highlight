@@ -27,6 +27,7 @@
 #define add_elem(x)		add_element(x, yystartoffset, yyendoffset)
 #define add_elem_s(x)	add_element(x, s->pos, yyendoffset)
 #define add_this_raw	add_raw(yystartoffset, yyendoffset)
+#define add_raw_ss		add_raw($$->pos, $$->end)
 
 %}
 
@@ -124,7 +125,6 @@ ListItem =  ( Bullet | Enumerator )
             < s:LocMarker
             ListBlock
             ( ListContinuationBlock )* >
-            { add_raw(s->pos, yyendoffset); }
 
 ListItemTight =
             ( Bullet | Enumerator )
@@ -133,7 +133,6 @@ ListItemTight =
             ( !BlankLine
               ListContinuationBlock )*
             !ListContinuationBlock >
-            { add_raw(s->pos, yyendoffset); }
 
 ListBlock = !BlankLine Line
             ( ListBlockLine )*
