@@ -4,7 +4,7 @@ int yyparse(void);
 
 element ** parse_markdown(char *string, element *elem, int extensions)
 {
-	p_elem = elem;
+	p_elem_head = p_elem = elem;
 	p_offset = elem->pos;
 	
     char *oldcharbuf;

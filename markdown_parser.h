@@ -55,6 +55,7 @@ struct Element
     long              pos;
     long              end;
     struct Element    *next;
+    struct Element    *children;
 };
 typedef struct Element element;
 

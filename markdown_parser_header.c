@@ -1,6 +1,16 @@
 
 #include "markdown_parser.h"
 
+
+static char *charbuf = "";     /* Buffer of characters to be parsed. */
+
+// linked list of (start, end) offset pairs determining which parts
+// of charbuf to parse
+static element *p_elem;
+static element *p_elem_head;
+static int p_offset; // current parsing offset
+
+
 char *typeName(int type)
 {
 	switch (type)
@@ -65,6 +75,32 @@ element * mk_element(int type, long pos, long end)
     return result;
 }
 
+
+void fixOffsets(element *elem)
+{
+	int new_pos = -1;
+	int new_end = -1;
+	
+	int c = 0;
+	element *cursor = p_elem_head;
+	while (cursor != NULL)
+	{
+		int thislen = cursor->end - cursor->pos;
+		
+		if (new_pos == -1 && (c <= elem->pos < c+thislen))
+			new_pos = cursor->pos + (elem->pos - c);
+		if (new_end == -1 && (c <= elem->end < c+thislen))
+			new_end = cursor->pos + (elem->end - c);
+		
+		c += thislen;
+		cursor = cursor->next;
+	}
+	
+	elem->pos = new_pos;
+	elem->end = new_end;
+}
+
+
 element* head_elements[33];
 
 void add(element *elem)
@@ -78,6 +114,8 @@ void add(element *elem)
 	}
 	
 	printf("  add: %i (%s) [%ld - %ld]\n", elem->type, typeName(elem->type), elem->pos, elem->end);
+	fixOffsets(elem);
+	printf("     : %i (%s) [%ld - %ld]\n", elem->type, typeName(elem->type), elem->pos, elem->end);
 }
 
 element * add_element(int type, long pos, long end)
@@ -94,12 +132,6 @@ void add_raw(long pos, long end)
 
 
 
-static char *charbuf = "";     /* Buffer of characters to be parsed. */
-
-// linked list of (start, end) offset pairs determining which parts
-// of charbuf to parse
-static element *p_elem;
-static int p_offset; // current parsing offset
 
 /**********************************************************************
 
