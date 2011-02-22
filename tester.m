@@ -191,6 +191,8 @@ void print_result(element *elem[])
 				case DOUBLEQUOTED:       typeStr = "DOUBLEQUOTED"; break;
 				case STR:                typeStr = "STR"; break;
 				case LINK:               typeStr = "LINK"; break;
+				case AUTO_LINK_URL:      typeStr = "AUTO_LINK_URL"; break;
+				case AUTO_LINK_EMAIL:    typeStr = "AUTO_LINK_EMAIL"; break;
 				case IMAGE:              typeStr = "IMAGE"; break;
 				case CODE:               typeStr = "CODE"; break;
 				case HTML:               typeStr = "HTML"; break;
@@ -256,6 +258,8 @@ void applyHighlighting(NSMutableAttributedString *attrStr, element *elem[])
 				case HRULE:		fgColor = [NSColor cyanColor]; break;
 				case ORDEREDLIST:
 				case BULLETLIST:fgColor = [NSColor magentaColor]; break;
+				case AUTO_LINK_EMAIL:
+				case AUTO_LINK_URL:fgColor = [NSColor cyanColor]; break;
 			}
 			
 			//printf("  %i-%i\n", cursor->pos, cursor->end);
