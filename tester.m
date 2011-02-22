@@ -85,6 +85,29 @@ void print_raw_blocks(element *elem[])
 }
 */
 
+void removeZeroLengthSpans(element *elem)
+{
+	element *parent = NULL;
+	element *c = elem;
+	while (c != NULL)
+	{
+		if (c->pos >= c->end) {
+			if (parent != NULL) {
+				parent->next = c->next;
+			} else {
+				elem = c->next;
+			}
+			element *oldc = c;
+			parent = c;
+			c = c->next;
+			free(oldc);
+			continue;
+		}
+		parent = c;
+		c = c->next;
+	}
+}
+
 element ** process_raw_blocks(char *text, element *elem[], int extensions)
 {
 	printf("--------process_raw_blocks---------\n");
@@ -95,6 +118,8 @@ element ** process_raw_blocks(char *text, element *elem[], int extensions)
 		elem[RAW_LIST] = NULL;
 		while (cursor != NULL)
 		{
+			removeZeroLengthSpans(cursor->children);
+			
 			printf("  process: ");
 			element *cur = cursor->children;
 			while (cur != NULL) {
