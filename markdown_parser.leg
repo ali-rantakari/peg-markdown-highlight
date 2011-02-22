@@ -97,8 +97,9 @@ VerbatimChunk = ( BlankLine )*
                 ( NonblankIndentedLine )+
                
 
-Verbatim =     < ( VerbatimChunk )+ >
-                 { add_elem(VERBATIM); }
+Verbatim =     < s:LocMarker
+				 ( VerbatimChunk )+ >
+                 { add_elem_s(VERBATIM); }
 
 HorizontalRule = < NonindentSpace
                  ( '*' Sp '*' Sp '*' (Sp '*')*
