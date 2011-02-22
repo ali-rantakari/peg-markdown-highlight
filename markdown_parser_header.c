@@ -206,12 +206,13 @@ void add_raw(long pos, long end)
     	*(buf) = *(charbuf+p_offset);  \
     	result = 1;                    \
 		p_offset++;                    \
-		if (p_offset > p_elem->end) {  \
+		printf("\e[43;30m"); putchar(*buf); printf("\e[0m");\
+		if (p_offset >= p_elem->end) {  \
 			p_elem = p_elem->next;     \
+			printf("\e[41m \e[0m");\
 			if (p_elem != NULL) p_offset = p_elem->pos;\
 		}                              \
 	}                                  \
-	if (result != 0) { printf("\e[43;30m"); putchar(*buf); printf("\e[0m"); }\
 }
 
 /*
