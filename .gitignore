@@ -1,4 +1,5 @@
 *.o
+*.log
 peg/leg
 peg/peg
 markdown_parser.c
