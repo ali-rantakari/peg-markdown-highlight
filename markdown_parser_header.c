@@ -119,7 +119,7 @@ element * mk_element(int type, long pos, long end)
     result->end = end;
     result->next = NULL;
     
-	printf("  mk_element: %s [%ld - %ld]\n", typeName(type), pos, end);
+	MKD_PRINTF("  mk_element: %s [%ld - %ld]\n", typeName(type), pos, end);
 	
     return result;
 }
@@ -186,20 +186,20 @@ void add(element *elem)
 	// > text HIGHLIGHTING
 	// > CONTINUES text
 	if (elem->type != RAW_LIST) {
-		printf("  add: %s [%ld - %ld]\n", typeName(elem->type), elem->pos, elem->end);
+		MKD_PRINTF("  add: %s [%ld - %ld]\n", typeName(elem->type), elem->pos, elem->end);
 		fixOffsets(elem);
-		printf("     : %s [%ld - %ld]\n", typeName(elem->type), elem->pos, elem->end);
+		MKD_PRINTF("     : %s [%ld - %ld]\n", typeName(elem->type), elem->pos, elem->end);
 	}
 	else {
-		printf("  add: RAW_LIST ");
+		MKD_PRINTF("  add: RAW_LIST ");
 		element *cursor = elem->children;
 		while (cursor != NULL) {
-			printf("(%ld-%ld)>", cursor->pos, cursor->end);
+			MKD_PRINTF("(%ld-%ld)>", cursor->pos, cursor->end);
 			fixOffsets(cursor);
-			printf("(%ld-%ld) ", cursor->pos, cursor->end);
+			MKD_PRINTF("(%ld-%ld) ", cursor->pos, cursor->end);
 			cursor = cursor->next;
 		}
-		printf("\n");
+		MKD_PRINTF("\n");
 	}
 }
 
@@ -248,12 +248,12 @@ element * mk_etext(char *string)
     		int yyc;\
     		if (p_elem->text && *p_elem->text != '\0') {\
     			yyc = *p_elem->text++;\
-				printf("\e[47;30m"); putchar(yyc); printf("\e[0m");\
-				if (yyc == '\n') printf("\e[47m \e[0m");\
+				MKD_PRINTF("\e[47;30m"); MKD_PUTCHAR(yyc); MKD_PRINTF("\e[0m");\
+				if (yyc == '\n') MKD_PRINTF("\e[47m \e[0m");\
     		} else {\
     			yyc = EOF;\
     			p_elem = p_elem->next;\
-				printf("\e[41m \e[0m");\
+				MKD_PRINTF("\e[41m \e[0m");\
 				if (p_elem != NULL) p_offset = p_elem->pos;\
     		}\
     		result = (EOF == yyc) ? 0 :(*(buf) = yyc, 1);\
@@ -261,11 +261,11 @@ element * mk_etext(char *string)
     		*(buf) = *(charbuf+p_offset);  \
 			result = 1;                    \
 			p_offset++;                    \
-			printf("\e[43;30m"); putchar(*buf); printf("\e[0m");\
-			if (*buf == '\n') printf("\e[42m \e[0m");\
+			MKD_PRINTF("\e[43;30m"); MKD_PUTCHAR(*buf); MKD_PRINTF("\e[0m");\
+			if (*buf == '\n') MKD_PRINTF("\e[42m \e[0m");\
 			if (p_offset >= p_elem->end) {  \
 				p_elem = p_elem->next;     \
-				printf("\e[41m \e[0m");\
+				MKD_PRINTF("\e[41m \e[0m");\
 				if (p_elem != NULL) p_offset = p_elem->pos;\
 			}                              \
 		} \

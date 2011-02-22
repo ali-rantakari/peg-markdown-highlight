@@ -89,7 +89,6 @@ BlockQuote = a:BlockQuoteRaw
             { element *rawlist = mk_element(RAW_LIST, 0,0);
               rawlist->children = reverse(a);
               add(rawlist);
-              printf("BLOCKQUOTE\n");
             }
 
 BlockQuoteRaw =  a:StartList
@@ -136,7 +135,6 @@ ListTight = a:StartList
 				  add(rawlist);
 				  cur = cur->next;
               }
-              printf("TIGHT\n");
             }
 
 ListLoose = a:StartList
@@ -153,7 +151,6 @@ ListLoose = a:StartList
 				  add(rawlist);
 				  cur = cur->next;
               }
-              printf("LOOSE\n");
             }
 
 ListItem =  ( Bullet | Enumerator )
@@ -175,8 +172,7 @@ ListItemTight =
 ListBlock = a:StartList
             !BlankLine Line { a = cons($$, a); }
             ( ListBlockLine { a = cons(elem(RAW), a); } )*
-            { $$ = a;
-            }
+            { $$ = a; }
 
 ListContinuationBlock = a:StartList
                         ( < BlankLine* >
@@ -186,8 +182,7 @@ ListContinuationBlock = a:StartList
                             	a = cons(elem(RAW), a);
                           } )
                         ( Indent ListBlock { a = cons($$, a); } )+
-						{ $$ = a;
-						}
+						{ $$ = a; }
 
 Enumerator = NonindentSpace < [0-9]+ '.' > Spacechar+
              { add_elem(ORDEREDLIST); }

@@ -42,13 +42,13 @@ void printStr(char *str, int max_chars)
 {
 	char *c = str;
 	int i = max_chars;
-	printf("'");
+	MKD_PRINTF("'");
 	while (i > 0 && *c != EOF)
 	{
 		putchar(*c);
 		i--; c++;
 	}
-	printf("'\n");
+	MKD_PRINTF("'\n");
 }
 /*
 element ** process_raw_blocks(char *text, element *elem[], int extensions)
@@ -63,7 +63,7 @@ element ** process_raw_blocks(char *text, element *elem[], int extensions)
 			//char *rawtext = malloc((len + 1) * sizeof(char));
 			//strncat(rawtext, text+cursor->pos, len);
 			
-			printf("process: (len %ld, pos %ld) ", len, cursor->pos);
+			MKD_PRINTF("process: (len %ld, pos %ld) ", len, cursor->pos);
 			printStr(text+cursor->pos, len);
 			elem = parse_markdown(text+cursor->pos, cursor->pos, len, extensions);
 			
@@ -79,7 +79,7 @@ void print_raw_blocks(element *elem[])
 	element *cursor = elem[RAW];
 	while (cursor != NULL)
 	{
-		printf("raw: [%ld - %ld]\n", cursor->pos, cursor->end);
+		MKD_PRINTF("raw: [%ld - %ld]\n", cursor->pos, cursor->end);
 		cursor = cursor->next;
 	}
 }
@@ -114,16 +114,16 @@ void removeZeroLengthSpans(element *elem)
 void printStrEscapes(char *str)
 {
 	char *c = str;
-	printf("'");
+	MKD_PRINTF("'");
 	while (*c != '\0')
 	{
-		if (*c == '\n')			printf("\\n");
-		else if (*c == '\e')	printf("\\e");
-		else if (*c == '\t')	printf("\\t");
+		if (*c == '\n')			MKD_PRINTF("\\n");
+		else if (*c == '\e')	MKD_PRINTF("\\e");
+		else if (*c == '\t')	MKD_PRINTF("\\t");
 		else putchar(*c);
 		c++;
 	}
-	printf("'");
+	MKD_PRINTF("'");
 }
 
 void printSpansInline(element *elem)
@@ -131,22 +131,22 @@ void printSpansInline(element *elem)
 	element *cur = elem;
 	while (cur != NULL) {
 		if (cur->type == SEPARATOR)
-			printf("<SEP %ld> ", cur->pos);
+			MKD_PRINTF("<SEP %ld> ", cur->pos);
 		else if (cur->type == EXTRA_TEXT) {
-			printf("{ETEXT "); printStrEscapes(cur->text); printf("}");
+			MKD_PRINTF("{ETEXT "); printStrEscapes(cur->text); MKD_PRINTF("}");
 		}
 		else
-			printf("(%ld-%ld) ", cur->pos, cur->end);
+			MKD_PRINTF("(%ld-%ld) ", cur->pos, cur->end);
 		cur = cur->next;
 	}
 }
 
 element ** process_raw_blocks(char *text, element *elem[], int extensions)
 {
-	printf("--------process_raw_blocks---------\n");
+	MKD_PRINTF("--------process_raw_blocks---------\n");
 	while (elem[RAW_LIST] != NULL)
 	{
-		printf("new iteration.\n");
+		MKD_PRINTF("new iteration.\n");
 		element *cursor = elem[RAW_LIST];
 		elem[RAW_LIST] = NULL;
 		while (cursor != NULL)
@@ -155,11 +155,13 @@ element ** process_raw_blocks(char *text, element *elem[], int extensions)
 			
 			removeZeroLengthSpans(span_list);
 			
-			printf("  process: "); printSpansInline(span_list); printf("\n");
+			#if MKD_DEBUG_OUTPUT
+			MKD_PRINTF("  process: "); printSpansInline(span_list); MKD_PRINTF("\n");
+			#endif
 			
 			while (span_list != NULL)
 			{
-				printf("next: span_list: %ld-%ld\n", span_list->pos, span_list->end);
+				MKD_PRINTF("next: span_list: %ld-%ld\n", span_list->pos, span_list->end);
 				
 				element *subspan_list = span_list;
 				element *previous = NULL;
@@ -172,10 +174,12 @@ element ** process_raw_blocks(char *text, element *elem[], int extensions)
 					previous->next = NULL;
 				}
 				
-				printf("    subspan process: "); printSpansInline(subspan_list); printf("\n");
+				#if MKD_DEBUG_OUTPUT
+				MKD_PRINTF("    subspan process: "); printSpansInline(subspan_list); MKD_PRINTF("\n");
+				#endif
 				
 				parse_markdown(text, subspan_list, extensions);
-				printf("parse over\n");
+				MKD_PRINTF("parse over\n");
 			}
 			
 			
@@ -187,8 +191,8 @@ element ** process_raw_blocks(char *text, element *elem[], int extensions)
 
 void print_raw_blocks(char *text, element *elem[])
 {
-	printf("--------print_raw_blocks---------\n");
-	printf("block:\n");
+	MKD_PRINTF("--------print_raw_blocks---------\n");
+	MKD_PRINTF("block:\n");
 	element *cursor = elem[RAW_LIST];
 	while (cursor != NULL)
 	{
@@ -206,7 +210,10 @@ void markdown_to_tree(char *text, int extensions, element **out[])
     element **result = parse_markdown(text, parsing_elem, extensions);
     free(parsing_elem);
     
+    #if MKD_DEBUG_OUTPUT
     print_raw_blocks(text, result);
+    #endif
+    
     result = process_raw_blocks(text, result, extensions);
     
     *out = result;
@@ -262,7 +269,7 @@ void print_result(element *elem[])
 				case NOTE:               typeStr = "NOTE"; break;
 				default:                 typeStr = "?";
 			}
-            fprintf(stderr, "[%ld-%ld] 0x%x: %s\n", cursor->pos, cursor->end, (int)cursor, typeStr);
+            MKD_PRINTF("[%ld-%ld] 0x%x: %s\n", cursor->pos, cursor->end, (int)cursor, typeStr);
 			
 			cursor = cursor->next;
 		}
@@ -308,7 +315,7 @@ void applyHighlighting(NSMutableAttributedString *attrStr, element *elem[])
 	
 	for (int i = 0; i < 34; i++)
 	{
-		//printf("applyHighlighting: %i\n", i);
+		//MKD_PRINTF("applyHighlighting: %i\n", i);
 		
 		element *cursor = elem[order[i]];
 		while (cursor != NULL)
@@ -345,7 +352,7 @@ void applyHighlighting(NSMutableAttributedString *attrStr, element *elem[])
 								fgColor = [NSColor magentaColor]; break;
 			}
 			
-			//printf("  %i-%i\n", cursor->pos, cursor->end);
+			//MKD_PRINTF("  %i-%i\n", cursor->pos, cursor->end);
 			if (fgColor != nil || bgColor != nil) {
 				int rangePos = MIN(MAX(cursor->pos, 0), sourceLength);
 				int len = cursor->end - cursor->pos;

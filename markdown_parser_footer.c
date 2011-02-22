@@ -13,13 +13,13 @@ element ** parse_markdown(char *string, element *elem, int extensions)
     charbuf = string;
     
     yybuflen = 0;
-    printf("\n");
-    printf("(starting at %i -- yybuflen:%i yypos:%i)\n", p_offset, yybuflen, yypos);
-    printf("PARSER: ");
+    MKD_PRINTF("\n");
+    MKD_PRINTF("(starting at %i -- yybuflen:%i yypos:%i)\n", p_offset, yybuflen, yypos);
+    MKD_PRINTF("PARSER: ");
     
     yyparsefrom(yy_Doc);
     
-    printf("\n\n");
+    MKD_PRINTF("\n\n");
     
     charbuf = oldcharbuf;          /* restore charbuf to original value */
     return head_elements;

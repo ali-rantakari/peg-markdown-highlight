@@ -11,7 +11,7 @@ $(LEG):
 markdown_parser.c : markdown_parser.leg $(LEG) markdown_parser_header.c markdown_parser_footer.c
 	$(LEG) -o $@ $<
 
-$(TEST_PROGRAM) : tester.m markdown_parser.c
+$(TEST_PROGRAM) : tester.m markdown_parser.c markdown_parser.h
 	clang $(CFLAGS) -o $@ markdown_parser.c ANSIEscapeHelper.m $<
 
 .PHONY: clean test
