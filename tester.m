@@ -199,9 +199,11 @@ void print_result(element *elem[])
 
 void applyHighlighting(NSMutableAttributedString *attrStr, element *elem[])
 {
+	int sourceLength = [attrStr length];
+	
 	for (int i = 0; i < 34; i++)
 	{
-		if (i == RAW)
+		if (i == RAW_LIST)
 			continue;
 		
 		//printf("applyHighlighting: %i\n", i);
@@ -209,6 +211,9 @@ void applyHighlighting(NSMutableAttributedString *attrStr, element *elem[])
 		element *cursor = elem[i];
 		while (cursor != NULL)
 		{
+			if (cursor->end <= cursor->pos)
+				goto next;
+			
 			NSColor *fgColor = nil;
 			
 			switch (cursor->type)
@@ -229,13 +234,20 @@ void applyHighlighting(NSMutableAttributedString *attrStr, element *elem[])
 			}
 			
 			//printf("  %i-%i\n", cursor->pos, cursor->end);
-			if (fgColor != nil)
+			if (fgColor != nil) {
+				int rangePos = MIN(MAX(cursor->pos, 0), sourceLength);
+				int len = cursor->end - cursor->pos;
+				if (rangePos+len > sourceLength)
+					len = sourceLength-rangePos;
+				NSRange range = NSMakeRange(rangePos, len);
 				[attrStr
 					addAttribute:NSForegroundColorAttributeName
 					value:fgColor
-					range:NSMakeRange(cursor->pos, cursor->end - cursor->pos)
+					range:range
 					];
+			}
 			
+			next:
 			cursor = cursor->next;
 		}
 	}
