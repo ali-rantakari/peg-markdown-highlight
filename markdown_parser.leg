@@ -507,7 +507,7 @@ AutoLink = AutoLinkUrl | AutoLinkEmail
 AutoLinkUrl =  < s:LocMarker '<' [A-Za-z]+ "://" ( !Newline !'>' . )+ '>' >
                { add_elem_s(AUTO_LINK_URL); }
 
-AutoLinkEmail = < s:LocMarker '<' [-A-Za-z0-9+_]+ '@' ( !Newline !'>' . )+ '>' >
+AutoLinkEmail = < s:LocMarker '<' [-A-Za-z0-9+_.]+ '@' ( !Newline !'>' . )+ '>' >
                 { add_elem_s(AUTO_LINK_EMAIL); }
 
 Reference = NonindentSpace !"[]" Label ':' Spnl RefSrc Spnl RefTitle BlankLine*
