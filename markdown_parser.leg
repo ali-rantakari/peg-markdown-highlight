@@ -26,8 +26,7 @@
 #define elem(x)			mk_element(x, yystartoffset, yyendoffset)
 #define add_elem(x)		add_element(x, yystartoffset, yyendoffset)
 #define add_elem_s(x)	add_element(x, s->pos, yyendoffset)
-#define add_this_raw	add_raw(yystartoffset, yyendoffset)
-#define add_raw_ss		add_raw($$->pos, $$->end)
+
 
 %}
 
@@ -114,33 +113,81 @@ Bullet = !HorizontalRule NonindentSpace < ('+' | '*' | '-') > Spacechar+
 BulletList = &Bullet (ListTight | ListLoose)
             
 
-ListTight = ( ListItemTight )+
+ListTight = a:StartList
+            ( ListItemTight { a = cons($$, a); } )+
             BlankLine* !(Bullet | Enumerator)
-           
+            { element *rawlist = mk_element(RAW, 0,0);
+              rawlist->children = reverse(a);
+              add(rawlist);
+              printf("TIGHT\n");
+            }
 
-ListLoose = ( ListItem BlankLine* )+
-           
+ListLoose = a:StartList
+            ( b:ListItem BlankLine*
+              { a = cons(b, a); 
+              } )+
+            { element *rawlist = mk_element(RAW, 0,0);
+              rawlist->children = reverse(a);
+              add(rawlist);
+              
+              element *c = rawlist->children;
+              while (c != NULL) {
+              	printf("    listloose a: %ld - %ld\n", c->pos, c->end);
+              	c = c->next;
+              }
+              
+              printf("LOOSE\n");
+            }
 
 ListItem =  ( Bullet | Enumerator )
-            < s:LocMarker
-            ListBlock
-            ( ListContinuationBlock )* >
+            a:StartList
+            ListBlock { a = cons($$, a); }
+            ( ListContinuationBlock { a = cons($$, a); } )*
+            { $$ = a;
+              
+              element *c = $$;
+              while (c != NULL) {
+              	printf("    listitem a: %ld - %ld\n", c->pos, c->end);
+              	c = c->next;
+              }
+              
+            }
 
 ListItemTight =
             ( Bullet | Enumerator )
-            < s:LocMarker
-            ListBlock
+            a:StartList
+            ListBlock { a = cons($$, a); }
             ( !BlankLine
-              ListContinuationBlock )*
-            !ListContinuationBlock >
+              ListContinuationBlock { a = cons($$, a); } )*
+            !ListContinuationBlock
+            { $$ = a; }
 
-ListBlock = !BlankLine Line
-            ( ListBlockLine )*
-           
+ListBlock = a:StartList
+            !BlankLine Line { a = cons($$, a); }
+            ( ListBlockLine { a = cons(elem(RAW), a); } )*
+            { $$ = a;
+              
+              element *c = $$;
+              while (c != NULL) {
+              	printf("    listblock a: %ld - %ld\n", c->pos, c->end);
+              	c = c->next;
+              }
+              
+            }
 
-ListContinuationBlock = ( BlankLine* )
-                        ( Indent ListBlock )+
-                       
+ListContinuationBlock = a:StartList
+                        ( < BlankLine* >
+                          { a = cons(elem(RAW), a); } )
+                        ( Indent ListBlock { a = cons($$, a); } )+
+						{ $$ = a;
+						  
+						  element *c = $$;
+						  while (c != NULL) {
+							printf("    listcont.block a: %ld - %ld\n", c->pos, c->end);
+							c = c->next;
+						  }
+						  
+						}
 
 Enumerator = NonindentSpace < [0-9]+ '.' > Spacechar+
              { add_elem(ORDEREDLIST); }
@@ -528,10 +575,14 @@ Indent =            "\t" | "    "
 IndentedLine =      Indent Line
 OptionallyIndentedLine = Indent? Line
 
+# StartList starts a list data structure that can be added to with cons:
+StartList = &.
+            { $$ = NULL; }
 
 Line =  RawLine
-       
-RawLine = ( (!'\r' !'\n' .)* Newline | .+ Eof )
+       { $$ = elem(RAW); }
+
+RawLine = ( < (!'\r' !'\n' .)* Newline > | < .+ > Eof )
 
 SkipBlock = ( !BlankLine RawLine )+ BlankLine*
           | BlankLine+

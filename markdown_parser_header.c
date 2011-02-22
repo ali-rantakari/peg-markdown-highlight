@@ -61,6 +61,54 @@ bool extension(int ext)
 }
 
 
+/* cons - cons an element onto a list, returning pointer to new head */
+static element * cons(element *new, element *list) {
+    assert(new != NULL);
+    
+    int c = 1;
+    element *cur = new;
+    while (cur->next != NULL) {
+    	cur = cur->next;
+    	c++;
+    }
+    cur->next = list;
+    printf("  cons: added %i to list. result: ", c);
+    cur = new;
+    while (cur != NULL) {
+    	printf("(%ld-%ld) ", cur->pos, cur->end);
+    	cur = cur->next;
+    }
+    printf("\n");
+    
+    return new;
+}
+
+/* reverse - reverse a list, returning pointer to new list */
+static element *reverse(element *list) {
+	/*
+    element *new = NULL;
+    element *next = NULL;
+    while (list != NULL) {
+        next = list->next;
+        new = cons(list, new);
+        list = next;
+    }
+    return new;
+    */
+    element *new = NULL;
+    element *next = NULL;
+    while (list != NULL) {
+    	next = list->next;
+    	list->next = new;
+    	new = list;
+    	list = next;
+    }
+    return new;
+}
+
+
+
+
 /* mk_element - generic constructor for element */
 element * mk_element(int type, long pos, long end)
 {
@@ -70,7 +118,7 @@ element * mk_element(int type, long pos, long end)
     result->end = end;
     result->next = NULL;
     
-	printf("  mk_element: %i (%s) [%ld - %ld]\n", type, typeName(type), pos, end);
+	printf("  mk_element: %s [%ld - %ld]\n", typeName(type), pos, end);
 	
     return result;
 }
@@ -91,6 +139,9 @@ void fixOffsets(element *elem)
 			new_pos = cursor->pos + (elem->pos - c);
 		if (new_end == -1 && (c <= elem->end < c+thislen))
 			new_end = cursor->pos + (elem->end - c);
+		
+		if (new_pos != -1 && new_end != -1)
+			break;
 		
 		c += thislen;
 		cursor = cursor->next;
@@ -113,9 +164,10 @@ void add(element *elem)
 		head_elements[elem->type] = elem;
 	}
 	
-	printf("  add: %i (%s) [%ld - %ld]\n", elem->type, typeName(elem->type), elem->pos, elem->end);
+	printf("  add: %s [%ld - %ld]\n", typeName(elem->type), elem->pos, elem->end);
+	// TODO: split into parts instead of just fixing offsets
 	fixOffsets(elem);
-	printf("     : %i (%s) [%ld - %ld]\n", elem->type, typeName(elem->type), elem->pos, elem->end);
+	printf("     : %s [%ld - %ld]\n", typeName(elem->type), elem->pos, elem->end);
 }
 
 element * add_element(int type, long pos, long end)

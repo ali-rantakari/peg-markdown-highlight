@@ -87,6 +87,7 @@ void print_raw_blocks(element *elem[])
 
 element ** process_raw_blocks(char *text, element *elem[], int extensions)
 {
+	printf("--------process_raw_blocks---------\n");
 	while (elem[RAW] != NULL)
 	{
 		element *cursor = elem[RAW];
@@ -94,7 +95,28 @@ element ** process_raw_blocks(char *text, element *elem[], int extensions)
 		while (cursor != NULL)
 		{
 			element **result = parse_markdown(text, cursor->children, extensions);
-			
+			cursor = cursor->next;
+		}
+	}
+	return elem;
+}
+
+element ** print_raw_blocks(char *text, element *elem[])
+{
+	printf("--------print_raw_blocks---------\n");
+	while (elem[RAW] != NULL)
+	{
+		printf("block:\n");
+		element *cursor = elem[RAW];
+		elem[RAW] = NULL;
+		while (cursor != NULL)
+		{
+			element *child = cursor->children;
+			while (child != NULL)
+			{
+				printf("  [%ld - %ld]\n", child->pos, child->end);
+				child = child->next;
+			}
 			cursor = cursor->next;
 		}
 	}
@@ -110,6 +132,7 @@ void markdown_to_tree(char *text, int extensions, element **out[])
     element **result = parse_markdown(text, parsing_elem, extensions);
     free(parsing_elem);
     
+    print_raw_blocks(text, result);
     result = process_raw_blocks(text, result, extensions);
     
     *out = result;
