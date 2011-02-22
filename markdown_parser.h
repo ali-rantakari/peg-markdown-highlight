@@ -16,6 +16,7 @@ enum types
 {
 	NO_TYPE,
 	SEPARATOR,
+	EXTRA_TEXT,
 	LIST,   /* A generic list of values.  For ordered and bullet lists, see below. */
 	RAW_LIST,
 	RAW,    /* Raw markdown to be processed further */
@@ -59,6 +60,7 @@ struct Element
     int               type;
     long              pos;
     long              end;
+    char              *text;
     struct Element    *next;
     struct Element    *children;
 };

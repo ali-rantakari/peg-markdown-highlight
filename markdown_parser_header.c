@@ -16,6 +16,7 @@ char *typeName(int type)
 	switch (type)
 	{
 		case SEPARATOR:			 return "SEPARATOR"; break;
+		case EXTRA_TEXT:		 return "EXTRA_TEXT"; break;
 		case NO_TYPE:			 return "NO TYPE"; break;
 		case LIST:               return "LIST"; break;
 		case RAW_LIST:			 return "RAW_LIST"; break;
@@ -64,39 +65,37 @@ bool extension(int ext)
 
 
 /* cons - cons an element onto a list, returning pointer to new head */
-static element * cons(element *new, element *list) {
+static element * cons(element *new, element *list)
+{
     assert(new != NULL);
     
-    int c = 1;
     element *cur = new;
     while (cur->next != NULL) {
     	cur = cur->next;
-    	c++;
     }
     cur->next = list;
-    printf("  cons: added %i to list. result: ", c);
-    cur = new;
-    while (cur != NULL) {
-    	printf("(%ld-%ld) ", cur->pos, cur->end);
-    	cur = cur->next;
-    }
-    printf("\n");
     
     return new;
 }
 
-/* reverse - reverse a list, returning pointer to new list */
-static element *reverse(element *list) {
-	/*
-    element *new = NULL;
-    element *next = NULL;
-    while (list != NULL) {
-        next = list->next;
-        new = cons(list, new);
-        list = next;
+// add to end
+element * conc(element *new, element *list)
+{
+    if (list == NULL) {
+    	list = new;
+    } else {
+		element *cur = list;
+		while (cur->next != NULL)
+			cur = cur->next;
+		cur->next = new;
     }
-    return new;
-    */
+    return list;
+}
+
+
+/* reverse - reverse a list, returning pointer to new list */
+static element *reverse(element *list)
+{
     element *new = NULL;
     element *next = NULL;
     while (list != NULL) {
@@ -128,24 +127,38 @@ element * mk_element(int type, long pos, long end)
 
 void fixOffsets(element *elem)
 {
+	if (elem->type == EXTRA_TEXT)
+		return;
+	
 	int new_pos = -1;
 	int new_end = -1;
 	
+	int previous_end = 0;
 	int c = 0;
 	element *cursor = p_elem_head;
 	while (cursor != NULL)
 	{
-		int thislen = cursor->end - cursor->pos;
+		int thislen = (cursor->type == EXTRA_TEXT)
+						? strlen(cursor->text)
+						: cursor->end - cursor->pos;
 		
-		if (new_pos == -1 && (c <= elem->pos && elem->pos <= c+thislen))
-			new_pos = cursor->pos + (elem->pos - c);
+		if (new_pos == -1 && (c <= elem->pos && elem->pos <= c+thislen)) {
+			new_pos = (cursor->type == EXTRA_TEXT)
+						? previous_end
+						: cursor->pos + (elem->pos - c);
+		}
 		
-		if (new_end == -1 && (c <= elem->end && elem->end <= c+thislen))
-			new_end = cursor->pos + (elem->end - c);
+		if (new_end == -1 && (c <= elem->end && elem->end <= c+thislen)) {
+			new_end = (cursor->type == EXTRA_TEXT)
+						? previous_end
+						: cursor->pos + (elem->end - c);
+		}
 		
 		if (new_pos != -1 && new_end != -1)
 			break;
 		
+		if (cursor->type != EXTRA_TEXT)
+			previous_end = cursor->end;
 		c += thislen;
 		cursor = cursor->next;
 	}
@@ -168,6 +181,10 @@ void add(element *elem)
 	}
 	
 	// TODO: split into parts instead of just fixing offsets
+	// (so that the color span would be disjoint just as the
+	// text in the input is, like:)
+	// > text HIGHLIGHTING
+	// > CONTINUES text
 	if (elem->type != RAW_LIST) {
 		printf("  add: %s [%ld - %ld]\n", typeName(elem->type), elem->pos, elem->end);
 		fixOffsets(elem);
@@ -195,9 +212,17 @@ element * add_element(int type, long pos, long end)
 
 void add_raw(long pos, long end)
 {
-	element *elem = add_element(RAW, pos, end);
+	add_element(RAW, pos, end);
 }
 
+element * mk_etext(char *string)
+{
+    element *result;
+    assert(string != NULL);
+    result = mk_element(EXTRA_TEXT, 0,0);
+    result->text = strdup(string);
+    return result;
+}
 
 
 
@@ -219,16 +244,31 @@ void add_raw(long pos, long end)
     if (p_elem == NULL) {              \
     	result = 0;                    \
     } else {                           \
-    	*(buf) = *(charbuf+p_offset);  \
-    	result = 1;                    \
-		p_offset++;                    \
-		printf("\e[43;30m"); putchar(*buf); printf("\e[0m");\
-		if (*buf == '\n') printf("\e[42m \e[0m");\
-		if (p_offset >= p_elem->end) {  \
-			p_elem = p_elem->next;     \
-			printf("\e[41m \e[0m");\
-			if (p_elem != NULL) p_offset = p_elem->pos;\
-		}                              \
+    	if (p_elem->type == EXTRA_TEXT) {\
+    		int yyc;\
+    		if (p_elem->text && *p_elem->text != '\0') {\
+    			yyc = *p_elem->text++;\
+				printf("\e[47;30m"); putchar(yyc); printf("\e[0m");\
+				if (yyc == '\n') printf("\e[47m \e[0m");\
+    		} else {\
+    			yyc = EOF;\
+    			p_elem = p_elem->next;\
+				printf("\e[41m \e[0m");\
+				if (p_elem != NULL) p_offset = p_elem->pos;\
+    		}\
+    		result = (EOF == yyc) ? 0 :(*(buf) = yyc, 1);\
+    	} else {\
+    		*(buf) = *(charbuf+p_offset);  \
+			result = 1;                    \
+			p_offset++;                    \
+			printf("\e[43;30m"); putchar(*buf); printf("\e[0m");\
+			if (*buf == '\n') printf("\e[42m \e[0m");\
+			if (p_offset >= p_elem->end) {  \
+				p_elem = p_elem->next;     \
+				printf("\e[41m \e[0m");\
+				if (p_elem != NULL) p_offset = p_elem->pos;\
+			}                              \
+		} \
 	}                                  \
 }
 

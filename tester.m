@@ -91,7 +91,10 @@ void removeZeroLengthSpans(element *elem)
 	element *c = elem;
 	while (c != NULL)
 	{
-		if (c->type != SEPARATOR && c->pos >= c->end) {
+		if (c->type != SEPARATOR
+			&& c->type != EXTRA_TEXT
+			&& c->pos >= c->end)
+		{
 			if (parent != NULL) {
 				parent->next = c->next;
 			} else {
@@ -108,12 +111,30 @@ void removeZeroLengthSpans(element *elem)
 	}
 }
 
+void printStrEscapes(char *str)
+{
+	char *c = str;
+	printf("'");
+	while (*c != '\0')
+	{
+		if (*c == '\n')			printf("\\n");
+		else if (*c == '\e')	printf("\\e");
+		else if (*c == '\t')	printf("\\t");
+		else putchar(*c);
+		c++;
+	}
+	printf("'");
+}
+
 void printSpansInline(element *elem)
 {
 	element *cur = elem;
 	while (cur != NULL) {
 		if (cur->type == SEPARATOR)
 			printf("<SEP %ld> ", cur->pos);
+		else if (cur->type == EXTRA_TEXT) {
+			printf("{ETEXT "); printStrEscapes(cur->text); printf("}");
+		}
 		else
 			printf("(%ld-%ld) ", cur->pos, cur->end);
 		cur = cur->next;
@@ -138,7 +159,6 @@ element ** process_raw_blocks(char *text, element *elem[], int extensions)
 			
 			while (span_list != NULL)
 			{
-				printf("next: span_list: 0x%x\n", (int)span_list);
 				printf("next: span_list: %ld-%ld\n", span_list->pos, span_list->end);
 				
 				element *subspan_list = span_list;
@@ -172,13 +192,7 @@ void print_raw_blocks(char *text, element *elem[])
 	element *cursor = elem[RAW_LIST];
 	while (cursor != NULL)
 	{
-		element *child = cursor->children;
-		while (child != NULL)
-		{
-			printf("  [%ld - %ld]", child->pos, child->end);
-			printf("%s\n", (child->type == SEPARATOR)?" SEP":"");
-			child = child->next;
-		}
+		printSpansInline(cursor->children);
 		cursor = cursor->next;
 	}
 }
@@ -248,7 +262,7 @@ void print_result(element *elem[])
 				case NOTE:               typeStr = "NOTE"; break;
 				default:                 typeStr = "?";
 			}
-            fprintf(stderr, "[%i-%i] 0x%x: %s\n", cursor->pos, cursor->end, (int)cursor, typeStr);
+            fprintf(stderr, "[%ld-%ld] 0x%x: %s\n", cursor->pos, cursor->end, (int)cursor, typeStr);
 			
 			cursor = cursor->next;
 		}

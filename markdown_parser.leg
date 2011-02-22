@@ -132,7 +132,9 @@ ListTight = a:StartList
 
 ListLoose = a:StartList
             ( b:ListItem BlankLine*
-              { a = cons(b, a); 
+              { b = cons(mk_etext("\n\n"), b); /* In loose list, \n\n added to end of each element */
+                a = cons(b, a);
+                
               } )+
             { element *rawlist = mk_element(RAW_LIST, 0,0);
               rawlist->children = reverse(a);
