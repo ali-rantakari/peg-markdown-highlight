@@ -27,7 +27,7 @@
 #define add_elem(x)		add_element(x, yystartoffset, yyendoffset)
 #define elem_s(x)		mk_element(x, s->pos, yyendoffset)
 #define add_elem_s(x)	add_element(x, s->pos, yyendoffset)
-
+#define mk_sep			mk_element(SEPARATOR, 0,0)
 
 %}
 
@@ -131,13 +131,6 @@ ListLoose = a:StartList
             { element *rawlist = mk_element(RAW_LIST, 0,0);
               rawlist->children = reverse(a);
               add(rawlist);
-              
-              element *c = rawlist->children;
-              while (c != NULL) {
-              	printf("    listloose a: %ld - %ld\n", c->pos, c->end);
-              	c = c->next;
-              }
-              
               printf("LOOSE\n");
             }
 
@@ -146,13 +139,6 @@ ListItem =  ( Bullet | Enumerator )
             ListBlock { a = cons($$, a); }
             ( ListContinuationBlock { a = cons($$, a); } )*
             { $$ = a;
-              
-              element *c = $$;
-              while (c != NULL) {
-              	printf("    listitem a: %ld - %ld\n", c->pos, c->end);
-              	c = c->next;
-              }
-              
             }
 
 ListItemTight =
@@ -168,27 +154,17 @@ ListBlock = a:StartList
             !BlankLine Line { a = cons($$, a); }
             ( ListBlockLine { a = cons(elem(RAW), a); } )*
             { $$ = a;
-              
-              element *c = $$;
-              while (c != NULL) {
-              	printf("    listblock a: %ld - %ld\n", c->pos, c->end);
-              	c = c->next;
-              }
-              
             }
 
 ListContinuationBlock = a:StartList
                         ( < BlankLine* >
-                          { a = cons(elem(RAW), a); } )
+                          { if (strlen(yytext) == 0)
+                          		a = cons(elem(SEPARATOR), a);
+                            else
+                            	a = cons(elem(RAW), a);
+                          } )
                         ( Indent ListBlock { a = cons($$, a); } )+
 						{ $$ = a;
-						  
-						  element *c = $$;
-						  while (c != NULL) {
-							printf("    listcont.block a: %ld - %ld\n", c->pos, c->end);
-							c = c->next;
-						  }
-						  
 						}
 
 Enumerator = NonindentSpace < [0-9]+ '.' > Spacechar+

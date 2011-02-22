@@ -15,6 +15,7 @@ char *typeName(int type)
 {
 	switch (type)
 	{
+		case SEPARATOR:			 return "SEPARATOR"; break;
 		case NO_TYPE:			 return "NO TYPE"; break;
 		case LIST:               return "LIST"; break;
 		case RAW_LIST:			 return "RAW_LIST"; break;

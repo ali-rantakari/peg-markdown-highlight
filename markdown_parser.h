@@ -15,6 +15,7 @@ enum markdown_extensions {
 enum types
 {
 	NO_TYPE,
+	SEPARATOR,
 	LIST,   /* A generic list of values.  For ordered and bullet lists, see below. */
 	RAW_LIST,
 	RAW,    /* Raw markdown to be processed further */

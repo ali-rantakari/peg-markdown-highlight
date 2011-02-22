@@ -91,7 +91,7 @@ void removeZeroLengthSpans(element *elem)
 	element *c = elem;
 	while (c != NULL)
 	{
-		if (c->pos >= c->end) {
+		if (c->type != SEPARATOR && c->pos >= c->end) {
 			if (parent != NULL) {
 				parent->next = c->next;
 			} else {
@@ -108,6 +108,18 @@ void removeZeroLengthSpans(element *elem)
 	}
 }
 
+void printSpansInline(element *elem)
+{
+	element *cur = elem;
+	while (cur != NULL) {
+		if (cur->type == SEPARATOR)
+			printf("<SEP %ld> ", cur->pos);
+		else
+			printf("(%ld-%ld) ", cur->pos, cur->end);
+		cur = cur->next;
+	}
+}
+
 element ** process_raw_blocks(char *text, element *elem[], int extensions)
 {
 	printf("--------process_raw_blocks---------\n");
@@ -118,17 +130,35 @@ element ** process_raw_blocks(char *text, element *elem[], int extensions)
 		elem[RAW_LIST] = NULL;
 		while (cursor != NULL)
 		{
-			removeZeroLengthSpans(cursor->children);
+			element *span_list = cursor->children;
 			
-			printf("  process: ");
-			element *cur = cursor->children;
-			while (cur != NULL) {
-				printf("(%ld-%ld) ", cur->pos, cur->end);
-				cur = cur->next;
+			removeZeroLengthSpans(span_list);
+			
+			printf("  process: "); printSpansInline(span_list); printf("\n");
+			
+			while (span_list != NULL)
+			{
+				printf("next: span_list: 0x%x\n", (int)span_list);
+				printf("next: span_list: %ld-%ld\n", span_list->pos, span_list->end);
+				
+				element *subspan_list = span_list;
+				element *previous = NULL;
+				while (span_list != NULL && span_list->type != SEPARATOR) {
+					previous = span_list;
+					span_list = span_list->next;
+				}
+				if (span_list != NULL && span_list->type == SEPARATOR) {
+					span_list = span_list->next;
+					previous->next = NULL;
+				}
+				
+				printf("    subspan process: "); printSpansInline(subspan_list); printf("\n");
+				
+				parse_markdown(text, subspan_list, extensions);
+				printf("parse over\n");
 			}
-			printf("\n");
 			
-			element **result = parse_markdown(text, cursor->children, extensions);
+			
 			cursor = cursor->next;
 		}
 	}
@@ -145,7 +175,8 @@ void print_raw_blocks(char *text, element *elem[])
 		element *child = cursor->children;
 		while (child != NULL)
 		{
-			printf("  [%ld - %ld]\n", child->pos, child->end);
+			printf("  [%ld - %ld]", child->pos, child->end);
+			printf("%s\n", (child->type == SEPARATOR)?" SEP":"");
 			child = child->next;
 		}
 		cursor = cursor->next;
@@ -229,10 +260,7 @@ void applyHighlighting(NSMutableAttributedString *attrStr, element *elem[])
 	int sourceLength = [attrStr length];
 	
 	int order[] = {
-		NO_TYPE,
 		LIST,
-		RAW_LIST,
-		RAW,
 		SPACE,
 		LINEBREAK,
 		ELLIPSIS,
@@ -264,11 +292,8 @@ void applyHighlighting(NSMutableAttributedString *attrStr, element *elem[])
 		NOTE
 	};
 	
-	for (int i = 0; i < 37; i++)
+	for (int i = 0; i < 34; i++)
 	{
-		if (i == RAW_LIST)
-			continue;
-		
 		//printf("applyHighlighting: %i\n", i);
 		
 		element *cursor = elem[order[i]];
