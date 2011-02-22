@@ -12,7 +12,10 @@ element ** parse_markdown(char *string, element *elem, int extensions)
     oldcharbuf = charbuf;
     charbuf = string;
     
-    printf("\nPARSER: ");
+    yybuflen = 0;
+    printf("\n");
+    printf("(starting at %ld -- yybuflen:%i yypos:%i)\n", p_offset, yybuflen, yypos);
+    printf("PARSER: ");
     
     yyparsefrom(yy_Doc);
     
