@@ -49,7 +49,7 @@ enum types
 	NOTE
 };
 
-#define MAX_TYPE 33;
+#define NUM_TYPES 37;
 
 
 /* Semantic value of a parsing action. */

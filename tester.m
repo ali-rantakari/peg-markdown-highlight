@@ -228,20 +228,57 @@ void applyHighlighting(NSMutableAttributedString *attrStr, element *elem[])
 {
 	int sourceLength = [attrStr length];
 	
-	for (int i = 0; i < 34; i++)
+	int order[] = {
+		NO_TYPE,
+		LIST,
+		RAW_LIST,
+		RAW,
+		SPACE,
+		LINEBREAK,
+		ELLIPSIS,
+		EMDASH,
+		ENDASH,
+		APOSTROPHE,
+		SINGLEQUOTED,
+		DOUBLEQUOTED,
+		STR,
+		LINK,
+		AUTO_LINK_URL,
+		AUTO_LINK_EMAIL,
+		IMAGE,
+		CODE,
+		HTML,
+		EMPH,
+		STRONG,
+		PLAIN,
+		PARA,
+		LISTITEM,
+		BULLETLIST,
+		ORDEREDLIST,
+		H1, H2, H3, H4, H5, H6,  
+		BLOCKQUOTE,
+		VERBATIM,
+		HTMLBLOCK,
+		HRULE,
+		REFERENCE,
+		NOTE
+	};
+	
+	for (int i = 0; i < 37; i++)
 	{
 		if (i == RAW_LIST)
 			continue;
 		
 		//printf("applyHighlighting: %i\n", i);
 		
-		element *cursor = elem[i];
+		element *cursor = elem[order[i]];
 		while (cursor != NULL)
 		{
 			if (cursor->end <= cursor->pos)
 				goto next;
 			
 			NSColor *fgColor = nil;
+			NSColor *bgColor = nil;
 			
 			switch (cursor->type)
 			{
@@ -260,20 +297,31 @@ void applyHighlighting(NSMutableAttributedString *attrStr, element *elem[])
 				case BULLETLIST:fgColor = [NSColor magentaColor]; break;
 				case AUTO_LINK_EMAIL:
 				case AUTO_LINK_URL:fgColor = [NSColor cyanColor]; break;
+				case IMAGE:
+				case LINK:		bgColor = [NSColor blackColor];
+								fgColor = [NSColor cyanColor]; break;
 			}
 			
 			//printf("  %i-%i\n", cursor->pos, cursor->end);
-			if (fgColor != nil) {
+			if (fgColor != nil || bgColor != nil) {
 				int rangePos = MIN(MAX(cursor->pos, 0), sourceLength);
 				int len = cursor->end - cursor->pos;
 				if (rangePos+len > sourceLength)
 					len = sourceLength-rangePos;
 				NSRange range = NSMakeRange(rangePos, len);
-				[attrStr
-					addAttribute:NSForegroundColorAttributeName
-					value:fgColor
-					range:range
-					];
+				
+				if (bgColor != nil)
+					[attrStr
+						addAttribute:NSBackgroundColorAttributeName
+						value:bgColor
+						range:range
+						];
+				if (fgColor != nil)
+					[attrStr
+						addAttribute:NSForegroundColorAttributeName
+						value:fgColor
+						range:range
+						];
 			}
 			
 			next:

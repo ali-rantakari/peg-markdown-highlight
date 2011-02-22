@@ -25,6 +25,7 @@
 
 #define elem(x)			mk_element(x, yystartoffset, yyendoffset)
 #define add_elem(x)		add_element(x, yystartoffset, yyendoffset)
+#define elem_s(x)		mk_element(x, s->pos, yyendoffset)
 #define add_elem_s(x)	add_element(x, s->pos, yyendoffset)
 
 
@@ -478,16 +479,21 @@ StrongUl =  s:TwoUlOpen
             { add_elem_s(STRONG); }
 
 Image = '!' ( ExplicitLink | ReferenceLink )
+		{ $$->type = IMAGE; $$->pos -= 1; add($$); }
 
-Link =  ExplicitLink | ReferenceLink | AutoLink
+Link =  ( ExplicitLink | ReferenceLink | AutoLink )
+		{ if ($$) add($$); } # AutoLink does not return $$
 
 ReferenceLink = ReferenceLinkDouble | ReferenceLinkSingle
 
-ReferenceLinkDouble =  Label Spnl !"[]" Label
+ReferenceLinkDouble =  < s:Label Spnl !"[]" Label >
+						{ $$ = elem_s(LINK); }
 
-ReferenceLinkSingle =  Label (Spnl "[]")?
+ReferenceLinkSingle =  < s:Label (Spnl "[]")? >
+						{ $$ = elem_s(LINK); }
 
-ExplicitLink =  Label Spnl '(' Sp Source Spnl Title Sp ')'
+ExplicitLink =  < s:Label Spnl '(' Sp Source Spnl Title Sp ')' >
+				{ $$ = elem_s(LINK); }
 
 Source  = ( '<' SourceContents '>' | SourceContents )
          
@@ -512,9 +518,11 @@ AutoLinkEmail = < s:LocMarker '<' [-A-Za-z0-9+_.]+ '@' ( !Newline !'>' . )+ '>' 
 
 Reference = NonindentSpace !"[]" Label ':' Spnl RefSrc Spnl RefTitle BlankLine*
 
-Label = '[' ( !'^' &{ extension(EXT_NOTES) } | &. &{ !extension(EXT_NOTES) } )
+Label = < s:LocMarker
+        '[' ( !'^' &{ extension(EXT_NOTES) } | &. &{ !extension(EXT_NOTES) } )
         ( !']' Inline )*
-        ']'
+        ']' >
+        { $$ = elem_s(NO_TYPE); }
        
 
 RefSrc = Nonspacechar+
