@@ -532,11 +532,11 @@ RefTitleParens = '(' ( !(')' Sp Newline | Newline) . )* ')'
 References = ( Reference | SkipBlock )*
             
 
-Ticks1 = "`" !'`' { $$ = elem(NO_TYPE); }
-Ticks2 = "``" !'`' { $$ = elem(NO_TYPE); }
-Ticks3 = "```" !'`' { $$ = elem(NO_TYPE); }
-Ticks4 = "````" !'`' { $$ = elem(NO_TYPE); }
-Ticks5 = "`````" !'`' { $$ = elem(NO_TYPE); }
+Ticks1 = < "`" > !'`' { $$ = elem(NO_TYPE); }
+Ticks2 = < "``" > !'`' { $$ = elem(NO_TYPE); }
+Ticks3 = < "```" > !'`' { $$ = elem(NO_TYPE); }
+Ticks4 = < "````" > !'`' { $$ = elem(NO_TYPE); }
+Ticks5 = < "`````" > !'`' { $$ = elem(NO_TYPE); }
 
 Code = < ( s:Ticks1 Sp ( ( !'`' Nonspacechar )+ | !Ticks1 '`'+ | !( Sp Ticks1 ) ( Spacechar | Newline !BlankLine ) )+ Sp Ticks1
        | s:Ticks2 Sp ( ( !'`' Nonspacechar )+ | !Ticks2 '`'+ | !( Sp Ticks2 ) ( Spacechar | Newline !BlankLine ) )+ Sp Ticks2
@@ -581,9 +581,10 @@ StartList = &.
             { $$ = NULL; }
 
 Line =  RawLine
-       { $$ = elem(RAW); }
+       { $$ = mk_element(RAW, $$->pos, $$->end); }
 
 RawLine = ( < (!'\r' !'\n' .)* Newline > | < .+ > Eof )
+	      { $$ = elem(RAW); }
 
 SkipBlock = ( !BlankLine RawLine )+ BlankLine*
           | BlankLine+
