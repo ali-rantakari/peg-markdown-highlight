@@ -211,6 +211,7 @@ void add_raw(long pos, long end)
 			if (p_elem != NULL) p_offset = p_elem->pos;\
 		}                              \
 	}                                  \
+	if (result != 0) { printf("\e[43;30m"); putchar(*buf); printf("\e[0m"); }\
 }
 
 /*

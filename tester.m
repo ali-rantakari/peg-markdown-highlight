@@ -90,10 +90,19 @@ element ** process_raw_blocks(char *text, element *elem[], int extensions)
 	printf("--------process_raw_blocks---------\n");
 	while (elem[RAW] != NULL)
 	{
+		printf("new iteration.\n");
 		element *cursor = elem[RAW];
 		elem[RAW] = NULL;
 		while (cursor != NULL)
 		{
+			printf("  process: ");
+			element *cur = cursor->children;
+			while (cur != NULL) {
+				printf("(%ld-%ld) ", cur->pos, cur->end);
+				cur = cur->next;
+			}
+			printf("\n");
+			
 			element **result = parse_markdown(text, cursor->children, extensions);
 			cursor = cursor->next;
 		}
@@ -101,26 +110,21 @@ element ** process_raw_blocks(char *text, element *elem[], int extensions)
 	return elem;
 }
 
-element ** print_raw_blocks(char *text, element *elem[])
+void print_raw_blocks(char *text, element *elem[])
 {
 	printf("--------print_raw_blocks---------\n");
-	while (elem[RAW] != NULL)
+	printf("block:\n");
+	element *cursor = elem[RAW];
+	while (cursor != NULL)
 	{
-		printf("block:\n");
-		element *cursor = elem[RAW];
-		elem[RAW] = NULL;
-		while (cursor != NULL)
+		element *child = cursor->children;
+		while (child != NULL)
 		{
-			element *child = cursor->children;
-			while (child != NULL)
-			{
-				printf("  [%ld - %ld]\n", child->pos, child->end);
-				child = child->next;
-			}
-			cursor = cursor->next;
+			printf("  [%ld - %ld]\n", child->pos, child->end);
+			child = child->next;
 		}
+		cursor = cursor->next;
 	}
-	return elem;
 }
 
 void markdown_to_tree(char *text, int extensions, element **out[])

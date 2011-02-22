@@ -12,7 +12,11 @@ element ** parse_markdown(char *string, element *elem, int extensions)
     oldcharbuf = charbuf;
     charbuf = string;
     
+    printf("\nPARSER: ");
+    
     yyparsefrom(yy_Doc);
+    
+    printf("\n\n");
     
     charbuf = oldcharbuf;          /* restore charbuf to original value */
     return head_elements;
