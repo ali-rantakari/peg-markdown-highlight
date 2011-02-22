@@ -84,13 +84,19 @@ SetextHeading2 =  &(RawLine SetextBottom2)
 
 Heading = AtxHeading | SetextHeading
 
-BlockQuote = BlockQuoteRaw
+BlockQuote = a:BlockQuoteRaw
+            { element *rawlist = mk_element(RAW_LIST, 0,0);
+              rawlist->children = reverse(a);
+              add(rawlist);
+              printf("BLOCKQUOTE\n");
+            }
 
-BlockQuoteRaw =  s:LocMarker
-                 (( '>' ' '? Line )
-                  ( !'>' !BlankLine Line )*
-                  ( BlankLine )*
+BlockQuoteRaw =  a:StartList
+                 (( < '>' ' '? > { add_elem(BLOCKQUOTE); } Line { a = cons($$, a); } )
+                  ( !'>' !BlankLine Line { a = cons($$, a); } )*
+                  ( < BlankLine > { a = cons(elem(RAW), a); /*a = cons(mk_str("\n"), a);*/ } )*
                  )+
+                 { $$ = a; }
 
 NonblankIndentedLine = !BlankLine IndentedLine
 

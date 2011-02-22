@@ -304,6 +304,8 @@ void applyHighlighting(NSMutableAttributedString *attrStr, element *elem[])
 			
 			NSColor *fgColor = nil;
 			NSColor *bgColor = nil;
+			BOOL removeFgColor = NO;
+			BOOL removeBgColor = NO;
 			
 			switch (cursor->type)
 			{
@@ -325,6 +327,8 @@ void applyHighlighting(NSMutableAttributedString *attrStr, element *elem[])
 				case IMAGE:
 				case LINK:		bgColor = [NSColor blackColor];
 								fgColor = [NSColor cyanColor]; break;
+				case BLOCKQUOTE:removeBgColor = YES;
+								fgColor = [NSColor magentaColor]; break;
 			}
 			
 			//printf("  %i-%i\n", cursor->pos, cursor->end);
@@ -335,13 +339,24 @@ void applyHighlighting(NSMutableAttributedString *attrStr, element *elem[])
 					len = sourceLength-rangePos;
 				NSRange range = NSMakeRange(rangePos, len);
 				
-				if (bgColor != nil)
+				if (removeBgColor)
+					[attrStr
+						removeAttribute:NSBackgroundColorAttributeName
+						range:range
+						];
+				else if (bgColor != nil)
 					[attrStr
 						addAttribute:NSBackgroundColorAttributeName
 						value:bgColor
 						range:range
 						];
-				if (fgColor != nil)
+				
+				if (removeFgColor)
+					[attrStr
+						removeAttribute:NSForegroundColorAttributeName
+						range:range
+						];
+				else if (fgColor != nil)
 					[attrStr
 						addAttribute:NSForegroundColorAttributeName
 						value:fgColor
