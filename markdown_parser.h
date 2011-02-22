@@ -16,6 +16,7 @@ enum types
 {
 	NO_TYPE,
 	LIST,   /* A generic list of values.  For ordered and bullet lists, see below. */
+	RAW_LIST,
 	RAW,    /* Raw markdown to be processed further */
 	SPACE,
 	LINEBREAK,

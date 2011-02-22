@@ -88,11 +88,11 @@ void print_raw_blocks(element *elem[])
 element ** process_raw_blocks(char *text, element *elem[], int extensions)
 {
 	printf("--------process_raw_blocks---------\n");
-	while (elem[RAW] != NULL)
+	while (elem[RAW_LIST] != NULL)
 	{
 		printf("new iteration.\n");
-		element *cursor = elem[RAW];
-		elem[RAW] = NULL;
+		element *cursor = elem[RAW_LIST];
+		elem[RAW_LIST] = NULL;
 		while (cursor != NULL)
 		{
 			printf("  process: ");
@@ -114,7 +114,7 @@ void print_raw_blocks(char *text, element *elem[])
 {
 	printf("--------print_raw_blocks---------\n");
 	printf("block:\n");
-	element *cursor = elem[RAW];
+	element *cursor = elem[RAW_LIST];
 	while (cursor != NULL)
 	{
 		element *child = cursor->children;
@@ -154,6 +154,7 @@ void print_result(element *elem[])
 			switch (cursor->type)
 			{
 				case LIST:               typeStr = "LIST"; break;
+				case RAW_LIST:			 typeStr = "RAW_LIST"; break;
 				case RAW:                typeStr = "RAW"; break;
 				case SPACE:              typeStr = "SPACE"; break;
 				case LINEBREAK:          typeStr = "LINEBREAK"; break;

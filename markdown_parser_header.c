@@ -17,6 +17,7 @@ char *typeName(int type)
 	{
 		case NO_TYPE:			 return "NO TYPE"; break;
 		case LIST:               return "LIST"; break;
+		case RAW_LIST:			 return "RAW_LIST"; break;
 		case RAW:                return "RAW"; break;
 		case SPACE:              return "SPACE"; break;
 		case LINEBREAK:          return "LINEBREAK"; break;
@@ -135,9 +136,10 @@ void fixOffsets(element *elem)
 	{
 		int thislen = cursor->end - cursor->pos;
 		
-		if (new_pos == -1 && (c <= elem->pos < c+thislen))
+		if (new_pos == -1 && (c <= elem->pos && elem->pos <= c+thislen))
 			new_pos = cursor->pos + (elem->pos - c);
-		if (new_end == -1 && (c <= elem->end < c+thislen))
+		
+		if (new_end == -1 && (c <= elem->end && elem->end <= c+thislen))
 			new_end = cursor->pos + (elem->end - c);
 		
 		if (new_pos != -1 && new_end != -1)
@@ -164,10 +166,23 @@ void add(element *elem)
 		head_elements[elem->type] = elem;
 	}
 	
-	printf("  add: %s [%ld - %ld]\n", typeName(elem->type), elem->pos, elem->end);
 	// TODO: split into parts instead of just fixing offsets
-	fixOffsets(elem);
-	printf("     : %s [%ld - %ld]\n", typeName(elem->type), elem->pos, elem->end);
+	if (elem->type != RAW_LIST) {
+		printf("  add: %s [%ld - %ld]\n", typeName(elem->type), elem->pos, elem->end);
+		fixOffsets(elem);
+		printf("     : %s [%ld - %ld]\n", typeName(elem->type), elem->pos, elem->end);
+	}
+	else {
+		printf("  add: RAW_LIST ");
+		element *cursor = elem->children;
+		while (cursor != NULL) {
+			printf("(%ld-%ld)>", cursor->pos, cursor->end);
+			fixOffsets(cursor);
+			printf("(%ld-%ld) ", cursor->pos, cursor->end);
+			cursor = cursor->next;
+		}
+		printf("\n");
+	}
 }
 
 element * add_element(int type, long pos, long end)

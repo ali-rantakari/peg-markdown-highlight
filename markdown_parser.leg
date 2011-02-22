@@ -116,7 +116,7 @@ BulletList = &Bullet (ListTight | ListLoose)
 ListTight = a:StartList
             ( ListItemTight { a = cons($$, a); } )+
             BlankLine* !(Bullet | Enumerator)
-            { element *rawlist = mk_element(RAW, 0,0);
+            { element *rawlist = mk_element(RAW_LIST, 0,0);
               rawlist->children = reverse(a);
               add(rawlist);
               printf("TIGHT\n");
@@ -126,7 +126,7 @@ ListLoose = a:StartList
             ( b:ListItem BlankLine*
               { a = cons(b, a); 
               } )+
-            { element *rawlist = mk_element(RAW, 0,0);
+            { element *rawlist = mk_element(RAW_LIST, 0,0);
               rawlist->children = reverse(a);
               add(rawlist);
               
