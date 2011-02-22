@@ -222,6 +222,7 @@ void add_raw(long pos, long end)
     	result = 1;                    \
 		p_offset++;                    \
 		printf("\e[43;30m"); putchar(*buf); printf("\e[0m");\
+		if (*buf == '\n') printf("\e[42m \e[0m");\
 		if (p_offset >= p_elem->end) {  \
 			p_elem = p_elem->next;     \
 			printf("\e[41m \e[0m");\
