@@ -28,6 +28,7 @@
 #define elem_s(x)		mk_element(x, s->pos, yyendoffset)
 #define add_elem_s(x)	add_element(x, s->pos, yyendoffset)
 #define mk_sep			mk_element(SEPARATOR, 0,0)
+#define mk_notype		mk_element(NO_TYPE, 0,0)
 
 %}
 
@@ -122,23 +123,36 @@ BulletList = &Bullet (ListTight | ListLoose)
             
 
 ListTight = a:StartList
-            ( ListItemTight { a = cons($$, a); } )+
+            ( ListItemTight
+              { element *el = mk_notype;
+                el->children = $$;
+                a = cons(el, a);
+              } )+
             BlankLine* !(Bullet | Enumerator)
-            { element *rawlist = mk_element(RAW_LIST, 0,0);
-              rawlist->children = reverse(a);
-              add(rawlist);
+            { element *cur = a;
+              while (cur != NULL) {
+				  element *rawlist = mk_element(RAW_LIST, 0,0);
+				  rawlist->children = reverse(cur->children);
+				  add(rawlist);
+				  cur = cur->next;
+              }
               printf("TIGHT\n");
             }
 
 ListLoose = a:StartList
             ( b:ListItem BlankLine*
               { b = cons(mk_etext("\n\n"), b); /* In loose list, \n\n added to end of each element */
-                a = cons(b, a);
-                
+                element *el = mk_notype;
+                el->children = b;
+                a = cons(el, a);
               } )+
-            { element *rawlist = mk_element(RAW_LIST, 0,0);
-              rawlist->children = reverse(a);
-              add(rawlist);
+            { element *cur = a;
+              while (cur != NULL) {
+				  element *rawlist = mk_element(RAW_LIST, 0,0);
+				  rawlist->children = reverse(cur->children);
+				  add(rawlist);
+				  cur = cur->next;
+              }
               printf("LOOSE\n");
             }
 
