@@ -20,5 +20,9 @@
 - Encapsulate
     - Into a C++ class?
     - Into an Objective-C class?
-
+- Highlight disjoint spans separately
+    - Not fully possible given the implementation right now (?)
+    - Could be done as a post-processing step, albeit with a performance penalty
+- _"[foo][bar] isn't a link in Markdown unless "bar" is defined somewhere"_ (?)
+    - There are differing opinions about this...
 
