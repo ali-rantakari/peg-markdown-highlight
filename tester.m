@@ -3,97 +3,14 @@
 #import "ANSIEscapeHelper.h"
 #import "markdown_parser.h"
 
-/* process_raw_blocks - traverses an element list, replacing any RAW elements with
- * the result of parsing them as markdown text, and recursing into the children
- * of parent elements.  The result should be a tree of elements without any RAWs. */
-/*
-static element * process_raw_blocks2(element *input, int extensions, element *references, element *notes) {
-    element *current = NULL;
-    element *last_child = NULL;
-    char *contents;
-    current = input;
 
-    while (current != NULL) {
-        if (current->key == RAW) {
-            // \001 is used to indicate boundaries between nested lists when there
-            // is no blank line.  We split the string by \001 and parse
-            // each chunk separately.
-            contents = strtok(current->contents.str, "\001");
-            current->key = LIST;
-            current->children = parse_markdown(contents, extensions, references, notes);
-            last_child = current->children;
-            while ((contents = strtok(NULL, "\001"))) {
-                while (last_child->next != NULL)
-                    last_child = last_child->next;
-                last_child->next = parse_markdown(contents, extensions, references, notes);
-            }
-            free(current->contents.str);
-            current->contents.str = NULL;
-        }
-        if (current->children != NULL)
-            current->children = process_raw_blocks2(current->children, extensions, references, notes);
-        current = current->next;
-    }
-    return input;
-}
-*/
-
-void printStr(char *str, int max_chars)
-{
-	char *c = str;
-	int i = max_chars;
-	MKD_PRINTF("'");
-	while (i > 0 && *c != EOF)
-	{
-		putchar(*c);
-		i--; c++;
-	}
-	MKD_PRINTF("'\n");
-}
-/*
-element ** process_raw_blocks(char *text, element *elem[], int extensions)
-{
-	while (elem[RAW] != NULL)
-	{
-		element *cursor = elem[RAW];
-		elem[RAW] = NULL;
-		while (cursor != NULL)
-		{
-			long len = cursor->end - cursor->pos;
-			//char *rawtext = malloc((len + 1) * sizeof(char));
-			//strncat(rawtext, text+cursor->pos, len);
-			
-			MKD_PRINTF("process: (len %ld, pos %ld) ", len, cursor->pos);
-			printStr(text+cursor->pos, len);
-			elem = parse_markdown(text+cursor->pos, cursor->pos, len, extensions);
-			
-			//free(rawtext);
-			cursor = cursor->next;
-		}
-	}
-	return elem;
-}
-
-void print_raw_blocks(element *elem[])
-{
-	element *cursor = elem[RAW];
-	while (cursor != NULL)
-	{
-		MKD_PRINTF("raw: [%ld - %ld]\n", cursor->pos, cursor->end);
-		cursor = cursor->next;
-	}
-}
-*/
-
-void removeZeroLengthSpans(element *elem)
+void removeZeroLengthRAWSpans(element *elem)
 {
 	element *parent = NULL;
 	element *c = elem;
 	while (c != NULL)
 	{
-		if (c->type != SEPARATOR
-			&& c->type != EXTRA_TEXT
-			&& c->pos >= c->end)
+		if (c->type == RAW && c->pos >= c->end)
 		{
 			if (parent != NULL) {
 				parent->next = c->next;
@@ -111,6 +28,8 @@ void removeZeroLengthSpans(element *elem)
 	}
 }
 
+// Print null-terminated string s.t. some characters are
+// represented by their corresponding espace sequences
 void printStrEscapes(char *str)
 {
 	char *c = str;
@@ -126,6 +45,8 @@ void printStrEscapes(char *str)
 	MKD_PRINTF("'");
 }
 
+// Print elements in a linked list of
+// RAW, SEPARATOR, EXTRA_TEXT elements
 void printSpansInline(element *elem)
 {
 	element *cur = elem;
@@ -141,6 +62,8 @@ void printSpansInline(element *elem)
 	}
 }
 
+// Perform postprocessing parsing runs for RAW_LIST elements in `elem`,
+// iteratively until no such elements exist.
 element ** process_raw_blocks(char *text, element *elem[], int extensions)
 {
 	MKD_PRINTF("--------process_raw_blocks---------\n");
@@ -153,7 +76,7 @@ element ** process_raw_blocks(char *text, element *elem[], int extensions)
 		{
 			element *span_list = cursor->children;
 			
-			removeZeroLengthSpans(span_list);
+			removeZeroLengthRAWSpans(span_list);
 			
 			#if MKD_DEBUG_OUTPUT
 			MKD_PRINTF("  process: "); printSpansInline(span_list); MKD_PRINTF("\n");
@@ -182,7 +105,6 @@ element ** process_raw_blocks(char *text, element *elem[], int extensions)
 				MKD_PRINTF("parse over\n");
 			}
 			
-			
 			cursor = cursor->next;
 		}
 	}
@@ -201,7 +123,7 @@ void print_raw_blocks(char *text, element *elem[])
 	}
 }
 
-void markdown_to_tree(char *text, int extensions, element **out[])
+void markdown_to_elements(char *text, int extensions, element **out[])
 {
 	element *parsing_elem = malloc(sizeof(element));
 	parsing_elem->pos = 0;
@@ -281,9 +203,6 @@ void applyHighlighting(NSMutableAttributedString *attrStr, element *elem[])
 	int sourceLength = [attrStr length];
 	
 	int order[] = {
-		LIST,
-		SPACE,
-		LINEBREAK,
 		H1, H2, H3, H4, H5, H6,  
 		ELLIPSIS,
 		EMDASH,
@@ -291,7 +210,6 @@ void applyHighlighting(NSMutableAttributedString *attrStr, element *elem[])
 		APOSTROPHE,
 		SINGLEQUOTED,
 		DOUBLEQUOTED,
-		STR,
 		LINK,
 		AUTO_LINK_URL,
 		AUTO_LINK_EMAIL,
@@ -313,7 +231,7 @@ void applyHighlighting(NSMutableAttributedString *attrStr, element *elem[])
 		NOTE
 	};
 	
-	for (int i = 0; i < 34; i++)
+	for (int i = 0; i < 31; i++)
 	{
 		//MKD_PRINTF("applyHighlighting: %i\n", i);
 		
@@ -350,6 +268,7 @@ void applyHighlighting(NSMutableAttributedString *attrStr, element *elem[])
 								fgColor = [NSColor cyanColor]; break;
 				case BLOCKQUOTE:removeBgColor = YES;
 								fgColor = [NSColor magentaColor]; break;
+				default: break;
 			}
 			
 			//MKD_PRINTF("  %i-%i\n", cursor->pos, cursor->end);
@@ -395,7 +314,7 @@ NSAttributedString *highlight(NSString *str)
 {
 	int extensions = 0;
 	element **result;
-	markdown_to_tree((char *)[str UTF8String], extensions, &result);
+	markdown_to_elements((char *)[str UTF8String], extensions, &result);
 	
 	NSMutableAttributedString *attrStr = [[[NSMutableAttributedString alloc] initWithString:str] autorelease];
 	applyHighlighting(attrStr, result);
@@ -426,7 +345,7 @@ int main(int argc, char * argv[])
 	{
 		int extensions = 0;
 		element **result;
-		markdown_to_tree((char *)[contents UTF8String], extensions, &result);
+		markdown_to_elements((char *)[contents UTF8String], extensions, &result);
 		print_result(result);
 	}
 	else

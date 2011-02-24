@@ -1,14 +1,20 @@
 
 #include "markdown_parser.h"
 
+// Buffer of characters to be parsed:
+static char *charbuf = "";
 
-static char *charbuf = "";     /* Buffer of characters to be parsed. */
-
-// linked list of (start, end) offset pairs determining which parts
-// of charbuf to parse
+// Linked list of {start, end} offset pairs determining which parts
+// of charbuf to actually parse:
 static element *p_elem;
 static element *p_elem_head;
-static int p_offset; // current parsing offset
+
+// Current parsing offset within charbuf:
+static int p_offset;
+
+// Array of parsing result elements, indexed by type:
+element* head_elements[37];
+
 
 
 char *typeName(int type)
@@ -18,8 +24,8 @@ char *typeName(int type)
 		case SEPARATOR:			 return "SEPARATOR"; break;
 		case EXTRA_TEXT:		 return "EXTRA_TEXT"; break;
 		case NO_TYPE:			 return "NO TYPE"; break;
-		case LIST:               return "LIST"; break;
 		case RAW_LIST:			 return "RAW_LIST"; break;
+		case LIST:               return "LIST"; break;
 		case RAW:                return "RAW"; break;
 		case SPACE:              return "SPACE"; break;
 		case LINEBREAK:          return "LINEBREAK"; break;
@@ -57,14 +63,14 @@ char *typeName(int type)
 	}
 }
 
-/* extension = returns true if extension is selected */
+/* returns true if extension is selected */
 bool extension(int ext)
 {
     return false;
 }
 
 
-/* cons - cons an element onto a list, returning pointer to new head */
+/* cons an element/list onto a list, returning pointer to new head */
 static element * cons(element *new, element *list)
 {
     assert(new != NULL);
@@ -78,22 +84,8 @@ static element * cons(element *new, element *list)
     return new;
 }
 
-// add to end
-element * conc(element *new, element *list)
-{
-    if (list == NULL) {
-    	list = new;
-    } else {
-		element *cur = list;
-		while (cur->next != NULL)
-			cur = cur->next;
-		cur->next = new;
-    }
-    return list;
-}
 
-
-/* reverse - reverse a list, returning pointer to new list */
+/* reverse a list, returning pointer to new list */
 static element *reverse(element *list)
 {
     element *new = NULL;
@@ -109,8 +101,7 @@ static element *reverse(element *list)
 
 
 
-
-/* mk_element - generic constructor for element */
+// construct element
 element * mk_element(int type, long pos, long end)
 {
     element *result = malloc(sizeof(element));
@@ -124,7 +115,21 @@ element * mk_element(int type, long pos, long end)
     return result;
 }
 
+// construct EXTRA_TEXT element
+element * mk_etext(char *string)
+{
+    element *result;
+    assert(string != NULL);
+    result = mk_element(EXTRA_TEXT, 0,0);
+    result->text = strdup(string);
+    return result;
+}
 
+
+// Given an element where the offsets {pos, end} represent
+// locations in the *parsed text* (defined by the linked list of RAW and
+// EXTRA_TEXT elements in p_elem), fix these offsets to represent
+// corresponding offsets in the original input (charbuf).
 void fixOffsets(element *elem)
 {
 	if (elem->type == EXTRA_TEXT)
@@ -168,8 +173,7 @@ void fixOffsets(element *elem)
 }
 
 
-element* head_elements[33];
-
+// Add an element to head_elements.
 void add(element *elem)
 {
 	if (head_elements[elem->type] == NULL)
@@ -213,15 +217,6 @@ element * add_element(int type, long pos, long end)
 void add_raw(long pos, long end)
 {
 	add_element(RAW, pos, end);
-}
-
-element * mk_etext(char *string)
-{
-    element *result;
-    assert(string != NULL);
-    result = mk_element(EXTRA_TEXT, 0,0);
-    result->text = strdup(string);
-    return result;
 }
 
 
@@ -271,18 +266,5 @@ element * mk_etext(char *string)
 		} \
 	}                                  \
 }
-
-/*
-#define YY_INPUT(buf, result, max_size)              \
-{                                                    \
-    int yyc;                                         \
-    if (charbuf && *charbuf != '\0') {               \
-        yyc= *charbuf++;                             \
-    } else {                                         \
-        yyc= EOF;                                    \
-    }                                                \
-    result= (EOF == yyc) ? 0 : (*(buf)= yyc, 1);     \
-}
-*/
 
 
