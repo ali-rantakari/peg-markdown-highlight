@@ -310,11 +310,36 @@ void applyHighlighting(NSMutableAttributedString *attrStr, element *elem[])
 	}
 }
 
+
+#define IS_CONTINUATION_BYTE(x)		((x & 0xc0) == 0x80)
+
+// todo: optimize?
+void stripUTF8ContinuationBytes(char **str)
+{
+	char *new = malloc(sizeof(char)*strlen(*str) +1);
+	char *c = *str;
+	int i = 0;
+	while (*c != '\0')
+	{
+		if (!IS_CONTINUATION_BYTE(*c))
+			*(new+i) = *c, i++;
+		c++;
+	}
+	*(new+i) = '\0';
+	
+	*str = new;
+}
+
+
 NSAttributedString *highlight(NSString *str)
 {
 	int extensions = 0;
 	element **result;
-	markdown_to_elements((char *)[str UTF8String], extensions, &result);
+	
+	char *md_source = (char *)[str UTF8String];
+	stripUTF8ContinuationBytes(&md_source);
+	
+	markdown_to_elements(md_source, extensions, &result);
 	
 	NSMutableAttributedString *attrStr = [[[NSMutableAttributedString alloc] initWithString:str] autorelease];
 	applyHighlighting(attrStr, result);

@@ -1,12 +1,6 @@
 
 ### Primary stuff:
 
-- UTF-8 support
-    - Determine offsets reliably with UTF-8 input
-    - Since we're jumping directly to offsets in `charbuf` by adding an `int`
-      to the pointer, the type needs to be `wchar_t` ?
-    - Otherwise we could simply ignore characters in the range `0x80 - 0xBF`
-      (continuation bytes).
 - Problem with tabs/spaces? *(see `preformat_text()`)*
     - Ask John McFarlane why expand tabs to spaces when `Indent = "\t" | "    "`
 - Fix memory leaks
