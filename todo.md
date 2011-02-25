@@ -1,6 +1,9 @@
 
 ### Primary stuff:
 
+- Replace mangled UTF-8 characters with something else
+    - With what? Might have to replace alphas with `a`, puncs with `.`, numerics 
+      with `1` etc.
 - Problem with tabs/spaces? *(see `preformat_text()`)*
     - Ask John McFarlane why expand tabs to spaces when `Indent = "\t" | "    "`
 - Fix memory leaks
