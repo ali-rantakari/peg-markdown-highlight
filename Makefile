@@ -1,7 +1,9 @@
 ALL : tester
 
 TEST_PROGRAM=tester
-CFLAGS ?= -Wall -O3 -framework Foundation -framework AppKit
+PROGRAM=highlighter
+CFLAGS ?= -Wall -O3
+OBJC_CFLAGS=-framework Foundation -framework AppKit
 PEGDIR=peg
 LEG=$(PEGDIR)/leg
 
@@ -12,7 +14,10 @@ markdown_parser.c : markdown_parser.leg $(LEG) markdown_parser_header.c markdown
 	$(LEG) -o $@ $<
 
 $(TEST_PROGRAM) : tester.m markdown_parser.c markdown_parser.h
-	clang $(CFLAGS) -o $@ markdown_parser.c ANSIEscapeHelper.m $<
+	clang $(CFLAGS) $(OBJC_CFLAGS) -o $@ markdown_parser.c ANSIEscapeHelper.m $<
+
+$(PROGRAM) : highlighter.c markdown_parser.c markdown_parser.h
+	cc $(CFLAGS) -DMKD_DEBUG_OUTPUT=0 -o $@ markdown_parser.c $<
 
 .PHONY: clean test
 
