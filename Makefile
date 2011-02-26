@@ -26,12 +26,12 @@ $(PROGRAM) : highlighter.c markdown_parser.c markdown_parser.h
 .PHONY: clean test
 
 clean:
-	rm -f markdown_parser.c $(TEST_PROGRAM) *.o; \
+	rm -f markdown_parser.c $(TEST_PROGRAM) $(TEST_CLIENT_PROGRAM) $(PROGRAM) *.o; \
 	make -C $(PEGDIR) clean
 
 distclean: clean
 	make -C $(PEGDIR) spotless
 
 leak-check: $(TEST_PROGRAM)
-	valgrind --leak-check=full ./$(TEST_PROGRAM) README
+	valgrind --leak-check=full ./$(TEST_PROGRAM) 100 todo.md
 
