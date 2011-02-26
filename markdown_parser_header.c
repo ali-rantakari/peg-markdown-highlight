@@ -125,10 +125,10 @@ void print_raw_blocks(char *text, element *elem[])
 #define IS_CONTINUATION_BYTE(x)		((x & 0xc0) == 0x80)
 
 // todo: optimize?
-void stripUTF8ContinuationBytes(char **str)
+char *copyStringStrippingUTF8ContBytes(char *str)
 {
-	char *new = malloc(sizeof(char)*strlen(*str) +1);
-	char *c = *str;
+	char *new = malloc(sizeof(char)*strlen(str) +1);
+	char *c = str;
 	int i = 0;
 	while (*c != '\0')
 	{
@@ -138,29 +138,29 @@ void stripUTF8ContinuationBytes(char **str)
 	}
 	*(new+i) = '\0';
 	
-	*str = new;
+	return new;
 }
 
 void markdown_to_elements(char *text, int extensions, element **out[])
 {
-	stripUTF8ContinuationBytes(&text);
+	char *text_copy = copyStringStrippingUTF8ContBytes(text);
 	
 	element *parsing_elem = malloc(sizeof(element));
 	parsing_elem->type = RAW;
 	parsing_elem->pos = 0;
-	parsing_elem->end = strlen(text)-1;
+	parsing_elem->end = strlen(text_copy)-1;
 	parsing_elem->next = NULL;
-    element **result = parse_markdown(text, parsing_elem, extensions);
+    element **result = parse_markdown(text_copy, parsing_elem, extensions);
     free(parsing_elem);
     
     #if MKD_DEBUG_OUTPUT
-    print_raw_blocks(text, result);
+    print_raw_blocks(text_copy, result);
     #endif
     
-    result = process_raw_blocks(text, result, extensions);
+    result = process_raw_blocks(text_copy, result, extensions);
     
     *out = result;
-    free(text);
+    free(text_copy);
 }
 
 
