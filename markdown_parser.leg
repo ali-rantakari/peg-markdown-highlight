@@ -174,7 +174,7 @@ ListBlock = a:StartList
 
 ListContinuationBlock = a:StartList
                         ( < BlankLine* >
-                          { if (strlen(yytext) == 0)
+                          { if (*yytext == '\0') // if strlen(yytext) == 0
                           		a = cons(elem(SEPARATOR), a);
                             else
                             	a = cons(elem(RAW), a);
