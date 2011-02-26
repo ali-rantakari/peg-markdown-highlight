@@ -146,6 +146,7 @@ void markdown_to_elements(char *text, int extensions, element **out[])
 	stripUTF8ContinuationBytes(&text);
 	
 	element *parsing_elem = malloc(sizeof(element));
+	parsing_elem->type = RAW;
 	parsing_elem->pos = 0;
 	parsing_elem->end = strlen(text)-1;
 	parsing_elem->next = NULL;
