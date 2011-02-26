@@ -10,10 +10,6 @@ void applyHighlighting(NSMutableAttributedString *attrStr, element *elem[])
 	
 	int order[] = {
 		H1, H2, H3, H4, H5, H6,  
-		ELLIPSIS,
-		EMDASH,
-		ENDASH,
-		APOSTROPHE,
 		SINGLEQUOTED,
 		DOUBLEQUOTED,
 		LINK,
@@ -24,9 +20,6 @@ void applyHighlighting(NSMutableAttributedString *attrStr, element *elem[])
 		EMPH,
 		STRONG,
 		CODE,
-		PLAIN,
-		PARA,
-		LISTITEM,
 		BULLETLIST,
 		ORDEREDLIST,
 		BLOCKQUOTE,
@@ -36,8 +29,9 @@ void applyHighlighting(NSMutableAttributedString *attrStr, element *elem[])
 		REFERENCE,
 		NOTE
 	};
+	int order_len = 24;
 	
-	for (int i = 0; i < 31; i++)
+	for (int i = 0; i < order_len; i++)
 	{
 		//MKD_PRINTF("applyHighlighting: %i\n", i);
 		
@@ -135,55 +129,12 @@ NSAttributedString *highlight(NSString *str)
 
 void print_result(element *elem[])
 {
-	for (int i = 0; i < 34; i++)
+	for (int i = 0; i < NUM_TYPES; i++)
 	{
 		element *cursor = elem[i];
 		while (cursor != NULL)
 		{
-			char *typeStr;
-			switch (cursor->type)
-			{
-				case LIST:               typeStr = "LIST"; break;
-				case RAW_LIST:			 typeStr = "RAW_LIST"; break;
-				case RAW:                typeStr = "RAW"; break;
-				case SPACE:              typeStr = "SPACE"; break;
-				case LINEBREAK:          typeStr = "LINEBREAK"; break;
-				case ELLIPSIS:           typeStr = "ELLIPSIS"; break;
-				case EMDASH:             typeStr = "EMDASH"; break;
-				case ENDASH:             typeStr = "ENDASH"; break;
-				case APOSTROPHE:         typeStr = "APOSTROPHE"; break;
-				case SINGLEQUOTED:       typeStr = "SINGLEQUOTED"; break;
-				case DOUBLEQUOTED:       typeStr = "DOUBLEQUOTED"; break;
-				case STR:                typeStr = "STR"; break;
-				case LINK:               typeStr = "LINK"; break;
-				case AUTO_LINK_URL:      typeStr = "AUTO_LINK_URL"; break;
-				case AUTO_LINK_EMAIL:    typeStr = "AUTO_LINK_EMAIL"; break;
-				case IMAGE:              typeStr = "IMAGE"; break;
-				case CODE:               typeStr = "CODE"; break;
-				case HTML:               typeStr = "HTML"; break;
-				case EMPH:               typeStr = "EMPH"; break;
-				case STRONG:             typeStr = "STRONG"; break;
-				case PLAIN:              typeStr = "PLAIN"; break;
-				case PARA:               typeStr = "PARA"; break;
-				case LISTITEM:           typeStr = "LISTITEM"; break;
-				case BULLETLIST:         typeStr = "BULLETLIST"; break;
-				case ORDEREDLIST:        typeStr = "ORDEREDLIST"; break;
-				case H1:                 typeStr = "H1"; break;
-				case H2:                 typeStr = "H2"; break;
-				case H3:                 typeStr = "H3"; break;
-				case H4:                 typeStr = "H4"; break;
-				case H5:                 typeStr = "H5"; break;
-				case H6:                 typeStr = "H6"; break;
-				case BLOCKQUOTE:         typeStr = "BLOCKQUOTE"; break;
-				case VERBATIM:           typeStr = "VERBATIM"; break;
-				case HTMLBLOCK:          typeStr = "HTMLBLOCK"; break;
-				case HRULE:              typeStr = "HRULE"; break;
-				case REFERENCE:          typeStr = "REFERENCE"; break;
-				case NOTE:               typeStr = "NOTE"; break;
-				default:                 typeStr = "?";
-			}
-            MKD_PRINTF("[%ld-%ld] 0x%x: %s\n", cursor->pos, cursor->end, (int)cursor, typeStr);
-			
+            MKD_PRINTF("[%ld-%ld] 0x%x: %s\n", cursor->pos, cursor->end, (int)cursor, typeName(cursor->type));
 			cursor = cursor->next;
 		}
 	}

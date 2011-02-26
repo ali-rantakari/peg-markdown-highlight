@@ -189,7 +189,7 @@ element* head_elements[NUM_TYPES];
 
 
 
-char *typeName(int type)
+char *typeName(enum types type)
 {
 	switch (type)
 	{
@@ -197,26 +197,16 @@ char *typeName(int type)
 		case EXTRA_TEXT:		 return "EXTRA_TEXT"; break;
 		case NO_TYPE:			 return "NO TYPE"; break;
 		case RAW_LIST:			 return "RAW_LIST"; break;
-		case LIST:               return "LIST"; break;
 		case RAW:                return "RAW"; break;
-		case SPACE:              return "SPACE"; break;
-		case LINEBREAK:          return "LINEBREAK"; break;
-		case ELLIPSIS:           return "ELLIPSIS"; break;
-		case EMDASH:             return "EMDASH"; break;
-		case ENDASH:             return "ENDASH"; break;
-		case APOSTROPHE:         return "APOSTROPHE"; break;
+		
 		case SINGLEQUOTED:       return "SINGLEQUOTED"; break;
 		case DOUBLEQUOTED:       return "DOUBLEQUOTED"; break;
-		case STR:                return "STR"; break;
 		case LINK:               return "LINK"; break;
 		case IMAGE:              return "IMAGE"; break;
 		case CODE:               return "CODE"; break;
 		case HTML:               return "HTML"; break;
 		case EMPH:               return "EMPH"; break;
 		case STRONG:             return "STRONG"; break;
-		case PLAIN:              return "PLAIN"; break;
-		case PARA:               return "PARA"; break;
-		case LISTITEM:           return "LISTITEM"; break;
 		case BULLETLIST:         return "BULLETLIST"; break;
 		case ORDEREDLIST:        return "ORDEREDLIST"; break;
 		case H1:                 return "H1"; break;

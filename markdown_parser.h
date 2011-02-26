@@ -26,16 +26,8 @@ enum markdown_extensions {
 // Element types
 enum types
 {
-	LIST,   // A generic list of values.  For ordered and bullet lists, see below.
-	SPACE,
-	LINEBREAK,
-	ELLIPSIS,
-	EMDASH,
-	ENDASH,
-	APOSTROPHE,
 	SINGLEQUOTED,
 	DOUBLEQUOTED,
-	STR,
 	LINK,
 	AUTO_LINK_URL,
 	AUTO_LINK_EMAIL,
@@ -45,8 +37,6 @@ enum types
 	EMPH,
 	STRONG,
 	PLAIN,
-	PARA,
-	LISTITEM,
 	BULLETLIST,
 	ORDEREDLIST,
 	H1, H2, H3, H4, H5, H6,  // Code assumes that these are in order.
@@ -89,4 +79,5 @@ typedef struct Element element;
 // see implementation for docs
 element ** parse_markdown(char *string, element *elem, int extensions);
 void markdown_to_elements(char *text, int extensions, element **out[]);
+char *typeName(enum types type);
 
