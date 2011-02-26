@@ -3,7 +3,9 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#ifndef MKD_DEBUG_OUTPUT
 #define MKD_DEBUG_OUTPUT 1
+#endif
 
 #if MKD_DEBUG_OUTPUT
 #define MKD_PRINTF(x, args...)	fprintf(stderr, x, ##args)
@@ -66,7 +68,7 @@ enum types
 	NOTE
 };
 
-#define NUM_TYPES 37;
+#define NUM_TYPES 40
 
 
 // Semantic value of a parsing action.
@@ -84,4 +86,5 @@ typedef struct Element element;
 
 // see implementation for docs
 element ** parse_markdown(char *string, element *elem, int extensions);
+void markdown_to_elements(char *text, int extensions, element **out[]);
 
