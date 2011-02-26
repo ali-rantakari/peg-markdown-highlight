@@ -26,17 +26,7 @@ enum markdown_extensions {
 // Element types
 enum types
 {
-	NO_TYPE,
-	
-	RAW_LIST,	// List of RAW element lists, each to be processed separately from others
-	RAW,    	// Span marker for positions in original input to be post-processed
-				// in a second parsing step
-	EXTRA_TEXT,	// Additional text to be parsed along with spans in the original input
-				// (these may be added to linked lists of RAW elements)
-	SEPARATOR,	// Separates linked lists of RAW elements into parts to be processed
-				// separately from each other
-	
-	LIST,   /* A generic list of values.  For ordered and bullet lists, see below. */
+	LIST,   // A generic list of values.  For ordered and bullet lists, see below.
 	SPACE,
 	LINEBREAK,
 	ELLIPSIS,
@@ -59,13 +49,25 @@ enum types
 	LISTITEM,
 	BULLETLIST,
 	ORDEREDLIST,
-	H1, H2, H3, H4, H5, H6,  /* Code assumes that these are in order. */
+	H1, H2, H3, H4, H5, H6,  // Code assumes that these are in order.
 	BLOCKQUOTE,
 	VERBATIM,
 	HTMLBLOCK,
 	HRULE,
 	REFERENCE,
-	NOTE
+	NOTE,
+	
+	// The following are not language element types; they're
+	// 'utility types' only used by the parser itself.
+	
+	RAW_LIST,	// List of RAW element lists, each to be processed separately from others
+	RAW,    	// Span marker for positions in original input to be post-processed
+				// in a second parsing step
+	EXTRA_TEXT,	// Additional text to be parsed along with spans in the original input
+				// (these may be added to linked lists of RAW elements)
+	SEPARATOR,	// Separates linked lists of RAW elements into parts to be processed
+				// separately from each other
+	NO_TYPE
 };
 
 #define NUM_TYPES 40
