@@ -5,7 +5,7 @@
 #include "mkd_types.h"
 
 #ifndef MKD_DEBUG_OUTPUT
-#define MKD_DEBUG_OUTPUT 1
+#define MKD_DEBUG_OUTPUT 0
 #endif
 
 #if MKD_DEBUG_OUTPUT
