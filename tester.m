@@ -185,7 +185,7 @@ int main(int argc, char * argv[])
 				attrStr = highlight(contents);
 				
 				if (stepProgress == 9) {
-					Print(@"x");
+					Print([NSString stringWithFormat:@"%i", i+1]);
 					stepProgress = 0;
 				} else {
 					Print(@"-");
