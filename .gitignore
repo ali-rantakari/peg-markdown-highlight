@@ -5,4 +5,5 @@ peg/peg
 markdown_parser.c
 tester
 highlighter
+testclient
 
