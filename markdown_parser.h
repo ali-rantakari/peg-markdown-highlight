@@ -36,9 +36,8 @@ enum types
 	HTML,
 	EMPH,
 	STRONG,
-	PLAIN,
-	BULLETLIST,
-	ORDEREDLIST,
+	LIST_BULLET,
+	LIST_ENUMERATOR,
 	H1, H2, H3, H4, H5, H6,  // Code assumes that these are in order.
 	BLOCKQUOTE,
 	VERBATIM,

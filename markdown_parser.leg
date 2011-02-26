@@ -114,7 +114,7 @@ HorizontalRule = < NonindentSpace
                  { add(elem(HRULE)); }
 
 Bullet = !HorizontalRule NonindentSpace < ('+' | '*' | '-') > Spacechar+
-         { add(elem(BULLETLIST)); }
+         { add(elem(LIST_BULLET)); }
 
 BulletList = &Bullet (ListTight | ListLoose)
             
@@ -183,7 +183,7 @@ ListContinuationBlock = a:StartList
 						{ $$ = a; }
 
 Enumerator = NonindentSpace < [0-9]+ '.' > Spacechar+
-             { add(elem(ORDEREDLIST)); }
+             { add(elem(LIST_ENUMERATOR)); }
 
 OrderedList = &Enumerator (ListTight | ListLoose)
              

@@ -207,8 +207,8 @@ char *typeName(enum types type)
 		case HTML:               return "HTML"; break;
 		case EMPH:               return "EMPH"; break;
 		case STRONG:             return "STRONG"; break;
-		case BULLETLIST:         return "BULLETLIST"; break;
-		case ORDEREDLIST:        return "ORDEREDLIST"; break;
+		case LIST_BULLET:        return "LIST_BULLET"; break;
+		case LIST_ENUMERATOR:    return "LIST_ENUMERATOR"; break;
 		case H1:                 return "H1"; break;
 		case H2:                 return "H2"; break;
 		case H3:                 return "H3"; break;

@@ -20,8 +20,8 @@ void applyHighlighting(NSMutableAttributedString *attrStr, element *elem[])
 		EMPH,
 		STRONG,
 		CODE,
-		BULLETLIST,
-		ORDEREDLIST,
+		LIST_BULLET,
+		LIST_ENUMERATOR,
 		BLOCKQUOTE,
 		VERBATIM,
 		HTMLBLOCK,
@@ -59,8 +59,8 @@ void applyHighlighting(NSMutableAttributedString *attrStr, element *elem[])
 				case CODE:
 				case VERBATIM:	fgColor = [NSColor greenColor]; break;
 				case HRULE:		fgColor = [NSColor cyanColor]; break;
-				case ORDEREDLIST:
-				case BULLETLIST:fgColor = [NSColor magentaColor]; break;
+				case LIST_ENUMERATOR:
+				case LIST_BULLET:fgColor = [NSColor magentaColor]; break;
 				case AUTO_LINK_EMAIL:
 				case AUTO_LINK_URL:fgColor = [NSColor cyanColor]; break;
 				case IMAGE:
