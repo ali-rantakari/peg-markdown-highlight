@@ -1,6 +1,7 @@
 
 ### Primary stuff:
 
+- Unify naming (don't use both `under_scores` and `camelCase`)
 - Make it possible to use several highlighting textareas at the same time
     - Encapsulate implementation?
         - Problem: `peg` and its globals :( -- lots of work to fix
