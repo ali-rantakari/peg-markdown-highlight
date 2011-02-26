@@ -56,6 +56,7 @@ struct Element
     long              end; // end offset in input
     char              *text;
     struct Element    *next;
+    struct Element    *allElemsNext;
     struct Element    *children;
 };
 typedef struct Element element;

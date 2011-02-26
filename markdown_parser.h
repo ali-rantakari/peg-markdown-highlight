@@ -20,4 +20,5 @@
 element ** parse_markdown(char *string, element *elem, int extensions);
 void markdown_to_elements(char *text, int extensions, element **out[]);
 char *typeName(enum types type);
+void free_elements();
 

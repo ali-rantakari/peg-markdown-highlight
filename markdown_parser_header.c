@@ -16,10 +16,8 @@ void removeZeroLengthRAWSpans(element *elem)
 			} else {
 				elem = c->next;
 			}
-			element *oldc = c;
 			parent = c;
 			c = c->next;
-			free(oldc);
 			continue;
 		}
 		parent = c;
@@ -161,8 +159,8 @@ void markdown_to_elements(char *text, int extensions, element **out[])
     result = process_raw_blocks(text, result, extensions);
     
     *out = result;
+    free(text);
 }
-
 
 
 
@@ -187,6 +185,26 @@ static int p_offset;
 // Array of parsing result elements, indexed by type:
 element* head_elements[NUM_TYPES];
 
+// Linked list of all elements (pointers to next are in allElemsNext)
+element* all_elements = NULL;
+
+// Free all elements created while parsing
+void free_elements()
+{
+	element *cursor = all_elements;
+	while (cursor != NULL) {
+		element *old = cursor;
+		cursor = cursor->allElemsNext;
+		free(old);
+	}
+	all_elements = NULL;
+	
+	int i;
+	for (i = 0; i < NUM_TYPES; i++)
+		head_elements[i] = NULL;
+	p_elem = NULL;
+	p_elem_head = NULL;
+}
 
 
 char *typeName(enum types type)
@@ -271,6 +289,10 @@ element * mk_element(int type, long pos, long end)
     result->pos = pos;
     result->end = end;
     result->next = NULL;
+    
+    element *old_all_elements = all_elements;
+    all_elements = result;
+    result->allElemsNext = old_all_elements;
     
 	MKD_PRINTF("  mk_element: %s [%ld - %ld]\n", typeName(type), pos, end);
 	

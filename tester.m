@@ -107,6 +107,8 @@ void applyHighlighting(NSMutableAttributedString *attrStr, element *elem[])
 			next:
 			cursor = cursor->next;
 		}
+		
+		elem[order[i]] = NULL;
 	}
 }
 
@@ -122,6 +124,8 @@ NSAttributedString *highlight(NSString *str)
 	
 	NSMutableAttributedString *attrStr = [[[NSMutableAttributedString alloc] initWithString:str] autorelease];
 	applyHighlighting(attrStr, result);
+	
+	free_elements();
 	
 	return attrStr;
 }
@@ -155,21 +159,45 @@ int main(int argc, char * argv[])
 		return(0);
 	}
 	
+	ANSIEscapeHelper *ansiHelper = [[[ANSIEscapeHelper alloc] init] autorelease];
 	NSString *filePath = [NSString stringWithUTF8String:argv[argc-1]];
 	NSString *contents = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:NULL];
 	
-	if (strcmp(argv[1], "-d") == 0)
+	if (argc > 2)
 	{
-		int extensions = 0;
-		element **result;
-		markdown_to_elements((char *)[contents UTF8String], extensions, &result);
-		print_result(result);
+		if (strcmp(argv[1], "-d") == 0)
+		{
+			int extensions = 0;
+			element **result;
+			markdown_to_elements((char *)[contents UTF8String], extensions, &result);
+			print_result(result);
+		}
+		else
+		{
+			int iterations = atoi(argv[1]);
+			printf("Doing %i iterations.\n", iterations);
+			
+			NSAttributedString *attrStr = nil;
+			
+			int stepProgress = 0;
+			for (int i = 0; i < iterations; i++)
+			{
+				attrStr = highlight(contents);
+				
+				if (stepProgress == 9) {
+					Print(@"x");
+					stepProgress = 0;
+				} else {
+					Print(@"-");
+					stepProgress++;
+				}
+			}
+			
+			Print([ansiHelper ansiEscapedStringWithAttributedString:attrStr]);
+		}
 	}
 	else
-	{
-		ANSIEscapeHelper *ansiHelper = [[[ANSIEscapeHelper alloc] init] autorelease];
 		Print([ansiHelper ansiEscapedStringWithAttributedString:highlight(contents)]);
-	}
 	
 	[autoReleasePool release];
     return(0);

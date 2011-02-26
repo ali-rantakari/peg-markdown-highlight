@@ -32,6 +32,11 @@ element ** parse_markdown(char *string, element *elem, int extensions)
     
     MKD_PRINTF("\n\n");
     
+    free(yybuf);
+    free(yytext);
+    free(yythunks);
+    free(yyvals);
+    
     charbuf = oldcharbuf;
     return head_elements;
 }

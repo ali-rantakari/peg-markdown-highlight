@@ -157,6 +157,8 @@ element **getHighlightElements(NSString *markdown_str)
 	[outHandle closeFile];
 	[errHandle closeFile];
 	
+	[task waitUntilExit];
+	
 	if (errData && [errData length] > 0)
 		NSLog(@"stderr: %@", [[[NSString alloc] initWithData:errData encoding:NSUTF8StringEncoding] autorelease]);
 	int exitStatus = [task terminationStatus];
@@ -215,11 +217,29 @@ int main(int argc, char * argv[])
 	
 	NSString *filePath = [NSString stringWithUTF8String:argv[argc-1]];
 	NSString *contents = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:NULL];
+	NSMutableAttributedString *attrStr = nil;
 	
-	element **highlightElements = getHighlightElements(contents);
+	int iterations = 1;
+	if (argc > 2) {
+		iterations = atoi(argv[1]);
+		printf("Doing %i iterations.\n", iterations);
+	}
 	
-	NSMutableAttributedString *attrStr = [[[NSMutableAttributedString alloc] initWithString:contents] autorelease];
-	applyHighlighting(attrStr, highlightElements);
+	int stepProgress = 0;
+	for (int i = 0; i < iterations; i++)
+	{
+		element **highlightElements = getHighlightElements(contents);
+		attrStr = [[[NSMutableAttributedString alloc] initWithString:contents] autorelease];
+		applyHighlighting(attrStr, highlightElements);
+		
+		if (stepProgress == 9) {
+			Print(@"x");
+			stepProgress = 0;
+		} else {
+			Print(@"-");
+			stepProgress++;
+		}
+	}
 	
 	ANSIEscapeHelper *ansiHelper = [[[ANSIEscapeHelper alloc] init] autorelease];
 	Print([ansiHelper ansiEscapedStringWithAttributedString:attrStr]);
