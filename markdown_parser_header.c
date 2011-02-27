@@ -122,6 +122,48 @@ void print_raw_blocks(char *text, element *elem[])
 
 
 
+
+
+
+
+
+
+
+// Buffer of characters to be parsed:
+static char *charbuf = "";
+
+// Linked list of {start, end} offset pairs determining which parts
+// of charbuf to actually parse:
+static element *p_elem;
+static element *p_elem_head;
+
+// Current parsing offset within charbuf:
+static int p_offset;
+
+// Array of parsing result elements, indexed by type:
+element **head_elements;
+
+// Free all elements created while parsing
+void free_elements(element **elems)
+{
+	element *cursor = elems[ALL];
+	while (cursor != NULL) {
+		element *old = cursor;
+		cursor = cursor->allElemsNext;
+		free(old);
+	}
+	elems[ALL] = NULL;
+	
+	free(elems);
+}
+
+
+
+
+
+
+
+
 #define IS_CONTINUATION_BYTE(x)		((x & 0xc0) == 0x80)
 
 // todo: optimize?
@@ -144,6 +186,11 @@ char *copyStringStrippingUTF8ContBytes(char *str)
 void markdown_to_elements(char *text, int extensions, element **out[])
 {
 	char *text_copy = copyStringStrippingUTF8ContBytes(text);
+	
+	head_elements = malloc(sizeof(element**)*NUM_TYPES);
+	int i;
+	for (i = 0; i < NUM_TYPES; i++)
+		head_elements[i] = NULL;
 	
 	element *parsing_elem = malloc(sizeof(element));
 	parsing_elem->type = RAW;
@@ -168,44 +215,6 @@ void markdown_to_elements(char *text, int extensions, element **out[])
 
 
 
-
-
-
-
-// Buffer of characters to be parsed:
-static char *charbuf = "";
-
-// Linked list of {start, end} offset pairs determining which parts
-// of charbuf to actually parse:
-static element *p_elem;
-static element *p_elem_head;
-
-// Current parsing offset within charbuf:
-static int p_offset;
-
-// Array of parsing result elements, indexed by type:
-element* head_elements[NUM_TYPES];
-
-// Linked list of all elements (pointers to next are in allElemsNext)
-element* all_elements = NULL;
-
-// Free all elements created while parsing
-void free_elements()
-{
-	element *cursor = all_elements;
-	while (cursor != NULL) {
-		element *old = cursor;
-		cursor = cursor->allElemsNext;
-		free(old);
-	}
-	all_elements = NULL;
-	
-	int i;
-	for (i = 0; i < NUM_TYPES; i++)
-		head_elements[i] = NULL;
-	p_elem = NULL;
-	p_elem_head = NULL;
-}
 
 
 char *typeName(enum types type)
@@ -291,9 +300,9 @@ element * mk_element(int type, long pos, long end)
     result->end = end;
     result->next = NULL;
     
-    element *old_all_elements = all_elements;
-    all_elements = result;
-    result->allElemsNext = old_all_elements;
+    element *old_all_elements_head = head_elements[ALL];
+    head_elements[ALL] = result;
+    result->allElemsNext = old_all_elements_head;
     
 	MKD_PRINTF("  mk_element: %s [%ld - %ld]\n", typeName(type), pos, end);
 	

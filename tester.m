@@ -125,7 +125,7 @@ NSAttributedString *highlight(NSString *str)
 	NSMutableAttributedString *attrStr = [[[NSMutableAttributedString alloc] initWithString:str] autorelease];
 	applyHighlighting(attrStr, result);
 	
-	free_elements();
+	free_elements(result);
 	
 	return attrStr;
 }

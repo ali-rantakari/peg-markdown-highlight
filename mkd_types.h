@@ -32,10 +32,11 @@ enum types
 				// (these may be added to linked lists of RAW elements)
 	SEPARATOR,	// Separates linked lists of RAW elements into parts to be processed
 				// separately from each other
-	NO_TYPE
+	NO_TYPE,
+	ALL			// linked list of *all* elements created while parsing
 };
 
-#define NUM_TYPES 40
+#define NUM_TYPES 41
 
 
 
