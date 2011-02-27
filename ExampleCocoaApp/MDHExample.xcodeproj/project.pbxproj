@@ -14,6 +14,7 @@
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		C9B5A5521319C3CA00A1DEB6 /* markdown_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = C9B5A54D1319C3CA00A1DEB6 /* markdown_parser.c */; };
 		C9B5A5571319C41E00A1DEB6 /* HGMarkdownHighlighter.m in Sources */ = {isa = PBXBuildFile; fileRef = C9B5A5561319C41E00A1DEB6 /* HGMarkdownHighlighter.m */; };
+		C9B5A858131ACC0500A1DEB6 /* big.md in Resources */ = {isa = PBXBuildFile; fileRef = C9B5A857131ACC0500A1DEB6 /* big.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +37,7 @@
 		C9B5A5561319C41E00A1DEB6 /* HGMarkdownHighlighter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGMarkdownHighlighter.m; sourceTree = "<group>"; };
 		C9B5A5AD1319C9EB00A1DEB6 /* markdown_parser_footer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = markdown_parser_footer.c; sourceTree = "<group>"; };
 		C9B5A5AE1319C9EB00A1DEB6 /* markdown_parser_header.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = markdown_parser_header.c; sourceTree = "<group>"; };
+		C9B5A857131ACC0500A1DEB6 /* big.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = big.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,6 +114,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				C9B5A857131ACC0500A1DEB6 /* big.md */,
 				8D1107310486CEB800E47090 /* MDHExample-Info.plist */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
 				1DDD58140DA1D0A300B32029 /* MainMenu.xib */,
@@ -192,6 +195,7 @@
 			files = (
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
 				1DDD58160DA1D0A300B32029 /* MainMenu.xib in Resources */,
+				C9B5A858131ACC0500A1DEB6 /* big.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

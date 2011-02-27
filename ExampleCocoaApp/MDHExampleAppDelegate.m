@@ -22,6 +22,17 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+	NSString *s = [NSString
+				   stringWithContentsOfFile:[[NSBundle mainBundle]
+											 pathForResource:@"big"
+											 ofType:@"md"]
+				   encoding:NSUTF8StringEncoding
+				   error:NULL];
+	[textView1 insertText:s];
+	//[textView2 insertText:s];
+	
+	[HGMarkdownHighlighter sharedInstance].waitInterval = 0;
+	
 	[[HGMarkdownHighlighter sharedInstance] startHighlighting:textView1];
 	[[HGMarkdownHighlighter sharedInstance] startHighlighting:textView2];
 }

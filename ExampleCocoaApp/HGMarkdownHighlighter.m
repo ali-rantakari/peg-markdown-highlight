@@ -44,7 +44,7 @@
 	self.updateTimer = nil;
 	self.currentHighlightTarget = nil;
 	self.targetTextViews = [NSMutableSet new];
-	self.waitInterval = 0;
+	self.waitInterval = 1;
 	self.defaultFont = [NSFont userFixedPitchFontOfSize:12];
 	self.elementLists = [NSMutableDictionary dictionary];
 	
@@ -67,8 +67,6 @@
 
 - (void) clearHighlightingIn:(NSTextView *)textView withRange:(NSRange)range
 {
-	//[textView setFont:self.defaultFont];
-	
 	[[textView textStorage] addAttributes:[NSDictionary dictionaryWithObject:self.defaultFont forKey:NSFontAttributeName] range:range];
 	[[textView textStorage] removeAttribute:NSBackgroundColorAttributeName range:range];
 	[[textView textStorage] removeAttribute:NSForegroundColorAttributeName range:range];
@@ -144,7 +142,7 @@
 				case AUTO_LINK_EMAIL:
 				case AUTO_LINK_URL:fgColor = [NSColor cyanColor]; break;
 				case IMAGE:
-				case LINK:		bgColor = [NSColor blackColor];
+				case LINK:		bgColor = [NSColor grayColor];
 					fgColor = [NSColor cyanColor]; break;
 				case BLOCKQUOTE:removeBgColor = YES;
 					fgColor = [NSColor magentaColor]; break;
