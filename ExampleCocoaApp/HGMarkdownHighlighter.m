@@ -77,6 +77,9 @@
 	//NSLog(@"applyHighlighting: %@", NSStringFromRange(range));
 	NSUInteger rangeEnd = NSMaxRange(range);
 	
+	// todo: disable undo registration
+	[[textView textStorage] beginEditing];
+	
 	[self clearHighlightingIn:textView withRange:range];
 	
 	NSMutableAttributedString *attrStr = [textView textStorage];
@@ -184,6 +187,9 @@
 			cursor = cursor->next;
 		}
 	}
+	
+	[[textView textStorage] endEditing];
+	// todo: re-enable undo registration
 }
 
 - (void) applyVisibleRangeHighlightingTo:(NSTextView *)textView
