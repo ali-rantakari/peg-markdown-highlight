@@ -12,8 +12,8 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="29"/>
 			<integer value="371"/>
+			<integer value="29"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1360,7 +1360,7 @@
 													<string>public.url</string>
 												</object>
 											</object>
-											<string key="NSFrameSize">{340, 0}</string>
+											<string key="NSFrame">{{0, -14}, {340, 14}}</string>
 											<reference key="NSSuperview" ref="562522133"/>
 											<object class="NSTextContainer" key="NSTextContainer" id="60750855">
 												<object class="NSLayoutManager" key="NSLayoutManager">
@@ -1525,7 +1525,7 @@
 													<string>public.url</string>
 												</object>
 											</object>
-											<string key="NSFrameSize">{340, 0}</string>
+											<string key="NSFrame">{{0, -14}, {340, 14}}</string>
 											<reference key="NSSuperview" ref="44899091"/>
 											<object class="NSTextContainer" key="NSTextContainer" id="541479139">
 												<object class="NSLayoutManager" key="NSLayoutManager">
@@ -1769,8 +1769,8 @@
 										<bool key="EncodedWithXMLCoder">YES</bool>
 										<object class="NSButton" id="993240733">
 											<reference key="NSNextResponder" ref="628665151"/>
-											<int key="NSvFlags">266</int>
-											<string key="NSFrame">{{111, 7}, {142, 32}}</string>
+											<int key="NSvFlags">301</int>
+											<string key="NSFrame">{{111, 6}, {140, 32}}</string>
 											<reference key="NSSuperview" ref="628665151"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="490818429">
