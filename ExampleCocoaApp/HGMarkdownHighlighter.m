@@ -7,18 +7,13 @@
 //
 
 #import "HGMarkdownHighlighter.h"
-#import "markdown_parser.h"
+#import "HGMarkdownParser.h"
 
 
 // 'private members' category
 @interface HGMarkdownHighlighter()
 
-@property(retain) NSMutableSet *targetTextViews;
 @property(retain) NSTimer *updateTimer;
-@property(retain) NSMutableDictionary *elementLists;
-@property(retain) NSThread *workerThread;
-@property(retain) NSMutableArray *queue;
-@property(retain) NSTextView *currentHighlightTarget;
 
 @end
 
@@ -27,62 +22,61 @@
 
 @synthesize waitInterval;
 @synthesize defaultFont;
-@synthesize targetTextViews;
+@synthesize targetTextView;
 @synthesize updateTimer;
-@synthesize elementLists;
-@synthesize workerThread;
-@synthesize currentHighlightTarget;
-@synthesize queue;
+@synthesize isHighlighting;
+@synthesize highlightAutomatically;
+@synthesize extensions;
 
-- (id) init
+- (id) initWithTextView:(NSTextView *)textView
 {
 	if (!(self = [super init]))
 		return nil;
 	
-	self.queue = [NSMutableArray array];
-	self.workerThread = nil;
+	cachedElements = NULL;
+	
+	self.isHighlighting = NO;
+	self.highlightAutomatically = YES;
 	self.updateTimer = nil;
-	self.currentHighlightTarget = nil;
-	self.targetTextViews = [NSMutableSet new];
+	self.targetTextView = textView;
 	self.waitInterval = 1;
+	self.extensions = 0;
 	self.defaultFont = [NSFont userFixedPitchFontOfSize:12];
-	self.elementLists = [NSMutableDictionary dictionary];
 	
 	return self;
 }
 
 - (void) dealloc
 {
-	self.elementLists = nil;
-	self.targetTextViews = nil;
+	self.targetTextView = nil;
 	self.defaultFont = nil;
 	self.updateTimer = nil;
-	self.workerThread = nil;
-	self.queue = nil;
 	[super dealloc];
 }
 
 
 #pragma mark -
 
-- (void) clearHighlightingIn:(NSTextView *)textView withRange:(NSRange)range
+- (void) clearHighlightingForRange:(NSRange)range
 {
-	[[textView textStorage] addAttributes:[NSDictionary dictionaryWithObject:self.defaultFont forKey:NSFontAttributeName] range:range];
-	[[textView textStorage] removeAttribute:NSBackgroundColorAttributeName range:range];
-	[[textView textStorage] removeAttribute:NSForegroundColorAttributeName range:range];
+	NSTextStorage *textStorage = [self.targetTextView textStorage];
+	
+	[textStorage addAttributes:[NSDictionary dictionaryWithObject:self.defaultFont forKey:NSFontAttributeName] range:range];
+	[textStorage removeAttribute:NSBackgroundColorAttributeName range:range];
+	[textStorage removeAttribute:NSForegroundColorAttributeName range:range];
 }
 
-- (void) applyHighlighting:(element **)elements to:(NSTextView *)textView withRange:(NSRange)range
+- (void) applyHighlighting:(element **)elements withRange:(NSRange)range
 {
 	//NSLog(@"applyHighlighting: %@", NSStringFromRange(range));
 	NSUInteger rangeEnd = NSMaxRange(range);
 	
 	// todo: disable undo registration
-	[[textView textStorage] beginEditing];
+	[[self.targetTextView textStorage] beginEditing];
 	
-	[self clearHighlightingIn:textView withRange:range];
+	[self clearHighlightingForRange:range];
 	
-	NSMutableAttributedString *attrStr = [textView textStorage];
+	NSMutableAttributedString *attrStr = [self.targetTextView textStorage];
 	int sourceLength = [attrStr length];
 	
 	int order[] = {
@@ -188,181 +182,91 @@
 		}
 	}
 	
-	[[textView textStorage] endEditing];
+	[[self.targetTextView textStorage] endEditing];
 	// todo: re-enable undo registration
 }
 
-- (void) applyVisibleRangeHighlightingTo:(NSTextView *)textView
+- (void) applyVisibleRangeHighlighting
 {
-	NSRect visibleRect = [[[textView enclosingScrollView] contentView] documentVisibleRect];
-	NSRange visibleRange = [[textView layoutManager] glyphRangeForBoundingRect:visibleRect inTextContainer:[textView textContainer]];
+	NSRect visibleRect = [[[self.targetTextView enclosingScrollView] contentView] documentVisibleRect];
+	NSRange visibleRange = [[self.targetTextView layoutManager] glyphRangeForBoundingRect:visibleRect inTextContainer:[self.targetTextView textContainer]];
 	
-	NSValue *elementValue = [self.elementLists objectForKey:[NSValue valueWithPointer:textView]];
-	if (elementValue == nil)
+	if (cachedElements == NULL)
 		return;
-	element **result = (element **)[elementValue pointerValue];
-	[self applyHighlighting:result to:textView withRange:visibleRange];
+	[self applyHighlighting:cachedElements withRange:visibleRange];
 }
 
-- (element **) parse:(NSTextView *)textView
+
+
+- (void) cacheElementList:(element **)list
 {
-	int extensions = 0;
-	element **result = NULL;
-	markdown_to_elements((char *)[[textView string] UTF8String], extensions, &result);
-	return result;
+	if (cachedElements != NULL) {
+		free_elements(cachedElements);
+		cachedElements = NULL;
+	}
+	cachedElements = list;
 }
 
-
-- (void) cacheElementList:(element **)list forTextView:(NSTextView *)textView
+- (void) clearElementsCache
 {
-	NSValue *viewKey = [NSValue valueWithPointer:textView];
-	NSValue *oldValue = [self.elementLists objectForKey:viewKey];
-	if (oldValue != nil)
-		free_elements((element **)[oldValue pointerValue]);
-	
-	if (list == NULL)
-		[self.elementLists removeObjectForKey:viewKey];
-	else
-		[self.elementLists setObject:[NSValue valueWithPointer:list] forKey:viewKey];
+	[self cacheElementList:NULL];
 }
 
-- (void) threadDoneHandler:(NSDictionary *)info
+
+
+- (void) parserDidParse:(NSValue *)resultPointer
 {
-	NSTextView *textView = (NSTextView *)[info objectForKey:@"textView"];
-	
-	if ([self.queue containsObject:textView])
-		return;
-	
-	element **result = (element **)[[info objectForKey:@"result"] pointerValue];
-	[self cacheElementList:result forTextView:textView];
-	
-	[self applyVisibleRangeHighlightingTo:textView];
+	[self cacheElementList:(element **)[resultPointer pointerValue]];
+	[self applyVisibleRangeHighlighting];
 }
-
-- (void) threadParseAndHighlight:(NSTextView *)textView
-{
-	NSAutoreleasePool *autoReleasePool = [[NSAutoreleasePool alloc] init];
-	
-	element **result = [self parse:textView];
-	
-	NSDictionary *infoDict = [NSDictionary
-							  dictionaryWithObjectsAndKeys:
-							  textView, @"textView",
-							  [NSValue valueWithPointer:result], @"result",
-							  nil];
-	[self
-	 performSelectorOnMainThread:@selector(threadDoneHandler:)
-	 withObject:infoDict
-	 waitUntilDone:YES];
-	
-	[autoReleasePool drain];
-}
-
-- (void) threadDidExit:(NSNotification *)notification
-{
-	[[NSNotificationCenter defaultCenter]
-	 removeObserver:self
-	 name:NSThreadWillExitNotification
-	 object:self.workerThread];
-	self.workerThread = nil;
-	self.currentHighlightTarget = nil;
-	[self
-	 performSelectorOnMainThread:@selector(processNextFromQueue)
-	 withObject:nil
-	 waitUntilDone:NO];
-}
-
-- (void) processNextFromQueue
-{
-	if ([self.queue count] == 0 || self.workerThread != nil)
-		return;
-	
-	// pop textView from queue
-	NSTextView *textView = [self.queue objectAtIndex:0];
-	[self.queue removeObjectAtIndex:0];
-	
-	self.workerThread = [[NSThread alloc]
-			  initWithTarget:self
-			  selector:@selector(threadParseAndHighlight:)
-			  object:textView];
-	
-	[[NSNotificationCenter defaultCenter]
-	 addObserver:self
-	 selector:@selector(threadDidExit:)
-	 name:NSThreadWillExitNotification
-	 object:self.workerThread];
-	
-	self.currentHighlightTarget = textView;
-	
-	[self.workerThread start];
-}
-
-- (void) requestHighlightFor:(NSTextView *)textView
-{
-	if ([self.queue containsObject:textView])
-		return;
-	
-	[self.queue addObject:textView];
-	[self processNextFromQueue];
-}
-
 
 - (void) textViewUpdateTimerFire:(NSTimer*)timer
 {
-	NSTextView *textView = (NSTextView *)[timer userInfo];
-	if (textView != nil && ![self.targetTextViews containsObject:textView])
-		return;
-	
 	self.updateTimer = nil;
-	
-	[self requestHighlightFor:textView];
+	[[HGMarkdownParser sharedInstance] requestParsing:self];
 }
 
 
 - (void) textViewTextDidChange:(NSNotification *)notification
 {
-	NSTextView *textView = (NSTextView *)[notification object];
-	if (textView != nil && ![self.targetTextViews containsObject:textView])
-		return;
-	
 	if (self.updateTimer != nil)
 		[self.updateTimer invalidate], self.updateTimer = nil;
 	self.updateTimer = [NSTimer
 				   scheduledTimerWithTimeInterval:self.waitInterval
 				   target:self
 				   selector:@selector(textViewUpdateTimerFire:)
-				   userInfo:textView
+				   userInfo:nil
 				   repeats:NO
 				   ];
 }
 
 - (void) textViewDidScroll:(NSNotification *)notification
 {
-	NSClipView *scrollViewContentView = (NSClipView *)[notification object];
-	NSTextView *textView = [scrollViewContentView documentView];
-	if (textView != nil && ![self.targetTextViews containsObject:textView])
+	if (cachedElements == NULL)
 		return;
-	
-	[self applyVisibleRangeHighlightingTo:textView];
+	[self applyVisibleRangeHighlighting];
 }
 
 
-- (void) startHighlighting:(NSTextView *)textView
+- (void) parseAndHighlightNow
 {
-	if ([self.targetTextViews containsObject:textView])
-		return;
+	[[HGMarkdownParser sharedInstance] requestParsing:self];
+}
+
+- (void) startHighlighting
+{
+	// todo: throw exception if targetTextView is nil?
 	
-	[self.targetTextViews addObject:textView];
+	[[HGMarkdownParser sharedInstance] requestParsing:self];
 	
-	[self requestHighlightFor:textView];
+	if (self.highlightAutomatically)
+		[[NSNotificationCenter defaultCenter]
+		 addObserver:self
+		 selector:@selector(textViewTextDidChange:)
+		 name:NSTextDidChangeNotification
+		 object:nil];
 	
-	[[NSNotificationCenter defaultCenter]
-	 addObserver:self
-	 selector:@selector(textViewTextDidChange:)
-	 name:NSTextDidChangeNotification
-	 object:textView];
-	
-	NSScrollView *scrollView = [textView enclosingScrollView];
+	NSScrollView *scrollView = [self.targetTextView enclosingScrollView];
 	if (scrollView != nil)
 	{
 		[[scrollView contentView] setPostsBoundsChangedNotifications: YES];
@@ -373,19 +277,21 @@
 		 object:[scrollView contentView]
 		 ];
 	}
+	
+	self.isHighlighting = YES;
 }
 
-- (void) stopHighlighting:(NSTextView *)textView
+- (void) stopHighlighting
 {
-	if (![self.targetTextViews containsObject:textView])
+	if (!self.isHighlighting)
 		return;
 	
 	[[NSNotificationCenter defaultCenter]
 	 removeObserver:self
 	 name:NSTextDidChangeNotification
-	 object:textView];
+	 object:self.targetTextView];
 	
-	NSScrollView *scrollView = [textView enclosingScrollView];
+	NSScrollView *scrollView = [self.targetTextView enclosingScrollView];
 	if (scrollView != nil)
 	{
 		// let's not change this here... the user may wish to control it
@@ -398,69 +304,10 @@
 		 ];
 	}
 	
-	[self.targetTextViews removeObject:textView];
-	[self cacheElementList:NULL forTextView:textView];
-	
+	[self clearElementsCache];
+	self.isHighlighting = NO;
 }
 
-
-
-
-
-
-
-#pragma mark -
-#pragma mark Singleton methods
-
-static HGMarkdownHighlighter *sharedInstance = NULL;
-
-+ (HGMarkdownHighlighter *) sharedInstance
-{
-    @synchronized(self)
-    {
-        if (sharedInstance == nil)
-			sharedInstance = [[HGMarkdownHighlighter alloc] init];
-    }
-    return sharedInstance;
-}
-
-+ (id) allocWithZone:(NSZone *)zone
-{
-    @synchronized(self)
-	{
-        if (sharedInstance == nil)
-		{
-            sharedInstance = [super allocWithZone:zone];
-            return sharedInstance;
-        }
-    }
-    return nil;
-}
-
-- (id) copyWithZone:(NSZone *)zone
-{
-    return self;
-}
-
-- (id) retain
-{
-    return self;
-}
-
-- (NSUInteger) retainCount
-{
-    return UINT_MAX;
-}
-
-- (void) release
-{
-    // do nothing
-}
-
-- (id) autorelease
-{
-    return self;
-}
 
 
 @end

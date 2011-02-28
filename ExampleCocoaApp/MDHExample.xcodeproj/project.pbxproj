@@ -15,6 +15,7 @@
 		C9B5A5521319C3CA00A1DEB6 /* markdown_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = C9B5A54D1319C3CA00A1DEB6 /* markdown_parser.c */; };
 		C9B5A5571319C41E00A1DEB6 /* HGMarkdownHighlighter.m in Sources */ = {isa = PBXBuildFile; fileRef = C9B5A5561319C41E00A1DEB6 /* HGMarkdownHighlighter.m */; };
 		C9B5A858131ACC0500A1DEB6 /* big.md in Resources */ = {isa = PBXBuildFile; fileRef = C9B5A857131ACC0500A1DEB6 /* big.md */; };
+		C9B5A8EE131C4CD600A1DEB6 /* HGMarkdownParser.m in Sources */ = {isa = PBXBuildFile; fileRef = C9B5A8ED131C4CD600A1DEB6 /* HGMarkdownParser.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +39,8 @@
 		C9B5A5AD1319C9EB00A1DEB6 /* markdown_parser_footer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = markdown_parser_footer.c; sourceTree = "<group>"; };
 		C9B5A5AE1319C9EB00A1DEB6 /* markdown_parser_header.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = markdown_parser_header.c; sourceTree = "<group>"; };
 		C9B5A857131ACC0500A1DEB6 /* big.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = big.md; sourceTree = "<group>"; };
+		C9B5A8EC131C4CD600A1DEB6 /* HGMarkdownParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGMarkdownParser.h; sourceTree = "<group>"; };
+		C9B5A8ED131C4CD600A1DEB6 /* HGMarkdownParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGMarkdownParser.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +59,8 @@
 			isa = PBXGroup;
 			children = (
 				C9B5A5541319C3D400A1DEB6 /* highlighter */,
+				C9B5A8EC131C4CD600A1DEB6 /* HGMarkdownParser.h */,
+				C9B5A8ED131C4CD600A1DEB6 /* HGMarkdownParser.m */,
 				C9B5A5551319C41E00A1DEB6 /* HGMarkdownHighlighter.h */,
 				C9B5A5561319C41E00A1DEB6 /* HGMarkdownHighlighter.m */,
 				256AC3D80F4B6AC300CF3369 /* MDHExampleAppDelegate.h */,
@@ -210,6 +215,7 @@
 				256AC3DA0F4B6AC300CF3369 /* MDHExampleAppDelegate.m in Sources */,
 				C9B5A5521319C3CA00A1DEB6 /* markdown_parser.c in Sources */,
 				C9B5A5571319C41E00A1DEB6 /* HGMarkdownHighlighter.m in Sources */,
+				C9B5A8EE131C4CD600A1DEB6 /* HGMarkdownParser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -7,7 +7,6 @@
 //
 
 #import "MDHExampleAppDelegate.h"
-#import "HGMarkdownHighlighter.h"
 
 @implementation MDHExampleAppDelegate
 
@@ -15,9 +14,23 @@
 @synthesize textView1;
 @synthesize textView2;
 
+- (id) init
+{
+	if (!(self = [super init]))
+		return nil;
+	
+	return self;
+}
+
 - (void) dealloc
 {
 	[super dealloc];
+}
+
+- (void) awakeFromNib
+{
+	[delayLabel takeIntValueFrom:delaySlider];
+	[delaySlider setIntValue:1];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
@@ -29,12 +42,29 @@
 				   encoding:NSUTF8StringEncoding
 				   error:NULL];
 	[textView1 insertText:s];
-	//[textView2 insertText:s];
+	[textView2 insertText:s];
 	
-	[HGMarkdownHighlighter sharedInstance].waitInterval = 0;
+	hl1 = [[HGMarkdownHighlighter alloc] initWithTextView:textView1];
+	hl1.waitInterval = [delaySlider intValue];
+	[hl1 startHighlighting];
 	
-	[[HGMarkdownHighlighter sharedInstance] startHighlighting:textView1];
-	[[HGMarkdownHighlighter sharedInstance] startHighlighting:textView2];
+	hl2 = [[HGMarkdownHighlighter alloc] initWithTextView:textView2];
+	hl2.waitInterval = 2; // only relevant if highlightAutomatically == YES
+	hl2.highlightAutomatically = NO;
+	[hl2 startHighlighting];
 }
+
+
+- (IBAction) delaySliderMove:(id)sender
+{
+	[delayLabel takeIntValueFrom:delaySlider];
+	hl1.waitInterval = [delaySlider intValue];
+}
+
+- (IBAction) manualHighlightButtonPress:(id)sender
+{
+	[hl2 parseAndHighlightNow];
+}
+
 
 @end
