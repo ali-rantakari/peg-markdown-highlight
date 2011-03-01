@@ -10,7 +10,7 @@ void Print(NSString *aStr)
 }
 
 
-void applyHighlighting(NSMutableAttributedString *attrStr, element *elem[])
+void apply_highlighting(NSMutableAttributedString *attrStr, element *elem[])
 {
 	int sourceLength = [attrStr length];
 	
@@ -124,7 +124,7 @@ element * mk_element(int type, long pos, long end)
 }
 
 
-element **getHighlightElements(NSString *markdown_str)
+element **get_highlight_elements(NSString *markdown_str)
 {
 	element **elements = malloc(sizeof(element*) * NUM_TYPES);
 	for (int i = 0; i < NUM_TYPES; i++)
@@ -228,9 +228,9 @@ int main(int argc, char * argv[])
 	int stepProgress = 0;
 	for (int i = 0; i < iterations; i++)
 	{
-		element **highlightElements = getHighlightElements(contents);
+		element **highlightElements = get_highlight_elements(contents);
 		attrStr = [[[NSMutableAttributedString alloc] initWithString:contents] autorelease];
-		applyHighlighting(attrStr, highlightElements);
+		apply_highlighting(attrStr, highlightElements);
 		
 		if (stepProgress == 9) {
 			Print(@"x");

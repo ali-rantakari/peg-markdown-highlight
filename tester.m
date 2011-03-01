@@ -4,7 +4,7 @@
 #import "markdown_parser.h"
 
 
-void applyHighlighting(NSMutableAttributedString *attrStr, element *elem[])
+void apply_highlighting(NSMutableAttributedString *attrStr, element *elem[])
 {
 	int sourceLength = [attrStr length];
 	
@@ -33,7 +33,7 @@ void applyHighlighting(NSMutableAttributedString *attrStr, element *elem[])
 	
 	for (int i = 0; i < order_len; i++)
 	{
-		//MKD_PRINTF("applyHighlighting: %i\n", i);
+		//MKD_PRINTF("apply_highlighting: %i\n", i);
 		
 		element *cursor = elem[order[i]];
 		while (cursor != NULL)
@@ -123,7 +123,7 @@ NSAttributedString *highlight(NSString *str)
 	markdown_to_elements(md_source, extensions, &result);
 	
 	NSMutableAttributedString *attrStr = [[[NSMutableAttributedString alloc] initWithString:str] autorelease];
-	applyHighlighting(attrStr, result);
+	apply_highlighting(attrStr, result);
 	
 	free_elements(result);
 	
@@ -138,7 +138,7 @@ void print_result(element *elem[])
 		element *cursor = elem[i];
 		while (cursor != NULL)
 		{
-            MKD_PRINTF("[%ld-%ld] 0x%x: %s\n", cursor->pos, cursor->end, (int)cursor, typeName(cursor->type));
+            MKD_PRINTF("[%ld-%ld] 0x%x: %s\n", cursor->pos, cursor->end, (int)cursor, type_name(cursor->type));
 			cursor = cursor->next;
 		}
 	}

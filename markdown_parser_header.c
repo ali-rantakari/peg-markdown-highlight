@@ -3,7 +3,7 @@
 
 
 
-void removeZeroLengthRAWSpans(element *elem)
+void remove_zero_length_raw_spans(element *elem)
 {
 	element *parent = NULL;
 	element *c = elem;
@@ -27,7 +27,7 @@ void removeZeroLengthRAWSpans(element *elem)
 
 // Print null-terminated string s.t. some characters are
 // represented by their corresponding espace sequences
-void printStrEscapes(char *str)
+void print_str_literal_escapes(char *str)
 {
 	char *c = str;
 	MKD_PRINTF("'");
@@ -44,14 +44,15 @@ void printStrEscapes(char *str)
 
 // Print elements in a linked list of
 // RAW, SEPARATOR, EXTRA_TEXT elements
-void printSpansInline(element *elem)
+void print_raw_spans_inline(element *elem)
 {
 	element *cur = elem;
-	while (cur != NULL) {
+	while (cur != NULL)
+	{
 		if (cur->type == SEPARATOR)
 			MKD_PRINTF("<SEP %ld> ", cur->pos);
 		else if (cur->type == EXTRA_TEXT) {
-			MKD_PRINTF("{ETEXT "); printStrEscapes(cur->text); MKD_PRINTF("}");
+			MKD_PRINTF("{ETEXT "); print_str_literal_escapes(cur->text); MKD_PRINTF("}");
 		}
 		else
 			MKD_PRINTF("(%ld-%ld) ", cur->pos, cur->end);
@@ -73,10 +74,10 @@ element ** process_raw_blocks(char *text, element *elem[], int extensions)
 		{
 			element *span_list = cursor->children;
 			
-			removeZeroLengthRAWSpans(span_list);
+			remove_zero_length_raw_spans(span_list);
 			
 			#if MKD_DEBUG_OUTPUT
-			MKD_PRINTF("  process: "); printSpansInline(span_list); MKD_PRINTF("\n");
+			MKD_PRINTF("  process: "); print_raw_spans_inline(span_list); MKD_PRINTF("\n");
 			#endif
 			
 			while (span_list != NULL)
@@ -95,7 +96,7 @@ element ** process_raw_blocks(char *text, element *elem[], int extensions)
 				}
 				
 				#if MKD_DEBUG_OUTPUT
-				MKD_PRINTF("    subspan process: "); printSpansInline(subspan_list); MKD_PRINTF("\n");
+				MKD_PRINTF("    subspan process: "); print_raw_spans_inline(subspan_list); MKD_PRINTF("\n");
 				#endif
 				
 				parse_markdown(text, subspan_list, extensions);
@@ -115,7 +116,7 @@ void print_raw_blocks(char *text, element *elem[])
 	element *cursor = elem[RAW_LIST];
 	while (cursor != NULL)
 	{
-		printSpansInline(cursor->children);
+		print_raw_spans_inline(cursor->children);
 		cursor = cursor->next;
 	}
 }
@@ -166,8 +167,7 @@ void free_elements(element **elems)
 
 #define IS_CONTINUATION_BYTE(x)		((x & 0xc0) == 0x80)
 
-// todo: optimize?
-char *copyStringStrippingUTF8ContBytes(char *str)
+char *strcpy_without_continuation_bytes(char *str)
 {
 	char *new = malloc(sizeof(char)*strlen(str) +1);
 	char *c = str;
@@ -185,7 +185,7 @@ char *copyStringStrippingUTF8ContBytes(char *str)
 
 void markdown_to_elements(char *text, int extensions, element **out[])
 {
-	char *text_copy = copyStringStrippingUTF8ContBytes(text);
+	char *text_copy = strcpy_without_continuation_bytes(text);
 	
 	head_elements = malloc(sizeof(element**)*NUM_TYPES);
 	int i;
@@ -217,7 +217,7 @@ void markdown_to_elements(char *text, int extensions, element **out[])
 
 
 
-char *typeName(enum types type)
+char *type_name(enum types type)
 {
 	switch (type)
 	{
@@ -304,7 +304,7 @@ element * mk_element(int type, long pos, long end)
     head_elements[ALL] = result;
     result->allElemsNext = old_all_elements_head;
     
-	MKD_PRINTF("  mk_element: %s [%ld - %ld]\n", typeName(type), pos, end);
+	MKD_PRINTF("  mk_element: %s [%ld - %ld]\n", type_name(type), pos, end);
 	
     return result;
 }
@@ -324,7 +324,7 @@ element * mk_etext(char *string)
 // locations in the *parsed text* (defined by the linked list of RAW and
 // EXTRA_TEXT elements in p_elem), fix these offsets to represent
 // corresponding offsets in the original input (charbuf).
-void fixOffsets(element *elem)
+void fix_offsets(element *elem)
 {
 	if (elem->type == EXTRA_TEXT)
 		return;
@@ -384,16 +384,16 @@ void add(element *elem)
 	// > text HIGHLIGHTING
 	// > CONTINUES text
 	if (elem->type != RAW_LIST) {
-		MKD_PRINTF("  add: %s [%ld - %ld]\n", typeName(elem->type), elem->pos, elem->end);
-		fixOffsets(elem);
-		MKD_PRINTF("     : %s [%ld - %ld]\n", typeName(elem->type), elem->pos, elem->end);
+		MKD_PRINTF("  add: %s [%ld - %ld]\n", type_name(elem->type), elem->pos, elem->end);
+		fix_offsets(elem);
+		MKD_PRINTF("     : %s [%ld - %ld]\n", type_name(elem->type), elem->pos, elem->end);
 	}
 	else {
 		MKD_PRINTF("  add: RAW_LIST ");
 		element *cursor = elem->children;
 		while (cursor != NULL) {
 			MKD_PRINTF("(%ld-%ld)>", cursor->pos, cursor->end);
-			fixOffsets(cursor);
+			fix_offsets(cursor);
 			MKD_PRINTF("(%ld-%ld) ", cursor->pos, cursor->end);
 			cursor = cursor->next;
 		}

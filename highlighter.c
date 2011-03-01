@@ -4,7 +4,7 @@
 
 
 #define READ_BUFFER_LEN 1024
-char *getUTF8FromStdin()
+char *utf8_from_stdin()
 {
 	char buffer[READ_BUFFER_LEN];
 	size_t content_len = 1;
@@ -22,7 +22,7 @@ char *getUTF8FromStdin()
 }
 
 
-void outputResult(element *elem[])
+void output_result(element *elem[])
 {
 	element *cursor;
 	bool firstType = true;
@@ -56,9 +56,9 @@ int main(int argc, char * argv[])
 	int extensions = 0;
 	element **result;
 	
-	char *md_source = getUTF8FromStdin();
+	char *md_source = utf8_from_stdin();
 	markdown_to_elements(md_source, extensions, &result);
-	outputResult(result);
+	output_result(result);
 	
     return(0);
 }
