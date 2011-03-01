@@ -1,6 +1,13 @@
 #import <Cocoa/Cocoa.h>
 #import "markdown_definitions.h"
 
+/**
+ * \brief Highlighter for an NSTextView.
+ *
+ * Given a reference to an NSTextView, handles the highlighting of its
+ * contents based on the Markdown syntax.
+ *
+ */
 @interface HGMarkdownHighlighter : NSObject
 {
 	NSFont *defaultFont;
@@ -15,19 +22,61 @@
 	element **cachedElements;
 }
 
+/** \brief The delay between editing text and it getting highlighted. */
 @property NSTimeInterval waitInterval;
-@property(copy) NSFont *defaultFont;
+
+/** \brief The NSTextView to highlight. */
 @property(retain) NSTextView *targetTextView;
+
+/** \brief Whether this highlighter is active.
+ * 
+ * \sa startHighlighting
+ */
 @property BOOL isHighlighting;
+
+/** \brief Whether to automatically highlight.
+ * Whether this highlighter will automatically parse and
+ * highlight the text whenever it changes, after a certain delay
+ * (determined by waitInterval).
+ * 
+ * \sa waitInterval
+ */
 @property BOOL highlightAutomatically;
+
+/** \brief The extensions to use for parsing.
+ * 
+ * A bitfield of markdown_extensions values.
+ * 
+ * \sa markdown_extensions
+ */
 @property int extensions;
 
+
+@property(copy) NSFont *defaultFont;
+
+
+/**
+ * 
+ * 
+ */
 - (id) initWithTextView:(NSTextView *)textView;
 
+/** \brief Manually highlight the NSTextView.
+ * 
+ */
 - (void) parseAndHighlightNow;
+
+/** \brief Begin highlighting the NSTextView.
+ * 
+ * 
+ */
 - (void) startHighlighting;
+
+/** \brief Stop highlighting the NSTextView.
+ * 
+ * 
+ */
 - (void) stopHighlighting;
 
-- (void) parserDidParse:(NSValue *)resultPointer;
 
 @end
