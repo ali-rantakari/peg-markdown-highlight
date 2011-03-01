@@ -1,7 +1,7 @@
 
 #import <Foundation/Foundation.h>
 #import "ANSIEscapeHelper.h"
-#import "mkd_types.h"
+#import "markdown_definitions.h"
 
 
 void Print(NSString *aStr)

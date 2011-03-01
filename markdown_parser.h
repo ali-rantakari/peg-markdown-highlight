@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <assert.h>
-#include "mkd_types.h"
+#include "markdown_definitions.h"
 
 #ifndef MKD_DEBUG_OUTPUT
 #define MKD_DEBUG_OUTPUT 0

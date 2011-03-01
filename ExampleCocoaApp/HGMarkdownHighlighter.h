@@ -1,14 +1,5 @@
-//
-//  HGMarkdownHighlighter.h
-//  MDHExample
-//
-//  Created by Ali Rantakari on 27.2.11.
-//  Copyright 2011 hasseg.org. All rights reserved.
-//
-
 #import <Cocoa/Cocoa.h>
-#import "mkd_types.h"
-
+#import "markdown_definitions.h"
 
 @interface HGMarkdownHighlighter : NSObject
 {
