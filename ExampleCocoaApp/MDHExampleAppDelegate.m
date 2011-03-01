@@ -8,6 +8,11 @@
 
 #import "MDHExampleAppDelegate.h"
 
+float roundToQuarter(float val) {
+	return (round(val * 4) / 4);
+}
+
+
 @implementation MDHExampleAppDelegate
 
 @synthesize window;
@@ -29,8 +34,8 @@
 
 - (void) awakeFromNib
 {
-	[delayLabel takeIntValueFrom:delaySlider];
-	[delaySlider setIntValue:1];
+	[delaySlider setFloatValue:1.0];
+	[delayLabel setFloatValue:roundToQuarter([delaySlider floatValue])];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
@@ -57,8 +62,9 @@
 
 - (IBAction) delaySliderMove:(id)sender
 {
-	[delayLabel takeIntValueFrom:delaySlider];
-	hl1.waitInterval = [delaySlider intValue];
+	float interval = roundToQuarter([delaySlider floatValue]);
+	[delayLabel setFloatValue:interval];
+	hl1.waitInterval = interval;
 }
 
 - (IBAction) manualHighlightButtonPress:(id)sender

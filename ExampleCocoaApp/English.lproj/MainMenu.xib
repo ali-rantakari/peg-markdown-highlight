@@ -1685,7 +1685,7 @@
 										<object class="NSSlider" id="725229456">
 											<reference key="NSNextResponder" ref="151222951"/>
 											<int key="NSvFlags">270</int>
-											<string key="NSFrame">{{16, 12}, {280, 21}}</string>
+											<string key="NSFrame">{{16, 7}, {280, 26}}</string>
 											<reference key="NSSuperview" ref="151222951"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSSliderCell" key="NSCell" id="556988710">
@@ -1693,13 +1693,13 @@
 												<int key="NSCellFlags2">0</int>
 												<string key="NSContents"/>
 												<reference key="NSControlView" ref="725229456"/>
-												<double key="NSMaxValue">10</double>
+												<double key="NSMaxValue">5</double>
 												<double key="NSMinValue">0.0</double>
 												<double key="NSValue">1</double>
 												<double key="NSAltIncValue">0.0</double>
-												<int key="NSNumberOfTickMarks">0</int>
+												<int key="NSNumberOfTickMarks">21</int>
 												<int key="NSTickMarkPosition">1</int>
-												<bool key="NSAllowsTickMarkValuesOnly">NO</bool>
+												<bool key="NSAllowsTickMarkValuesOnly">YES</bool>
 												<bool key="NSVertical">NO</bool>
 											</object>
 										</object>
