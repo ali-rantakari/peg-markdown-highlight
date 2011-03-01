@@ -1,6 +1,7 @@
 
 #include "markdown_parser.h"
 
+element ** parse_markdown(char *string, element *elem, int extensions);
 
 
 void remove_zero_length_raw_spans(element *elem)
@@ -141,6 +142,10 @@ static element *p_elem_head;
 // Current parsing offset within charbuf:
 static int p_offset;
 
+// The extensions to use for parsing (bitfield
+// of enum markdown_extensions):
+static int p_extensions;
+
 // Array of parsing result elements, indexed by type:
 element **head_elements;
 
@@ -183,7 +188,7 @@ char *strcpy_without_continuation_bytes(char *str)
 	return new;
 }
 
-void markdown_to_elements(char *text, int extensions, element **out[])
+void markdown_to_elements(char *text, int extensions, element **out_result[])
 {
 	char *text_copy = strcpy_without_continuation_bytes(text);
 	
@@ -206,7 +211,7 @@ void markdown_to_elements(char *text, int extensions, element **out[])
     
     result = process_raw_blocks(text_copy, result, extensions);
     
-    *out = result;
+    *out_result = result;
     free(text_copy);
 }
 
@@ -217,7 +222,7 @@ void markdown_to_elements(char *text, int extensions, element **out[])
 
 
 
-char *type_name(enum types type)
+char *type_name(element_type type)
 {
 	switch (type)
 	{
@@ -253,14 +258,14 @@ char *type_name(enum types type)
 	}
 }
 
-/* returns true if extension is selected */
+// return true if extension is selected
 bool extension(int ext)
 {
-    return false;
+    return (p_extensions & ext);
 }
 
 
-/* cons an element/list onto a list, returning pointer to new head */
+// cons an element/list onto a list, returning pointer to new head
 static element * cons(element *new, element *list)
 {
     assert(new != NULL);
@@ -275,7 +280,7 @@ static element * cons(element *new, element *list)
 }
 
 
-/* reverse a list, returning pointer to new list */
+// reverse a list, returning pointer to new list
 static element *reverse(element *list)
 {
     element *new = NULL;
