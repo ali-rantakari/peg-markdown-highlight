@@ -12,10 +12,10 @@
 #endif
 
 #if MKD_DEBUG_OUTPUT
-#define MKD_PRINTF(x, args...)	fprintf(stderr, x, ##args)
+#define MKD_PRINTF(x, ...)	fprintf(stderr, x, ##__VA_ARGS__)
 #define MKD_PUTCHAR(x)			putchar(x)
 #else
-#define MKD_PRINTF(x, args...)
+#define MKD_PRINTF(x, ...)
 #define MKD_PUTCHAR(x)
 #endif
 
