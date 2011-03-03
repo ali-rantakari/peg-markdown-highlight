@@ -12,7 +12,7 @@
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
-		C9B5A5521319C3CA00A1DEB6 /* markdown_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = C9B5A54D1319C3CA00A1DEB6 /* markdown_parser.c */; };
+		C98C790A131FE46800943A0C /* markdown_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = C98C7909131FE46800943A0C /* markdown_parser.c */; };
 		C9B5A5571319C41E00A1DEB6 /* HGMarkdownHighlighter.m in Sources */ = {isa = PBXBuildFile; fileRef = C9B5A5561319C41E00A1DEB6 /* HGMarkdownHighlighter.m */; };
 		C9B5A858131ACC0500A1DEB6 /* big.md in Resources */ = {isa = PBXBuildFile; fileRef = C9B5A857131ACC0500A1DEB6 /* big.md */; };
 		C9B5A8EE131C4CD600A1DEB6 /* HGMarkdownParser.m in Sources */ = {isa = PBXBuildFile; fileRef = C9B5A8ED131C4CD600A1DEB6 /* HGMarkdownParser.m */; };
@@ -31,13 +31,10 @@
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		8D1107310486CEB800E47090 /* MDHExample-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "MDHExample-Info.plist"; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* MDHExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MDHExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		C9B5A54D1319C3CA00A1DEB6 /* markdown_parser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = markdown_parser.c; sourceTree = "<group>"; };
-		C9B5A54E1319C3CA00A1DEB6 /* markdown_parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = markdown_parser.h; sourceTree = "<group>"; };
-		C9B5A54F1319C3CA00A1DEB6 /* mkd_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mkd_types.h; sourceTree = "<group>"; };
+		C98C7904131FE45600943A0C /* markdown_parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = markdown_parser.h; sourceTree = "<group>"; };
+		C98C7909131FE46800943A0C /* markdown_parser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = markdown_parser.c; sourceTree = "<group>"; };
 		C9B5A5551319C41E00A1DEB6 /* HGMarkdownHighlighter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGMarkdownHighlighter.h; sourceTree = "<group>"; };
 		C9B5A5561319C41E00A1DEB6 /* HGMarkdownHighlighter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGMarkdownHighlighter.m; sourceTree = "<group>"; };
-		C9B5A5AD1319C9EB00A1DEB6 /* markdown_parser_footer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = markdown_parser_footer.c; sourceTree = "<group>"; };
-		C9B5A5AE1319C9EB00A1DEB6 /* markdown_parser_header.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = markdown_parser_header.c; sourceTree = "<group>"; };
 		C9B5A857131ACC0500A1DEB6 /* big.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = big.md; sourceTree = "<group>"; };
 		C9B5A8EC131C4CD600A1DEB6 /* HGMarkdownParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGMarkdownParser.h; sourceTree = "<group>"; };
 		C9B5A8ED131C4CD600A1DEB6 /* HGMarkdownParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGMarkdownParser.m; sourceTree = "<group>"; };
@@ -58,11 +55,7 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				C9B5A5541319C3D400A1DEB6 /* highlighter */,
-				C9B5A8EC131C4CD600A1DEB6 /* HGMarkdownParser.h */,
-				C9B5A8ED131C4CD600A1DEB6 /* HGMarkdownParser.m */,
-				C9B5A5551319C41E00A1DEB6 /* HGMarkdownHighlighter.h */,
-				C9B5A5561319C41E00A1DEB6 /* HGMarkdownHighlighter.m */,
+				C98C790D131FE47A00943A0C /* Highlighter */,
 				256AC3D80F4B6AC300CF3369 /* MDHExampleAppDelegate.h */,
 				256AC3D90F4B6AC300CF3369 /* MDHExampleAppDelegate.m */,
 			);
@@ -136,16 +129,17 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		C9B5A5541319C3D400A1DEB6 /* highlighter */ = {
+		C98C790D131FE47A00943A0C /* Highlighter */ = {
 			isa = PBXGroup;
 			children = (
-				C9B5A5AD1319C9EB00A1DEB6 /* markdown_parser_footer.c */,
-				C9B5A5AE1319C9EB00A1DEB6 /* markdown_parser_header.c */,
-				C9B5A54D1319C3CA00A1DEB6 /* markdown_parser.c */,
-				C9B5A54E1319C3CA00A1DEB6 /* markdown_parser.h */,
-				C9B5A54F1319C3CA00A1DEB6 /* mkd_types.h */,
+				C98C7909131FE46800943A0C /* markdown_parser.c */,
+				C98C7904131FE45600943A0C /* markdown_parser.h */,
+				C9B5A8EC131C4CD600A1DEB6 /* HGMarkdownParser.h */,
+				C9B5A8ED131C4CD600A1DEB6 /* HGMarkdownParser.m */,
+				C9B5A5551319C41E00A1DEB6 /* HGMarkdownHighlighter.h */,
+				C9B5A5561319C41E00A1DEB6 /* HGMarkdownHighlighter.m */,
 			);
-			name = highlighter;
+			name = Highlighter;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -213,9 +207,9 @@
 			files = (
 				8D11072D0486CEB800E47090 /* main.m in Sources */,
 				256AC3DA0F4B6AC300CF3369 /* MDHExampleAppDelegate.m in Sources */,
-				C9B5A5521319C3CA00A1DEB6 /* markdown_parser.c in Sources */,
 				C9B5A5571319C41E00A1DEB6 /* HGMarkdownHighlighter.m in Sources */,
 				C9B5A8EE131C4CD600A1DEB6 /* HGMarkdownParser.m in Sources */,
+				C98C790A131FE46800943A0C /* markdown_parser.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
