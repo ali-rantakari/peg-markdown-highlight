@@ -1,7 +1,6 @@
 
 ### Primary stuff:
 
-- Unify naming (don't use both `under_scores` and `camelCase`)
 - Implement (stress) tests for modifying several NSTextViews simultaneously
 
 
