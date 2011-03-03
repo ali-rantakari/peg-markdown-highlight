@@ -173,7 +173,7 @@ void free_elements(element **elems)
 
 char *strcpy_without_continuation_bytes(char *str)
 {
-	char *new_str = malloc(sizeof(char)*strlen(str) +1);
+	char *new_str = (char *)malloc(sizeof(char)*strlen(str) +1);
 	char *c = str;
 	int i = 0;
 	while (*c != '\0')
@@ -191,12 +191,12 @@ void markdown_to_elements(char *text, int extensions, element **out_result[])
 {
 	char *text_copy = strcpy_without_continuation_bytes(text);
 	
-	head_elements = malloc(sizeof(element**)*NUM_TYPES);
+	head_elements = (element **)malloc(sizeof(element **) * NUM_TYPES);
 	int i;
 	for (i = 0; i < NUM_TYPES; i++)
 		head_elements[i] = NULL;
 	
-	element *parsing_elem = malloc(sizeof(element));
+	element *parsing_elem = (element *)malloc(sizeof(element));
 	parsing_elem->type = RAW;
 	parsing_elem->pos = 0;
 	parsing_elem->end = strlen(text_copy)-1;
@@ -298,7 +298,7 @@ static element *reverse(element *list)
 // construct element
 element * mk_element(element_type type, long pos, long end)
 {
-    element *result = malloc(sizeof(element));
+    element *result = (element *)malloc(sizeof(element));
     result->type = type;
     result->pos = pos;
     result->end = end;
