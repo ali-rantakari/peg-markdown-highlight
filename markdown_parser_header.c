@@ -35,7 +35,6 @@ void print_str_literal_escapes(char *str)
 	while (*c != '\0')
 	{
 		if (*c == '\n')			MKD_PRINTF("\\n");
-		else if (*c == '\e')	MKD_PRINTF("\\e");
 		else if (*c == '\t')	MKD_PRINTF("\\t");
 		else putchar(*c);
 		c++;
@@ -174,18 +173,18 @@ void free_elements(element **elems)
 
 char *strcpy_without_continuation_bytes(char *str)
 {
-	char *new = malloc(sizeof(char)*strlen(str) +1);
+	char *new_str = malloc(sizeof(char)*strlen(str) +1);
 	char *c = str;
 	int i = 0;
 	while (*c != '\0')
 	{
 		if (!IS_CONTINUATION_BYTE(*c))
-			*(new+i) = *c, i++;
+			*(new_str+i) = *c, i++;
 		c++;
 	}
-	*(new+i) = '\0';
+	*(new_str+i) = '\0';
 	
-	return new;
+	return new_str;
 }
 
 void markdown_to_elements(char *text, int extensions, element **out_result[])
@@ -266,38 +265,38 @@ bool extension(int ext)
 
 
 // cons an element/list onto a list, returning pointer to new head
-static element * cons(element *new, element *list)
+static element * cons(element *elem, element *list)
 {
-    assert(new != NULL);
+    assert(elem != NULL);
     
-    element *cur = new;
+    element *cur = elem;
     while (cur->next != NULL) {
     	cur = cur->next;
     }
     cur->next = list;
     
-    return new;
+    return elem;
 }
 
 
 // reverse a list, returning pointer to new list
 static element *reverse(element *list)
 {
-    element *new = NULL;
+    element *new_head = NULL;
     element *next = NULL;
     while (list != NULL) {
     	next = list->next;
-    	list->next = new;
-    	new = list;
+    	list->next = new_head;
+    	new_head = list;
     	list = next;
     }
-    return new;
+    return new_head;
 }
 
 
 
 // construct element
-element * mk_element(int type, long pos, long end)
+element * mk_element(element_type type, long pos, long end)
 {
     element *result = malloc(sizeof(element));
     result->type = type;
@@ -406,7 +405,7 @@ void add(element *elem)
 	}
 }
 
-element * add_element(int type, long pos, long end)
+element * add_element(element_type type, long pos, long end)
 {
 	element *new_element = mk_element(type, pos, end);
 	add(new_element);
