@@ -27,7 +27,7 @@ void output_result(element *elem[])
 	element *cursor;
 	bool firstType = true;
 	int i;
-	for (i = 0; i < NUM_TYPES; i++)
+	for (i = 0; i < NUM_LANG_TYPES; i++)
 	{
 		cursor = elem[i];
 		if (cursor == NULL)

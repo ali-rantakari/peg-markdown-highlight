@@ -63,6 +63,12 @@ typedef enum
 */
 #define NUM_TYPES 41
 
+/**
+* \brief Number of *language element* types in element_type.
+* \sa element_type
+*/
+#define NUM_LANG_TYPES (NUM_TYPES - 6)
+
 
 //! \brief Semantic value of a parsing action.
 struct Element
