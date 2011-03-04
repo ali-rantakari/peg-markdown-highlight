@@ -1,8 +1,15 @@
 
-OWN LICENSE GOES HERE.
+PEG-Markdown-Highlight
+
+Markdown parser for syntax highlighting.
+
+Copyright 2011 Ali Rantakari -- http://hasseg.org
+
+PEG-Markdown-Highlight is licensed under the same terms as peg-markdown (see
+below for more information).
 
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+===============================================================================
 
 peg-markdown -- https://github.com/jgm/peg-markdown
 
@@ -48,7 +55,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+===============================================================================
 
 peg-0.1.4 (included for convenience - http://piumarta.com/software/peg/)
 
