@@ -173,7 +173,7 @@ void free_elements(element **elems)
 
 char *strcpy_without_continuation_bytes(char *str)
 {
-	char *new_str = (char *)malloc(sizeof(char)*strlen(str) +1);
+	char *new_str = (char *)malloc(sizeof(char) * strlen(str) + 1);
 	char *c = str;
 	int i = 0;
 	while (*c != '\0')
@@ -191,7 +191,7 @@ void markdown_to_elements(char *text, int extensions, element **out_result[])
 {
 	char *text_copy = strcpy_without_continuation_bytes(text);
 	
-	head_elements = (element **)malloc(sizeof(element **) * NUM_TYPES);
+	head_elements = (element **)malloc(sizeof(element *) * NUM_TYPES);
 	int i;
 	for (i = 0; i < NUM_TYPES; i++)
 		head_elements[i] = NULL;

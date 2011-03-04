@@ -548,7 +548,7 @@ YY_PARSE(int) YYPARSEFROM(yyrule yystart)\n\
       yythunkslen= 32;\n\
       yythunks= (yythunk *)malloc(sizeof(yythunk) * yythunkslen);\n\
       yyvalslen= 32;\n\
-      yyvals= (YYSTYPE*)malloc(sizeof(YYSTYPE) * yyvalslen);\n\
+      yyvals= (YYSTYPE *)malloc(sizeof(YYSTYPE) * yyvalslen);\n\
       yybegin= yyend= yypos= yylimit= yythunkpos= 0;\n\
     }\n\
   yybegin= yyend= yypos;\n\
