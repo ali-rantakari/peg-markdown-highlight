@@ -1,6 +1,8 @@
 
 ### Primary stuff:
 
+- Interface in Obj-C for specifying highlighting styles
+    - GUI widget for this?
 - Implement (stress) tests for modifying several NSTextViews simultaneously
 
 
@@ -21,7 +23,16 @@
     - Add interface to choose which ones to use
 
 
-### Maybe (Nice to have):
+
+### Nice to have
+
+- .NET (C#) example of highlighting a `RichTextBox`
+    - Need to create a wrapper assembly for the parser
+- GTK+ or Qt example of highlighting a rich text widget
+
+
+
+### Maybe (or then maybe not):
 
 - Strip continuation bytes at the same time as reading stdin in `highlighter`
 - Highlight disjoint spans separately
