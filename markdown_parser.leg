@@ -58,7 +58,8 @@ Plain =     Inlines
 
 AtxInline = !Newline !(Sp? '#'* Sp Newline) Inline
 
-AtxStart =  < ( "######" | "#####" | "####" | "###" | "##" | "#" ) > { $$ = elem(H1 + (strlen(yytext) - 1)); }
+AtxStart =  < ( "######" | "#####" | "####" | "###" | "##" | "#" ) >
+			{ $$ = elem((element_type)(H1 + (strlen(yytext) - 1))); }
 
 AtxHeading = < s:AtxStart Sp? ( AtxInline )+ (Sp? '#'* Sp)? > Newline
             { add(elem_s(s->type)); }
