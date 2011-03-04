@@ -12,7 +12,7 @@ $(LEG):
 	@echo '------- building peg/leg'
 	CC=gcc make -C $(PEGDIR)
 
-markdown_parser.c : markdown_parser.leg $(LEG) markdown_parser_header.c markdown_parser_footer.c
+markdown_parser.c : markdown_parser.leg $(LEG) markdown_parser_head.c markdown_parser_foot.c
 	$(LEG) -o $@ $<
 
 $(TEST_PROGRAM) : tester.m markdown_parser.c markdown_parser.h ANSIEscapeHelper.m ANSIEscapeHelper.h
