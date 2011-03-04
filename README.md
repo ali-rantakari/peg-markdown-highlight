@@ -39,10 +39,10 @@ You need to add the following files into your project:
 - `markdown_parser_head.c`
 - `markdown_parser_foot.c`
 
-*(Note that `markdown_parser.c` must be generated with `make`.)*
-
-Then just `#import "markdown_parser.h"` and go wild. See the API docs for
-more information.
+`markdown_parser.c` must be generated with `make`, and is the only source code
+file that you should compile as part of your project (it imports the other
+two). `markdown_parser.h` contains the parser's public interface (see the
+API docs for more info).
 
 
 
