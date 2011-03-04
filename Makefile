@@ -27,7 +27,7 @@ $(PROGRAM) : highlighter.c markdown_parser.c markdown_parser.h
 	@echo '------- building highlighter'
 	cc $(CFLAGS) -DMKD_DEBUG_OUTPUT=0 -o $@ markdown_parser.c $<
 
-docs: markdown_parser.h markdown_definitions.h doxygen.cfg ExampleCocoaApp/HGMarkdownHighlighter.h
+docs: markdown_parser.h markdown_definitions.h doxygen.cfg example_cocoa/HGMarkdownHighlighter.h
 	doxygen doxygen.cfg
 	touch docs
 
