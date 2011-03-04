@@ -2,7 +2,10 @@
 * \brief Parser public interface.
 */
 
+#ifndef __cplusplus
 #include <stdbool.h>
+#endif
+
 #include <stdlib.h>
 #include <assert.h>
 #include "markdown_definitions.h"
