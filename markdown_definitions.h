@@ -61,7 +61,7 @@ typedef enum
 * \brief Number of types in element_type.
 * \sa element_type
 */
-#define NUM_TYPES 41
+#define NUM_TYPES 29
 
 /**
 * \brief Number of *language element* types in element_type.
