@@ -15,9 +15,11 @@
 #endif
 
 #if MKD_DEBUG_OUTPUT
-#define MKD_PRINTF(x, ...)	fprintf(stderr, x, ##__VA_ARGS__)
-#define MKD_PUTCHAR(x)			putchar(x)
+#define MKD_IF(x)           if (x)
+#define MKD_PRINTF(x, ...)  fprintf(stderr, x, ##__VA_ARGS__)
+#define MKD_PUTCHAR(x)      putchar(x)
 #else
+#define MKD_IF(x)
 #define MKD_PRINTF(x, ...)
 #define MKD_PUTCHAR(x)
 #endif

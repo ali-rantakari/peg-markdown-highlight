@@ -442,7 +442,7 @@ void add_raw(long pos, long end)
     		if (p_elem->text && *p_elem->text != '\0') {\
     			yyc = *p_elem->text++;\
 				MKD_PRINTF("\e[47;30m"); MKD_PUTCHAR(yyc); MKD_PRINTF("\e[0m");\
-				if (yyc == '\n') MKD_PRINTF("\e[47m \e[0m");\
+				MKD_IF(yyc == '\n') MKD_PRINTF("\e[47m \e[0m");\
     		} else {\
     			yyc = EOF;\
     			p_elem = p_elem->next;\
@@ -455,7 +455,7 @@ void add_raw(long pos, long end)
 			result = 1;                    \
 			p_offset++;                    \
 			MKD_PRINTF("\e[43;30m"); MKD_PUTCHAR(*buf); MKD_PRINTF("\e[0m");\
-			if (*buf == '\n') MKD_PRINTF("\e[42m \e[0m");\
+			MKD_IF(*buf == '\n') MKD_PRINTF("\e[42m \e[0m");\
 			if (p_offset >= p_elem->end) {  \
 				p_elem = p_elem->next;     \
 				MKD_PRINTF("\e[41m \e[0m");\
