@@ -29,9 +29,6 @@ print '-----checking output'
 type_lists = [(y[0], y[1].split(','))
               for y in [x.split(':') for x in out.split('|')]]
 
-# ignore the last element types
-type_lists = type_lists[:-6]
-
 w = lambda s: sys.stdout.write(s); sys.stdout.flush()
 
 for t in type_lists:
