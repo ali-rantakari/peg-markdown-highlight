@@ -72,13 +72,13 @@ SetextBottom2 = "---" '-'* Newline
 
 SetextHeading1 =  &(RawLine SetextBottom1)
                   s:LocMarker
-                  < ( !Endline Inline )+ Newline
+                  < ( !Endline Inline )+ Sp? Newline
                   SetextBottom1 >
 	              { add(elem_s(H1)); }
 
 SetextHeading2 =  &(RawLine SetextBottom2)
                   s:LocMarker
-                  < ( !Endline Inline )+ Newline
+                  < ( !Endline Inline )+ Sp? Newline
                   SetextBottom2 >
 	              { add(elem_s(H2)); }
 
@@ -347,6 +347,7 @@ HtmlBlockInTags = HtmlBlockAddress
                 | HtmlBlockMenu
                 | HtmlBlockNoframes
                 | HtmlBlockNoscript
+                | HtmlBlockOl
                 | HtmlBlockP
                 | HtmlBlockPre
                 | HtmlBlockTable
