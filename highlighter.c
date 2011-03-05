@@ -58,6 +58,7 @@ int main(int argc, char * argv[])
 	
 	char *md_source = utf8_from_stdin();
 	markdown_to_elements(md_source, extensions, &result);
+	sort_elements_by_pos(result);
 	output_result(result);
 	
     return(0);
