@@ -10,18 +10,10 @@
 
 - Fix blockquote handling
 - Implement highlighting for the rest of the language types
-- Ability to choose whether to highlight whole NSTextView when parsing is over
-  or to only highlight visible area on scroll
-    - Add widget to choose between these into the test app
-- To optimize highlighting for the visible range:
-    - Index elements by position as well as by type (in order) during parsing,
-      then when highlighting, use binary search to find first element that falls
-      within the visible range and search linearly in both directions to get the
-      rest of the elements for the range
 - CSS (or similar) parser for defining colors + highlighting order
 - Enable supported extensions
     - Add interface to choose which ones to use
-
+- Document (lack of) thread safety & re-entranness (is that a word?)
 
 
 ### Nice to have
@@ -34,6 +26,10 @@
 
 ### Maybe (or then maybe not):
 
+- Ability to choose whether to highlight whole NSTextView when parsing is over
+  or to only highlight visible area on scroll
+    - Would anyone really even want to do this?
+    - Add widget to choose between these into the test app
 - Strip continuation bytes at the same time as reading stdin in `highlighter`
 - Highlight disjoint spans separately
     - Not fully possible given the implementation right now (?)
