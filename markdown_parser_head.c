@@ -187,6 +187,8 @@ char *strcpy_without_continuation_bytes(char *str)
 	return new_str;
 }
 
+
+
 void markdown_to_elements(char *text, int extensions, element **out_result[])
 {
 	char *text_copy = strcpy_without_continuation_bytes(text);
@@ -212,6 +214,88 @@ void markdown_to_elements(char *text, int extensions, element **out_result[])
     
     *out_result = result;
     free(text_copy);
+}
+
+
+
+// Mergesort linked list of elements (using comparison function `compare`),
+// return new head
+element *ll_mergesort(element *list, int (*compare)(const element*, const element*))
+{
+	if (!list)
+		return NULL;
+	
+	element *out_head = list;
+	
+	// Merge widths of doubling size until done
+	int merge_width = 1;
+	while (1)
+	{
+		element *l, *r; // left & right segment pointers
+		element *tail = NULL; // tail of sorted section
+		
+		l = out_head;
+		out_head = NULL;
+		
+		int merge_count = 0;
+		
+		while (l)
+		{
+			merge_count++;
+			
+			// Position r, determine lsize & rsize
+			r = l;
+			int lsize = 0;
+			for (int i = 0; i < merge_width; i++) {
+				lsize++;
+				r = r->next;
+				if (!r)
+					break;
+			}
+			int rsize = merge_width;
+			
+			// Merge l & r
+			while (lsize > 0 || (rsize > 0 && r))
+			{
+				bool get_from_left = false;
+				if (lsize == 0)				get_from_left = false;
+				else if (rsize == 0 || !r)	get_from_left = true;
+				else if (compare(l,r) <= 0)	get_from_left = true;
+				
+				element *e;
+				if (get_from_left) {
+					e = l; l = l->next; lsize--;
+				} else {
+					e = r; r = r->next; rsize--;
+				}
+				
+				// add the next element to the merged list
+				if (tail)
+					tail->next = e;
+				else
+					out_head = e;
+				tail = e;
+			}
+			
+			l = r;
+		}
+		tail->next = NULL;
+		
+		if (merge_count <= 1)
+			return out_head;
+		
+		merge_width *= 2;
+	}
+}
+
+int elem_compare_by_pos(const element *a, const element *b) {
+	return a->pos - b->pos;
+}
+
+void sort_elements_by_pos(element *element_lists[])
+{
+	for (int i = 0; i < NUM_LANG_TYPES; i++)
+		element_lists[i] = ll_mergesort(element_lists[i], &elem_compare_by_pos);
 }
 
 

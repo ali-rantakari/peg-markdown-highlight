@@ -44,6 +44,20 @@
 void markdown_to_elements(char *text, int extensions, element **out_result[]);
 
 /**
+* \brief Sort elements in list by start offset.
+* 
+* Sorts the linked lists of elements in the list returned by
+* markdown_to_elements() by their start offsets (pos).
+* 
+* \param[in] element_lists  Array of linked lists of elements (output
+*                           from markdown_to_elements()).
+* 
+* \sa markdown_to_elements
+* \sa element::pos
+*/
+void sort_elements_by_pos(element *element_lists[]);
+
+/**
 * \brief Free element array
 * 
 * Frees an element array returned by markdown_to_elements().
