@@ -1,9 +1,9 @@
 ALL : tester testclient highlighter
 
-TEST_PROGRAM=tester
-TEST_CLIENT_PROGRAM=testclient
-PROGRAM=highlighter
-CFLAGS ?= -Wall -O3
+TESTER=tester
+TEST_CLIENT=testclient
+HIGHLIGHTER=highlighter
+CFLAGS ?= -Wall -O3 --std=c99
 OBJC_CFLAGS=-framework Foundation -framework AppKit
 PEGDIR=peg
 LEG=$(PEGDIR)/leg
@@ -15,15 +15,15 @@ $(LEG):
 markdown_parser.c : markdown_parser.leg $(LEG) markdown_parser_head.c markdown_parser_foot.c
 	$(LEG) -o $@ $<
 
-$(TEST_PROGRAM) : tester.m markdown_parser.c markdown_parser.h ANSIEscapeHelper.m ANSIEscapeHelper.h
+$(TESTER) : tester.m markdown_parser.c markdown_parser.h ANSIEscapeHelper.m ANSIEscapeHelper.h
 	@echo '------- building tester'
 	clang $(CFLAGS) $(OBJC_CFLAGS) -o $@ markdown_parser.c ANSIEscapeHelper.m $<
 
-$(TEST_CLIENT_PROGRAM) : testclient.m ANSIEscapeHelper.m ANSIEscapeHelper.h
+$(TEST_CLIENT) : testclient.m ANSIEscapeHelper.m ANSIEscapeHelper.h
 	@echo '------- building testclient'
 	clang $(CFLAGS) $(OBJC_CFLAGS) -o $@ ANSIEscapeHelper.m $<
 
-$(PROGRAM) : highlighter.c markdown_parser.c markdown_parser.h
+$(HIGHLIGHTER) : highlighter.c markdown_parser.c markdown_parser.h
 	@echo '------- building highlighter'
 	cc $(CFLAGS) -DMKD_DEBUG_OUTPUT=0 -o $@ markdown_parser.c $<
 
@@ -34,12 +34,12 @@ docs: markdown_parser.h markdown_definitions.h doxygen.cfg example_cocoa/HGMarkd
 .PHONY: clean test
 
 clean:
-	rm -f markdown_parser.c $(TEST_PROGRAM) $(TEST_CLIENT_PROGRAM) $(PROGRAM) *.o; \
+	rm -f markdown_parser.c $(TESTER) $(TEST_CLIENT) $(HIGHLIGHTER) *.o; \
 	make -C $(PEGDIR) clean
 
 distclean: clean
 	make -C $(PEGDIR) spotless
 
-leak-check: $(TEST_PROGRAM)
-	valgrind --leak-check=full ./$(TEST_PROGRAM) 100 todo.md
+leak-check: $(TESTER)
+	valgrind --leak-check=full ./$(TESTER) 100 todo.md
 
