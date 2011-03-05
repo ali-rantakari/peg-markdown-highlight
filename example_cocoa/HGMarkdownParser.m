@@ -53,6 +53,7 @@
 {
 	element **result = NULL;
 	markdown_to_elements((char *)[content UTF8String], extensions, &result);
+	sort_elements_by_pos(result);
 	return result;
 }
 

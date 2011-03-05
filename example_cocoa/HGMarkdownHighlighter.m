@@ -108,13 +108,19 @@
 		
 		while (cursor != NULL)
 		{
-			
-			if ((cursor->end <= cursor->pos)
-				|| (cursor->end <= range.location || cursor->pos >= rangeEnd))
+			// Ignore (length <= 0) elements (just in case) and
+			// ones that end before our range begins
+			if (cursor->end <= cursor->pos
+				|| cursor->end <= range.location)
 			{
 				cursor = cursor->next;
 				continue;
 			}
+			
+			// HGMarkdownParser orders elements by pos so we can stop
+			// at the first one that goes over our range
+			if (cursor->pos >= rangeEnd)
+				break;
 			
 			NSColor *fgColor = nil;
 			NSColor *bgColor = nil;

@@ -42,7 +42,7 @@ float roundToQuarter(float val) {
 {
 	NSString *s = [NSString
 				   stringWithContentsOfFile:[[NSBundle mainBundle]
-											 pathForResource:@"big"
+											 pathForResource:@"huge"
 											 ofType:@"md"]
 				   encoding:NSUTF8StringEncoding
 				   error:NULL];
