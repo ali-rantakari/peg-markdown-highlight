@@ -14,6 +14,7 @@
 - Enable supported extensions
     - Add interface to choose which ones to use
 - Document (lack of) thread safety & re-entranness (is that a word?)
+- Use a union to separate elements into language & parser classes
 
 
 ### Nice to have
@@ -21,16 +22,21 @@
 - .NET (C#) example of highlighting a `RichTextBox`
     - Need to create a wrapper assembly for the parser
 - GTK+ or Qt example of highlighting a rich text widget
+- Reduce memory usage (profile with valgrind)
 
 
 
 ### Maybe (or then maybe not):
 
+- Handle UTF-8 BOM?
 - Ability to choose whether to highlight whole NSTextView when parsing is over
   or to only highlight visible area on scroll
-    - Would anyone really even want to do this?
+    - Would it be better to highlight a copy of the NSTextStorage in the
+      background thread and then switch it with the original in the foreground
+      thread (assuming it hasn't changed, the checking of which would be of
+      the utmost importance)?
+    - Would make editing slower but scrolling faster.
     - Add widget to choose between these into the test app
-- Strip continuation bytes at the same time as reading stdin in `highlighter`
 - Highlight disjoint spans separately
     - Not fully possible given the implementation right now (?)
     - Could be done as a post-processing step, albeit with a performance penalty
