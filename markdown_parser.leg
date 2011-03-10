@@ -82,7 +82,7 @@ SetextHeading2 =  &(RawLine SetextBottom2)
                   SetextBottom2 >
 	              { add(elem_s(H2)); }
 
-Heading = AtxHeading | SetextHeading
+Heading = SetextHeading | AtxHeading
 
 BlockQuote = a:BlockQuoteRaw
             { element *rawlist = mk_element(RAW_LIST, 0,0);
