@@ -7,4 +7,5 @@ markdown_parser.c
 tester
 highlighter
 testclient
+bench
 docs

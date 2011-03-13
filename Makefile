@@ -1,5 +1,6 @@
 ALL : tester testclient highlighter
 
+BENCH=bench
 TESTER=tester
 TEST_CLIENT=testclient
 HIGHLIGHTER=highlighter
@@ -25,6 +26,10 @@ $(TEST_CLIENT) : testclient.m ANSIEscapeHelper.m ANSIEscapeHelper.h
 
 $(HIGHLIGHTER) : highlighter.c markdown_parser.c markdown_parser.h
 	@echo '------- building highlighter'
+	cc $(CFLAGS) -DMKD_DEBUG_OUTPUT=0 -o $@ markdown_parser.c $<
+
+$(BENCH) : bench.c markdown_parser.c markdown_parser.h
+	@echo '------- building bench'
 	cc $(CFLAGS) -DMKD_DEBUG_OUTPUT=0 -o $@ markdown_parser.c $<
 
 docs: markdown_parser.h markdown_definitions.h doxygen.cfg example_cocoa/HGMarkdownHighlighter.h
