@@ -26,8 +26,8 @@ void remove_zero_length_raw_spans(element *elem)
 	}
 }
 
-// Print null-terminated string s.t. some characters are
-// represented by their corresponding espace sequences
+/* Print null-terminated string s.t. some characters are */
+/* represented by their corresponding espace sequences */
 void print_str_literal_escapes(char *str)
 {
 	char *c = str;
@@ -42,8 +42,8 @@ void print_str_literal_escapes(char *str)
 	MKD_PRINTF("'");
 }
 
-// Print elements in a linked list of
-// RAW, SEPARATOR, EXTRA_TEXT elements
+/* Print elements in a linked list of */
+/* RAW, SEPARATOR, EXTRA_TEXT elements */
 void print_raw_spans_inline(element *elem)
 {
 	element *cur = elem;
@@ -60,8 +60,8 @@ void print_raw_spans_inline(element *elem)
 	}
 }
 
-// Perform postprocessing parsing runs for RAW_LIST elements in `elem`,
-// iteratively until no such elements exist.
+/* Perform postprocessing parsing runs for RAW_LIST elements in `elem`, */
+/* iteratively until no such elements exist. */
 element ** process_raw_blocks(char *text, element *elem[], int extensions)
 {
 	MKD_PRINTF("--------process_raw_blocks---------\n");
@@ -130,25 +130,25 @@ void print_raw_blocks(char *text, element *elem[])
 
 
 
-// Buffer of characters to be parsed:
+/* Buffer of characters to be parsed: */
 static char *charbuf = "";
 
-// Linked list of {start, end} offset pairs determining which parts
-// of charbuf to actually parse:
+/* Linked list of {start, end} offset pairs determining which parts */
+/* of charbuf to actually parse: */
 static element *p_elem;
 static element *p_elem_head;
 
-// Current parsing offset within charbuf:
+/* Current parsing offset within charbuf: */
 static int p_offset;
 
-// The extensions to use for parsing (bitfield
-// of enum markdown_extensions):
+/* The extensions to use for parsing (bitfield */
+/* of enum markdown_extensions): */
 static int p_extensions;
 
-// Array of parsing result elements, indexed by type:
+/* Array of parsing result elements, indexed by type: */
 element **head_elements;
 
-// Free all elements created while parsing
+/* Free all elements created while parsing */
 void free_elements(element **elems)
 {
 	element *cursor = elems[ALL];
@@ -218,8 +218,8 @@ void markdown_to_elements(char *text, int extensions, element **out_result[])
 
 
 
-// Mergesort linked list of elements (using comparison function `compare`),
-// return new head
+/* Mergesort linked list of elements (using comparison function `compare`), */
+/* return new head */
 element *ll_mergesort(element *list, int (*compare)(const element*, const element*))
 {
 	if (!list)
@@ -227,12 +227,12 @@ element *ll_mergesort(element *list, int (*compare)(const element*, const elemen
 	
 	element *out_head = list;
 	
-	// Merge widths of doubling size until done
+	/* Merge widths of doubling size until done */
 	int merge_width = 1;
 	while (1)
 	{
-		element *l, *r; // left & right segment pointers
-		element *tail = NULL; // tail of sorted section
+		element *l, *r; /* left & right segment pointers */
+		element *tail = NULL; /* tail of sorted section */
 		
 		l = out_head;
 		out_head = NULL;
@@ -243,10 +243,11 @@ element *ll_mergesort(element *list, int (*compare)(const element*, const elemen
 		{
 			merge_count++;
 			
-			// Position r, determine lsize & rsize
+			/* Position r, determine lsize & rsize */
 			r = l;
 			int lsize = 0;
-			for (int i = 0; i < merge_width; i++) {
+			int i;
+			for (i = 0; i < merge_width; i++) {
 				lsize++;
 				r = r->next;
 				if (!r)
@@ -254,7 +255,7 @@ element *ll_mergesort(element *list, int (*compare)(const element*, const elemen
 			}
 			int rsize = merge_width;
 			
-			// Merge l & r
+			/* Merge l & r */
 			while (lsize > 0 || (rsize > 0 && r))
 			{
 				bool get_from_left = false;
@@ -269,7 +270,7 @@ element *ll_mergesort(element *list, int (*compare)(const element*, const elemen
 					e = r; r = r->next; rsize--;
 				}
 				
-				// add the next element to the merged list
+				/* add the next element to the merged list */
 				if (tail)
 					tail->next = e;
 				else
@@ -294,7 +295,8 @@ int elem_compare_by_pos(const element *a, const element *b) {
 
 void sort_elements_by_pos(element *element_lists[])
 {
-	for (int i = 0; i < NUM_LANG_TYPES; i++)
+	int i;
+	for (i = 0; i < NUM_LANG_TYPES; i++)
 		element_lists[i] = ll_mergesort(element_lists[i], &elem_compare_by_pos);
 }
 
@@ -341,14 +343,14 @@ char *type_name(element_type type)
 	}
 }
 
-// return true if extension is selected
+/* return true if extension is selected */
 bool extension(int ext)
 {
     return (p_extensions & ext);
 }
 
 
-// cons an element/list onto a list, returning pointer to new head
+/* cons an element/list onto a list, returning pointer to new head */
 static element * cons(element *elem, element *list)
 {
     assert(elem != NULL);
@@ -363,7 +365,7 @@ static element * cons(element *elem, element *list)
 }
 
 
-// reverse a list, returning pointer to new list
+/* reverse a list, returning pointer to new list */
 static element *reverse(element *list)
 {
     element *new_head = NULL;
@@ -379,7 +381,7 @@ static element *reverse(element *list)
 
 
 
-// construct element
+/* construct element */
 element * mk_element(element_type type, long pos, long end)
 {
     element *result = (element *)malloc(sizeof(element));
@@ -397,7 +399,7 @@ element * mk_element(element_type type, long pos, long end)
     return result;
 }
 
-// construct EXTRA_TEXT element
+/* construct EXTRA_TEXT element */
 element * mk_etext(char *string)
 {
     element *result;
@@ -408,10 +410,10 @@ element * mk_etext(char *string)
 }
 
 
-// Given an element where the offsets {pos, end} represent
-// locations in the *parsed text* (defined by the linked list of RAW and
-// EXTRA_TEXT elements in p_elem), fix these offsets to represent
-// corresponding offsets in the original input (charbuf).
+/* Given an element where the offsets {pos, end} represent */
+/* locations in the *parsed text* (defined by the linked list of RAW and */
+/* EXTRA_TEXT elements in p_elem), fix these offsets to represent */
+/* corresponding offsets in the original input (charbuf). */
 void fix_offsets(element *elem)
 {
 	if (elem->type == EXTRA_TEXT)
@@ -455,7 +457,7 @@ void fix_offsets(element *elem)
 }
 
 
-// Add an element to head_elements.
+/* Add an element to head_elements. */
 void add(element *elem)
 {
 	if (head_elements[elem->type] == NULL)
@@ -466,11 +468,13 @@ void add(element *elem)
 		head_elements[elem->type] = elem;
 	}
 	
-	// TODO: split into parts instead of just fixing offsets
-	// (so that the color span would be disjoint just as the
-	// text in the input is, like:)
-	// > text HIGHLIGHTING
-	// > CONTINUES text
+	/*
+	TODO: split into parts instead of just fixing offsets
+	(so that the color span would be disjoint just as the
+	text in the input is, like:)
+	> text HIGHLIGHTING
+	> CONTINUES text
+	*/
 	if (elem->type != RAW_LIST) {
 		MKD_PRINTF("  add: %s [%ld - %ld]\n", type_name(elem->type), elem->pos, elem->end);
 		fix_offsets(elem);

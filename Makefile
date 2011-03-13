@@ -26,7 +26,7 @@ $(TEST_CLIENT) : testclient.m ANSIEscapeHelper.m ANSIEscapeHelper.h
 
 $(HIGHLIGHTER) : highlighter.c markdown_parser.c markdown_parser.h
 	@echo '------- building highlighter'
-	cc $(CFLAGS) -DMKD_DEBUG_OUTPUT=0 -o $@ markdown_parser.c $<
+	cc -Wall -O3 -ansi -DMKD_DEBUG_OUTPUT=0 -o $@ markdown_parser.c $<
 
 $(BENCH) : bench.c markdown_parser.c markdown_parser.h
 	@echo '------- building bench'

@@ -28,7 +28,7 @@ typedef enum
 	LIST_BULLET,		/**< Bullet for a list item */
 	LIST_ENUMERATOR,	/**< Enumerator for a list item */
 	
-	// Code assumes that H1-6 are in order.
+	/* Code assumes that H1-6 are in order. */
 	H1,					/**< Header, level 1 */
 	H2,					/**< Header, level 2 */
 	H3,					/**< Header, level 3 */
@@ -43,18 +43,18 @@ typedef enum
 	REFERENCE,			/**< Reference */
 	NOTE,				/**< Note */
 	
-	// Utility types used by the parser itself:
-	RAW_LIST,	// List of RAW element lists, each to be processed separately from others
-	            // (for each element in linked lists of this type, `children` points
-	            // to a linked list of RAW elements)
-	RAW,    	// Span marker for positions in original input to be post-processed
-				// in a second parsing step
-	EXTRA_TEXT,	// Additional text to be parsed along with spans in the original input
-				// (these may be added to linked lists of RAW elements)
-	SEPARATOR,	// Separates linked lists of RAW elements into parts to be processed
-				// separate from each other
-	NO_TYPE,	// Placeholder element used while parsing
-	ALL			// Linked list of *all* elements created while parsing
+	/* Utility types used by the parser itself: */
+	RAW_LIST,	/* List of RAW element lists, each to be processed separately from others
+	             * (for each element in linked lists of this type, `children` points
+	             * to a linked list of RAW elements) */
+	RAW,    	/* Span marker for positions in original input to be post-processed
+				 * in a second parsing step */
+	EXTRA_TEXT,	/* Additional text to be parsed along with spans in the original input
+				 * (these may be added to linked lists of RAW elements) */
+	SEPARATOR,	/* Separates linked lists of RAW elements into parts to be processed
+				 * separate from each other */
+	NO_TYPE,	/* Placeholder element used while parsing */
+	ALL			/* Linked list of *all* elements created while parsing */
 } element_type;
 
 /**
@@ -69,8 +69,9 @@ typedef enum
 */
 #define NUM_LANG_TYPES (NUM_TYPES - 6)
 
-
-//! \brief Semantic value of a parsing action.
+/**
+* \brief Semantic value of a parsing action.
+*/
 struct Element
 {
     element_type type;            /**< type of element */
@@ -83,7 +84,9 @@ struct Element
 };
 typedef struct Element element;
 
-//! \brief Bitfield enumeration of supported Markdown extensions.
+/**
+* \brief Bitfield enumeration of supported Markdown extensions.
+*/
 enum markdown_extensions
 {
     EXT_SMART            = 0x01, /**< Smart quotes, dashes, and ellipses */
