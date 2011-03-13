@@ -219,7 +219,7 @@ void markdown_to_elements(char *text, int extensions, element **out_result[])
 
 
 /* Mergesort linked list of elements (using comparison function `compare`), */
-/* return new head */
+/* return new head. (Adapted slightly from Simon Tatham's algorithm.) */
 element *ll_mergesort(element *list, int (*compare)(const element*, const element*))
 {
 	if (!list)
