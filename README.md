@@ -36,8 +36,6 @@ You need to add the following files into your project:
 - `markdown_definitions.h`
 - `markdown_parser.h`
 - `markdown_parser.c`
-- `markdown_parser_head.c`
-- `markdown_parser_foot.c`
 
 `markdown_parser.c` must be generated with `make`, and is the only source code
 file that you should compile as part of your project (it imports the other

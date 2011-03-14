@@ -13,27 +13,29 @@ $(LEG):
 	@echo '------- building peg/leg'
 	CC=gcc make -C $(PEGDIR)
 
-markdown_parser.c : markdown_parser.leg $(LEG)
+markdown_parser_core.c : markdown_grammar.leg $(LEG)
+	@echo '------- generating parser core from grammar'
 	$(LEG) -o $@ $<
 
-pmh_parser.c : markdown_parser.c markdown_parser_head.c markdown_parser_foot.c
+markdown_parser.c : markdown_parser_core.c markdown_parser_head.c markdown_parser_foot.c
+	@echo '------- combining parser code'
 	./combine_parser_files.py > $@
 
-$(TESTER) : tester.m pmh_parser.c markdown_parser.h ANSIEscapeHelper.m ANSIEscapeHelper.h
+$(TESTER) : tester.m markdown_parser.c markdown_parser.h ANSIEscapeHelper.m ANSIEscapeHelper.h
 	@echo '------- building tester'
-	clang $(CFLAGS) $(OBJC_CFLAGS) -o $@ pmh_parser.c ANSIEscapeHelper.m $<
+	clang $(CFLAGS) $(OBJC_CFLAGS) -o $@ markdown_parser.c ANSIEscapeHelper.m $<
 
 $(TEST_CLIENT) : testclient.m ANSIEscapeHelper.m ANSIEscapeHelper.h
 	@echo '------- building testclient'
 	clang $(CFLAGS) $(OBJC_CFLAGS) -o $@ ANSIEscapeHelper.m $<
 
-$(HIGHLIGHTER) : highlighter.c pmh_parser.c markdown_parser.h
+$(HIGHLIGHTER) : highlighter.c markdown_parser.c markdown_parser.h
 	@echo '------- building highlighter'
-	cc -Wall -O3 -ansi -DMKD_DEBUG_OUTPUT=0 -o $@ pmh_parser.c $<
+	cc -Wall -O3 -ansi -DMKD_DEBUG_OUTPUT=0 -o $@ markdown_parser.c $<
 
-$(BENCH) : bench.c pmh_parser.c markdown_parser.h
+$(BENCH) : bench.c markdown_parser.c markdown_parser.h
 	@echo '------- building bench'
-	cc $(CFLAGS) -DMKD_DEBUG_OUTPUT=0 -o $@ pmh_parser.c $<
+	cc $(CFLAGS) -DMKD_DEBUG_OUTPUT=0 -o $@ markdown_parser.c $<
 
 docs: markdown_parser.h markdown_definitions.h doxygen.cfg example_cocoa/HGMarkdownHighlighter.h
 	doxygen doxygen.cfg
@@ -42,7 +44,7 @@ docs: markdown_parser.h markdown_definitions.h doxygen.cfg example_cocoa/HGMarkd
 .PHONY: clean test
 
 clean:
-	rm -f markdown_parser.c pmh_parser.c $(TESTER) $(TEST_CLIENT) $(HIGHLIGHTER) *.o; \
+	rm -f markdown_parser_core.c markdown_parser.c $(TESTER) $(TEST_CLIENT) $(HIGHLIGHTER) *.o; \
 	make -C $(PEGDIR) clean
 
 distclean: clean

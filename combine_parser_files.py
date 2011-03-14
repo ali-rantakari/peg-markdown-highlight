@@ -16,7 +16,7 @@ def get_contents(fn):
 
 out = ''
 
-for line in get_contents('markdown_parser.c').splitlines(True):
+for line in get_contents('markdown_parser_core.c').splitlines(True):
     if line.strip() == '/// header_code_here':
         out += get_contents('markdown_parser_head.c')
     elif line.strip() == '/// footer_code_here':
