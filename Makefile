@@ -4,7 +4,7 @@ BENCH=bench
 TESTER=tester
 TEST_CLIENT=testclient
 HIGHLIGHTER=highlighter
-CFLAGS ?= -Wall -O3 --std=c99
+CFLAGS ?= -Wall -O3
 OBJC_CFLAGS=-framework Foundation -framework AppKit
 PEGDIR=peg
 LEG=$(PEGDIR)/leg
@@ -17,25 +17,29 @@ markdown_parser_core.c : markdown_grammar.leg $(LEG)
 	@echo '------- generating parser core from grammar'
 	$(LEG) -o $@ $<
 
-markdown_parser.c : markdown_parser_core.c markdown_parser_head.c markdown_parser_foot.c
+markdown_parser.c : markdown_parser_core.c markdown_parser_head.c markdown_parser_foot.c tools/combine_parser_files.py
 	@echo '------- combining parser code'
 	./tools/combine_parser_files.py > $@
 
-$(TESTER) : tester.m markdown_parser.c markdown_parser.h ANSIEscapeHelper.m ANSIEscapeHelper.h
+markdown_parser.o : markdown_parser.c
+	@echo '------- building markdown_parser.o'
+	$(CC) $(CFLAGS) -ansi -c -o $@ $<
+
+$(TESTER) : tester.m markdown_parser.o markdown_parser.h ANSIEscapeHelper.m ANSIEscapeHelper.h
 	@echo '------- building tester'
-	clang $(CFLAGS) $(OBJC_CFLAGS) -o $@ markdown_parser.c ANSIEscapeHelper.m $<
+	clang $(CFLAGS) $(OBJC_CFLAGS) -o $@ markdown_parser.o ANSIEscapeHelper.m $<
 
 $(TEST_CLIENT) : testclient.m ANSIEscapeHelper.m ANSIEscapeHelper.h
 	@echo '------- building testclient'
 	clang $(CFLAGS) $(OBJC_CFLAGS) -o $@ ANSIEscapeHelper.m $<
 
-$(HIGHLIGHTER) : highlighter.c markdown_parser.c markdown_parser.h
+$(HIGHLIGHTER) : highlighter.c markdown_parser.o markdown_parser.h
 	@echo '------- building highlighter'
-	cc -Wall -O3 -ansi -DMKD_DEBUG_OUTPUT=0 -o $@ markdown_parser.c $<
+	$(CC) $(CFLAGS) -ansi -DMKD_DEBUG_OUTPUT=0 -o $@ markdown_parser.o $<
 
-$(BENCH) : bench.c markdown_parser.c markdown_parser.h
+$(BENCH) : bench.c markdown_parser.o markdown_parser.h
 	@echo '------- building bench'
-	cc $(CFLAGS) -DMKD_DEBUG_OUTPUT=0 -o $@ markdown_parser.c $<
+	$(CC) $(CFLAGS) -DMKD_DEBUG_OUTPUT=0 -o $@ markdown_parser.o $<
 
 docs: markdown_parser.h markdown_definitions.h doxygen.cfg example_cocoa/HGMarkdownHighlighter.h
 	doxygen doxygen.cfg
