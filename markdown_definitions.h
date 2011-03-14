@@ -75,8 +75,8 @@ typedef enum
 struct Element
 {
     element_type type;            /**< type of element */
-    long pos;                     /**< start offset in input */
-    long end;                     /**< end offset in input */
+    unsigned long pos;            /**< start offset in input */
+    unsigned long end;            /**< end offset in input */
     struct Element *next;         /**< next element in list */
     struct Element *allElemsNext; /**< next element in list of all elements */
     char *text;                   /**< text content (relevant only for elements of type EXTRA_TEXT) */

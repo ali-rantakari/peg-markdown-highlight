@@ -139,7 +139,7 @@ static element *p_elem;
 static element *p_elem_head;
 
 /* Current parsing offset within charbuf: */
-static int p_offset;
+static unsigned long p_offset;
 
 /* The extensions to use for parsing (bitfield */
 /* of enum markdown_extensions): */
@@ -419,11 +419,13 @@ void fix_offsets(element *elem)
 	if (elem->type == EXTRA_TEXT)
 		return;
 	
-	int new_pos = -1;
-	int new_end = -1;
+	bool have_new_pos = false;
+	bool have_new_end = false;
+	unsigned long new_pos = 0;
+	unsigned long new_end = 0;
 	
-	int previous_end = 0;
-	int c = 0;
+	unsigned long previous_end = 0;
+	unsigned long c = 0;
 	element *cursor = p_elem_head;
 	while (cursor != NULL)
 	{
@@ -431,19 +433,21 @@ void fix_offsets(element *elem)
 						? strlen(cursor->text)
 						: cursor->end - cursor->pos;
 		
-		if (new_pos == -1 && (c <= elem->pos && elem->pos <= c+thislen)) {
+		if (!have_new_pos && (c <= elem->pos && elem->pos <= c+thislen)) {
 			new_pos = (cursor->type == EXTRA_TEXT)
 						? previous_end
 						: cursor->pos + (elem->pos - c);
+			have_new_pos = true;
 		}
 		
-		if (new_end == -1 && (c <= elem->end && elem->end <= c+thislen)) {
+		if (!have_new_end && (c <= elem->end && elem->end <= c+thislen)) {
 			new_end = (cursor->type == EXTRA_TEXT)
 						? previous_end
 						: cursor->pos + (elem->end - c);
+			have_new_end = true;
 		}
 		
-		if (new_pos != -1 && new_end != -1)
+		if (have_new_pos && have_new_end)
 			break;
 		
 		if (cursor->type != EXTRA_TEXT)
