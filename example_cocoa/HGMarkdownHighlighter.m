@@ -77,7 +77,7 @@
 	[self clearHighlightingForRange:range];
 	
 	NSMutableAttributedString *attrStr = [self.targetTextView textStorage];
-	int sourceLength = [attrStr length];
+	unsigned long sourceLength = [attrStr length];
 	
 	int order[] = {
 		H1, H2, H3, H4, H5, H6,  
@@ -102,7 +102,8 @@
 	};
 	int order_len = 24;
 	
-	for (int i = 0; i < order_len; i++)
+	int i;
+	for (i = 0; i < order_len; i++)
 	{
 		element *cursor = elements[order[i]];
 		
@@ -153,34 +154,35 @@
 			}
 			
 			if (fgColor != nil || bgColor != nil) {
-				int rangePos = MIN(MAX(cursor->pos, 0), sourceLength);
-				int len = cursor->end - cursor->pos;
+				unsigned long rangePosLowLimited = MAX(cursor->pos, (unsigned long)0);
+				unsigned long rangePos = MIN(rangePosLowLimited, sourceLength);
+				unsigned long len = cursor->end - cursor->pos;
 				if (rangePos+len > sourceLength)
 					len = sourceLength-rangePos;
-				NSRange range = NSMakeRange(rangePos, len);
+				NSRange hlRange = NSMakeRange(rangePos, len);
 				
 				if (removeBgColor)
 					[attrStr
 					 removeAttribute:NSBackgroundColorAttributeName
-					 range:range
+					 range:hlRange
 					 ];
 				else if (bgColor != nil)
 					[attrStr
 					 addAttribute:NSBackgroundColorAttributeName
 					 value:bgColor
-					 range:range
+					 range:hlRange
 					 ];
 				
 				if (removeFgColor)
 					[attrStr
 					 removeAttribute:NSForegroundColorAttributeName
-					 range:range
+					 range:hlRange
 					 ];
 				else if (fgColor != nil)
 					[attrStr
 					 addAttribute:NSForegroundColorAttributeName
 					 value:fgColor
-					 range:range
+					 range:hlRange
 					 ];
 			}
 			

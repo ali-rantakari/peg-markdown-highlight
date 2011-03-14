@@ -9,7 +9,7 @@
 #import <Cocoa/Cocoa.h>
 #import "HGMarkdownHighlighter.h"
 
-@interface MDHExampleAppDelegate : NSObject <NSApplicationDelegate>
+@interface MDHExampleAppDelegate : NSObject
 {
     NSWindow *window;
 	NSTextView *textView1;
