@@ -371,7 +371,7 @@ YY_VARIABLE(char *   ) yybuf= 0;\n\
 YY_VARIABLE(int	     ) yybuflen= 0;\n\
 YY_VARIABLE(int	     ) yypos= 0;\n\
 YY_VARIABLE(int	     ) yylimit= 0;\n\
-YY_VARIABLE(char *   ) yytext= 0;\n\
+YY_VARIABLE(char *   ) yytext_g= 0;\n\
 YY_VARIABLE(int	     ) yytextlen= 0;\n\
 YY_VARIABLE(int	     ) yybegin= 0;\n\
 YY_VARIABLE(int	     ) yyend= 0;\n\
@@ -473,11 +473,11 @@ YY_LOCAL(int) yyText(int begin, int end)\n\
       while (yytextlen < (yyleng - 1))\n\
 	{\n\
 	  yytextlen *= 2;\n\
-	  yytext= (char *)realloc(yytext, yytextlen);\n\
+	  yytext_g= (char *)realloc(yytext_g, yytextlen);\n\
 	}\n\
-      memcpy(yytext, yybuf + begin, yyleng);\n\
+      memcpy(yytext_g, yybuf + begin, yyleng);\n\
     }\n\
-  yytext[yyleng]= '\\0';\n\
+  yytext_g[yyleng]= '\\0';\n\
   return yyleng;\n\
 }\n\
 \n\
@@ -489,7 +489,7 @@ YY_LOCAL(void) yyDone(void)\n\
       yythunk *thunk= &yythunks[pos];\n\
       int yyleng= thunk->end ? yyText(thunk->begin, thunk->end) : thunk->begin;\n\
       yyprintf((stderr, \"DO [%d] %p %s\\n\", pos, thunk->action, yytext));\n\
-      thunk->action(yytext, thunk->begin, thunk->end, yyleng);\n\
+      thunk->action(yytext_g, thunk->begin, thunk->end, yyleng);\n\
     }\n\
   yythunkpos= 0;\n\
 }\n\
@@ -544,7 +544,7 @@ YY_PARSE(int) YYPARSEFROM(yyrule yystart)\n\
       yybuflen= 1024;\n\
       yybuf= (char *)malloc(yybuflen);\n\
       yytextlen= 1024;\n\
-      yytext= (char *)malloc(yytextlen);\n\
+      yytext_g= (char *)malloc(yytextlen);\n\
       yythunkslen= 32;\n\
       yythunks= (yythunk *)malloc(sizeof(yythunk) * yythunkslen);\n\
       yyvalslen= 32;\n\
