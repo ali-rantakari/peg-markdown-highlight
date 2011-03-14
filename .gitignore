@@ -4,6 +4,7 @@
 peg/leg
 peg/peg
 markdown_parser.c
+pmh_parser.c
 tester
 highlighter
 testclient

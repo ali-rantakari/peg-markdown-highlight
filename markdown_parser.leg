@@ -15,7 +15,7 @@
 
  ***********************************************************************/
 
-#include "markdown_parser_head.c"
+/// header_code_here
 
 /**********************************************************************
 
@@ -655,5 +655,6 @@ RawNoteBlock =  ( !BlankLine OptionallyIndentedLine )+
 
 %%
 
-#include "markdown_parser_foot.c"
+/// footer_code_here
+
 
