@@ -19,7 +19,7 @@ markdown_parser_core.c : markdown_grammar.leg $(LEG)
 
 markdown_parser.c : markdown_parser_core.c markdown_parser_head.c markdown_parser_foot.c
 	@echo '------- combining parser code'
-	./combine_parser_files.py > $@
+	./tools/combine_parser_files.py > $@
 
 $(TESTER) : tester.m markdown_parser.c markdown_parser.h ANSIEscapeHelper.m ANSIEscapeHelper.h
 	@echo '------- building tester'
@@ -44,7 +44,8 @@ docs: markdown_parser.h markdown_definitions.h doxygen.cfg example_cocoa/HGMarkd
 .PHONY: clean test
 
 clean:
-	rm -f markdown_parser_core.c markdown_parser.c $(TESTER) $(TEST_CLIENT) $(HIGHLIGHTER) *.o; \
+	rm -f markdown_parser_core.c markdown_parser.c $(TESTER) $(TEST_CLIENT) $(HIGHLIGHTER) $(BENCH) *.o; \
+	rm -rf *.dSYM; \
 	make -C $(PEGDIR) clean
 
 distclean: clean

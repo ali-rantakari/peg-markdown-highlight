@@ -5,6 +5,7 @@
 # one file.
 # 
 
+import fileinput
 import sys
 
 def get_contents(fn):
@@ -13,16 +14,13 @@ def get_contents(fn):
     ff.close()
     return con
 
+out = sys.stdout.write
 
-out = ''
-
-for line in get_contents('markdown_parser_core.c').splitlines(True):
+for line in fileinput.input('markdown_parser_core.c'):
     if line.strip() == '/// header_code_here':
-        out += get_contents('markdown_parser_head.c')
+        out(get_contents('markdown_parser_head.c'))
     elif line.strip() == '/// footer_code_here':
-        out += get_contents('markdown_parser_foot.c')
+        out(get_contents('markdown_parser_foot.c'))
     else:
-        out += line
-
-print out
+        out(line)
 
