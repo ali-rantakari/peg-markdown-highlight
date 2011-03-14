@@ -4,7 +4,7 @@ BENCH=bench
 TESTER=tester
 TEST_CLIENT=testclient
 HIGHLIGHTER=highlighter
-CFLAGS ?= -Wall -Wswitch -Wshadow -Wsign-compare -O3
+CFLAGS ?= -Wall -Wswitch -Wshadow -Wsign-compare -O3 -std=gnu89
 OBJC_CFLAGS=-framework Foundation -framework AppKit
 PEGDIR=peg
 LEG=$(PEGDIR)/leg
@@ -25,13 +25,17 @@ markdown_parser.o : markdown_parser.c
 	@echo '------- building markdown_parser.o'
 	$(CC) $(CFLAGS) -ansi -c -o $@ $<
 
-$(TESTER) : tester.m markdown_parser.o markdown_parser.h ANSIEscapeHelper.m ANSIEscapeHelper.h
-	@echo '------- building tester'
-	clang $(CFLAGS) $(OBJC_CFLAGS) -o $@ markdown_parser.o ANSIEscapeHelper.m $<
+ANSIEscapeHelper.o : ANSIEscapeHelper.m ANSIEscapeHelper.h
+	@echo '------- building ANSIEscapeHelper.o'
+	clang -Wall -O3 -c -o $@ $<
 
-$(TEST_CLIENT) : testclient.m ANSIEscapeHelper.m ANSIEscapeHelper.h
+$(TESTER) : tester.m markdown_parser.o markdown_parser.h ANSIEscapeHelper.o ANSIEscapeHelper.h
+	@echo '------- building tester'
+	clang $(CFLAGS) $(OBJC_CFLAGS) -o $@ markdown_parser.o ANSIEscapeHelper.o $<
+
+$(TEST_CLIENT) : testclient.m ANSIEscapeHelper.o ANSIEscapeHelper.h
 	@echo '------- building testclient'
-	clang $(CFLAGS) $(OBJC_CFLAGS) -o $@ ANSIEscapeHelper.m $<
+	clang $(CFLAGS) $(OBJC_CFLAGS) -o $@ ANSIEscapeHelper.o $<
 
 $(HIGHLIGHTER) : highlighter.c markdown_parser.o markdown_parser.h
 	@echo '------- building highlighter'

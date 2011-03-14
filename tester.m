@@ -6,7 +6,7 @@
 
 void apply_highlighting(NSMutableAttributedString *attrStr, element *elem[])
 {
-	int sourceLength = [attrStr length];
+	unsigned long sourceLength = [attrStr length];
 	
 	int order[] = {
 		H1, H2, H3, H4, H5, H6,  
@@ -31,7 +31,8 @@ void apply_highlighting(NSMutableAttributedString *attrStr, element *elem[])
 	};
 	int order_len = 24;
 	
-	for (int i = 0; i < order_len; i++)
+	int i;
+	for (i = 0; i < order_len; i++)
 	{
 		//MKD_PRINTF("apply_highlighting: %i\n", i);
 		
@@ -73,8 +74,9 @@ void apply_highlighting(NSMutableAttributedString *attrStr, element *elem[])
 			
 			//MKD_PRINTF("  %i-%i\n", cursor->pos, cursor->end);
 			if (fgColor != nil || bgColor != nil) {
-				int rangePos = MIN(MAX(cursor->pos, 0), sourceLength);
-				int len = cursor->end - cursor->pos;
+				unsigned long rangePosLimitedLow = MAX(cursor->pos, (unsigned long)0);
+				unsigned long rangePos = MIN(rangePosLimitedLow, sourceLength);
+				unsigned long len = cursor->end - cursor->pos;
 				if (rangePos+len > sourceLength)
 					len = sourceLength-rangePos;
 				NSRange range = NSMakeRange(rangePos, len);
