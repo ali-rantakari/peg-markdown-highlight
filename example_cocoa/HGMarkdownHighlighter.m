@@ -21,7 +21,6 @@
 @implementation HGMarkdownHighlighter
 
 @synthesize waitInterval;
-@synthesize defaultFont;
 @synthesize targetTextView;
 @synthesize updateTimer;
 @synthesize isHighlighting;
@@ -43,7 +42,6 @@
 	self.targetTextView = textView;
 	self.waitInterval = 1;
 	self.extensions = 0;
-	self.defaultFont = [NSFont userFixedPitchFontOfSize:12];
 	
 	return self;
 }
@@ -51,7 +49,6 @@
 - (void) dealloc
 {
 	self.targetTextView = nil;
-	self.defaultFont = nil;
 	self.updateTimer = nil;
 	[super dealloc];
 }
@@ -59,11 +56,33 @@
 
 #pragma mark -
 
+- (NSFontTraitMask) getClearFontTraitMask:(NSFontTraitMask)currentFontTraitMask
+{
+	static NSDictionary *oppositeFontTraits = nil;	
+	if (oppositeFontTraits == nil)
+		oppositeFontTraits = [[NSDictionary dictionaryWithObjectsAndKeys:
+							   [NSNumber numberWithUnsignedInt:NSItalicFontMask], [NSNumber numberWithUnsignedInt:NSUnitalicFontMask],
+							   [NSNumber numberWithUnsignedInt:NSUnitalicFontMask], [NSNumber numberWithUnsignedInt:NSItalicFontMask],
+							   [NSNumber numberWithUnsignedInt:NSUnboldFontMask], [NSNumber numberWithUnsignedInt:NSBoldFontMask],
+							   [NSNumber numberWithUnsignedInt:NSBoldFontMask], [NSNumber numberWithUnsignedInt:NSUnboldFontMask],
+							   [NSNumber numberWithUnsignedInt:NSCondensedFontMask], [NSNumber numberWithUnsignedInt:NSExpandedFontMask],
+							   [NSNumber numberWithUnsignedInt:NSExpandedFontMask], [NSNumber numberWithUnsignedInt:NSCondensedFontMask],
+							   nil] retain];
+	NSFontTraitMask traitsToApply = 0;
+	for (NSNumber *trait in oppositeFontTraits)
+	{
+		if ((currentFontTraitMask & [trait unsignedIntValue]) != 0)
+			continue;
+		traitsToApply |= [(NSNumber *)[oppositeFontTraits objectForKey:trait] unsignedIntValue];
+	}
+	return traitsToApply;
+}
+
 - (void) clearHighlightingForRange:(NSRange)range
 {
 	NSTextStorage *textStorage = [self.targetTextView textStorage];
 	
-	[textStorage addAttributes:[NSDictionary dictionaryWithObject:self.defaultFont forKey:NSFontAttributeName] range:range];
+	[textStorage applyFontTraits:clearFontTraitMask range:range];
 	[textStorage removeAttribute:NSBackgroundColorAttributeName range:range];
 	[textStorage removeAttribute:NSForegroundColorAttributeName range:range];
 }
@@ -112,6 +131,9 @@
 				[attrStr removeAttribute:attrName range:hlRange];
 			
 			[attrStr addAttributes:style.attributesToAdd range:hlRange];
+			
+			if (style.fontTraitsToAdd != 0)
+				[attrStr applyFontTraits:style.fontTraitsToAdd range:hlRange];
 			
 			cursor = cursor->next;
 		}
@@ -189,25 +211,25 @@
 	if (defaultStyles != nil)
 		return defaultStyles;
 	
-	defaultStyles = [NSArray arrayWithObjects:
-		HG_MKSTYLE(H1, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil),
-		HG_MKSTYLE(H2, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil),
-		HG_MKSTYLE(H3, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil),
-		HG_MKSTYLE(H4, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil),
-		HG_MKSTYLE(H5, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil),
-		HG_MKSTYLE(H6, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil),
-		HG_MKSTYLE(HRULE, HG_D(HG_DARK_GRAY,HG_FORE, HG_LIGHT_GRAY,HG_BACK), nil),
-		HG_MKSTYLE(LIST_BULLET, HG_D(HG_DARK(HG_MAGENTA),HG_FORE), nil),
-		HG_MKSTYLE(LIST_ENUMERATOR, HG_D(HG_DARK(HG_MAGENTA),HG_FORE), nil),
-		HG_MKSTYLE(LINK, HG_D(HG_DARK(HG_CYAN),HG_FORE, HG_LIGHT(HG_CYAN),HG_BACK), nil),
-		HG_MKSTYLE(AUTO_LINK_URL, HG_D(HG_DARK(HG_CYAN),HG_FORE, HG_LIGHT(HG_CYAN),HG_BACK), nil),
-		HG_MKSTYLE(AUTO_LINK_EMAIL, HG_D(HG_DARK(HG_CYAN),HG_FORE, HG_LIGHT(HG_CYAN),HG_BACK), nil),
-		HG_MKSTYLE(CODE, HG_D(HG_DARK(HG_GREEN),HG_FORE, HG_LIGHT(HG_GREEN),HG_BACK), nil),
-		HG_MKSTYLE(EMPH, HG_D(HG_DARK(HG_YELLOW),HG_FORE), nil),
-		HG_MKSTYLE(STRONG, HG_D(HG_DARK(HG_MAGENTA),HG_FORE), nil),
-		HG_MKSTYLE(VERBATIM, HG_D(HG_DARK(HG_GREEN),HG_FORE, HG_LIGHT(HG_GREEN),HG_BACK), nil),
-		HG_MKSTYLE(BLOCKQUOTE, HG_D(HG_DARK(HG_MAGENTA),HG_FORE), HG_A(HG_BACK)),
-		nil];
+	defaultStyles = [[NSArray arrayWithObjects:
+		HG_MKSTYLE(H1, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil, NSBoldFontMask),
+		HG_MKSTYLE(H2, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil, NSBoldFontMask),
+		HG_MKSTYLE(H3, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil, NSBoldFontMask),
+		HG_MKSTYLE(H4, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil, NSBoldFontMask),
+		HG_MKSTYLE(H5, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil, NSBoldFontMask),
+		HG_MKSTYLE(H6, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil, NSBoldFontMask),
+		HG_MKSTYLE(HRULE, HG_D(HG_DARK_GRAY,HG_FORE, HG_LIGHT_GRAY,HG_BACK), nil, 0),
+		HG_MKSTYLE(LIST_BULLET, HG_D(HG_DARK(HG_MAGENTA),HG_FORE), nil, 0),
+		HG_MKSTYLE(LIST_ENUMERATOR, HG_D(HG_DARK(HG_MAGENTA),HG_FORE), nil, 0),
+		HG_MKSTYLE(LINK, HG_D(HG_DARK(HG_CYAN),HG_FORE, HG_LIGHT(HG_CYAN),HG_BACK), nil, 0),
+		HG_MKSTYLE(AUTO_LINK_URL, HG_D(HG_DARK(HG_CYAN),HG_FORE, HG_LIGHT(HG_CYAN),HG_BACK), nil, 0),
+		HG_MKSTYLE(AUTO_LINK_EMAIL, HG_D(HG_DARK(HG_CYAN),HG_FORE, HG_LIGHT(HG_CYAN),HG_BACK), nil, 0),
+		HG_MKSTYLE(CODE, HG_D(HG_DARK(HG_GREEN),HG_FORE, HG_LIGHT(HG_GREEN),HG_BACK), nil, 0),
+		HG_MKSTYLE(EMPH, HG_D(HG_DARK(HG_YELLOW),HG_FORE), nil, NSItalicFontMask),
+		HG_MKSTYLE(STRONG, HG_D(HG_DARK(HG_MAGENTA),HG_FORE), nil, NSBoldFontMask),
+		HG_MKSTYLE(VERBATIM, HG_D(HG_DARK(HG_GREEN),HG_FORE, HG_LIGHT(HG_GREEN),HG_BACK), nil, 0),
+		HG_MKSTYLE(BLOCKQUOTE, HG_D(HG_DARK(HG_MAGENTA),HG_FORE), HG_A(HG_BACK), 0),
+		nil] retain];
 	
 	return defaultStyles;
 }
@@ -225,6 +247,8 @@
 	if (self.styles == nil)
 		self.styles = [self getDefaultStyles];
 	
+	clearFontTraitMask = [self getClearFontTraitMask:[[NSFontManager sharedFontManager] traitsOfFont:[self.targetTextView font]]];
+	
 	[[HGMarkdownParser sharedInstance] requestParsing:self];
 	
 	if (self.highlightAutomatically)
@@ -232,7 +256,7 @@
 		 addObserver:self
 		 selector:@selector(textViewTextDidChange:)
 		 name:NSTextDidChangeNotification
-		 object:nil];
+		 object:self.targetTextView];
 	
 	NSScrollView *scrollView = [self.targetTextView enclosingScrollView];
 	if (scrollView != nil)

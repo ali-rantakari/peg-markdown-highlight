@@ -10,7 +10,7 @@
 #import "markdown_definitions.h"
 
 
-#define HG_MKSTYLE(elem, add, remove)	[[[HGMarkdownHighlightingStyle alloc] initWithType:(elem) attributesToAdd:(add) toRemove:(remove)] autorelease]
+#define HG_MKSTYLE(elem, add, remove, traits)	[[[HGMarkdownHighlightingStyle alloc] initWithType:(elem) attributesToAdd:(add) toRemove:(remove) fontTraitsToAdd:(traits)] autorelease]
 #define HG_D(...)	[NSDictionary dictionaryWithObjectsAndKeys:__VA_ARGS__, nil]
 #define HG_A(...)	[NSArray arrayWithObjects:__VA_ARGS__, nil]
 
@@ -41,12 +41,14 @@
 {
 	NSDictionary *attributesToAdd;
 	NSArray *attributesToRemove;
+	NSFontTraitMask fontTraitsToAdd;
 	element_type elementType;
 }
 
-- (id) initWithType:(element_type)elemType attributesToAdd:(NSDictionary *)toAdd toRemove:(NSArray *)toRemove;
+- (id) initWithType:(element_type)elemType attributesToAdd:(NSDictionary *)toAdd toRemove:(NSArray *)toRemove fontTraitsToAdd:(NSFontTraitMask)traits;
 
 @property element_type elementType;
+@property NSFontTraitMask fontTraitsToAdd;
 @property(copy) NSDictionary *attributesToAdd;
 @property(copy) NSArray *attributesToRemove;
 

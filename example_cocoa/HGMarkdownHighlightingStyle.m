@@ -10,7 +10,10 @@
 
 @implementation HGMarkdownHighlightingStyle
 
-- (id) initWithType:(element_type)elemType attributesToAdd:(NSDictionary *)toAdd toRemove:(NSArray *)toRemove
+- (id) initWithType:(element_type)elemType
+	attributesToAdd:(NSDictionary *)toAdd
+		   toRemove:(NSArray *)toRemove
+	fontTraitsToAdd:(NSFontTraitMask)traits
 {
 	if (!(self = [super init]))
 		return nil;
@@ -18,6 +21,7 @@
 	self.elementType = elemType;
 	self.attributesToAdd = toAdd;
 	self.attributesToRemove = toRemove;
+	self.fontTraitsToAdd = traits;
 	
 	return self;
 }
@@ -32,5 +36,6 @@
 @synthesize elementType;
 @synthesize attributesToAdd;
 @synthesize attributesToRemove;
+@synthesize fontTraitsToAdd;
 
 @end

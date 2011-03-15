@@ -10,7 +10,6 @@
  */
 @interface HGMarkdownHighlighter : NSObject
 {
-	NSFont *defaultFont;
 	NSTimeInterval waitInterval;
 	NSTextView *targetTextView;
 	int extensions;
@@ -19,11 +18,12 @@
 	NSArray *styles;
 
 @private
+	NSFontTraitMask clearFontTraitMask;
 	NSTimer *updateTimer;
 	element **cachedElements;
 }
 
-/** \brief The styles to highlight different language elements with.
+/** \brief The order and styles for higlighting different elements.
  * Values must be instances of HGMarkdownHighlightingStyle. The
  * order of objects in this array determines the highlighting order
  * for element types.
@@ -61,8 +61,6 @@
  */
 @property int extensions;
 
-
-@property(copy) NSFont *defaultFont;
 
 
 /**

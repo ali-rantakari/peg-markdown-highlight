@@ -40,6 +40,8 @@ float roundToQuarter(float val) {
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+	[textView1 setFont:[NSFont fontWithName:@"courier" size:12]];
+	
 	NSString *s = [NSString
 				   stringWithContentsOfFile:[[NSBundle mainBundle]
 											 pathForResource:@"huge"
