@@ -1,5 +1,5 @@
 
-PEG-Markdown-Highlight
+PEG Markdown Highlight
 ========================
 
 Description
@@ -7,7 +7,7 @@ Description
 
 This project contains:
 
-- A Markdown parser for syntax highlighting, written in C99. The parser itself
+- A Markdown parser for syntax highlighting, written in C. The parser itself
   should compile as is on OS X, Linux and Windows (at least).
 - Helper classes for syntax highlighting an `NSTextView` in a Cocoa GUI
   application
@@ -31,6 +31,14 @@ run `make docs` and they should be available under the `docs/` directory.
 Using the Parser in Your Application
 -------------------------------------
 
+The parser has been written in ANSI/ISO C89 with GNU extensions, which means
+that you need a _GCC-compatible compiler_ (see section on MSVC below, though).
+You also need _Python_ due to a utility script that is used to combine some
+files in a `make` step.
+
+
+### Files You Need
+
 You need to add the following files into your project:
 
 - `markdown_definitions.h`
@@ -44,8 +52,7 @@ API docs for more info).
 
 
 
-Compiling in Microsoft Visual C++
--------------------------------------
+### Compiling in Microsoft Visual C++
 
 First you need to generate `markdown_parser.c` somehow. There are two main
 ways to do this:
@@ -55,10 +62,9 @@ ways to do this:
 
 Whichever way you go, the command you run is `make markdown_parser.c`.
 
-The parser is written in C99, which MSVC does not explicitly support (it
-apparently expects `.c` files to be C89), but the code should compile nicely as
-C++ (just change the extensions to `.cpp` or set some magic switch in the
-project settings to make them compile as C++).
+MSVC does not support some of the GNU extensions the code uses, but the it
+should compile nicely as C++ (just change the extensions to `.cpp` or set some
+magic switch in the project settings to make them compile as C++).
 
 
 
