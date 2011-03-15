@@ -12,6 +12,7 @@
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		C90AECB2132EF3560077250F /* HGMarkdownHighlightingStyle.m in Sources */ = {isa = PBXBuildFile; fileRef = C90AECB1132EF3560077250F /* HGMarkdownHighlightingStyle.m */; };
 		C938C8061322C0F100C18368 /* huge.md in Resources */ = {isa = PBXBuildFile; fileRef = C938C8051322C0F100C18368 /* huge.md */; };
 		C98C790A131FE46800943A0C /* markdown_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = C98C7909131FE46800943A0C /* markdown_parser.c */; };
 		C9B5A5571319C41E00A1DEB6 /* HGMarkdownHighlighter.m in Sources */ = {isa = PBXBuildFile; fileRef = C9B5A5561319C41E00A1DEB6 /* HGMarkdownHighlighter.m */; };
@@ -32,6 +33,9 @@
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		8D1107310486CEB800E47090 /* MDHExample-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "MDHExample-Info.plist"; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* MDHExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MDHExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C90AECB0132EF3560077250F /* HGMarkdownHighlightingStyle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGMarkdownHighlightingStyle.h; sourceTree = "<group>"; };
+		C90AECB1132EF3560077250F /* HGMarkdownHighlightingStyle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGMarkdownHighlightingStyle.m; sourceTree = "<group>"; };
+		C90AECB6132EF5290077250F /* markdown_definitions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = markdown_definitions.h; sourceTree = "<group>"; };
 		C938C8051322C0F100C18368 /* huge.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = huge.md; sourceTree = "<group>"; };
 		C98C7904131FE45600943A0C /* markdown_parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = markdown_parser.h; sourceTree = "<group>"; };
 		C98C7909131FE46800943A0C /* markdown_parser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = markdown_parser.c; sourceTree = "<group>"; };
@@ -135,12 +139,15 @@
 		C98C790D131FE47A00943A0C /* Highlighter */ = {
 			isa = PBXGroup;
 			children = (
+				C90AECB6132EF5290077250F /* markdown_definitions.h */,
 				C98C7909131FE46800943A0C /* markdown_parser.c */,
 				C98C7904131FE45600943A0C /* markdown_parser.h */,
 				C9B5A8EC131C4CD600A1DEB6 /* HGMarkdownParser.h */,
 				C9B5A8ED131C4CD600A1DEB6 /* HGMarkdownParser.m */,
 				C9B5A5551319C41E00A1DEB6 /* HGMarkdownHighlighter.h */,
 				C9B5A5561319C41E00A1DEB6 /* HGMarkdownHighlighter.m */,
+				C90AECB0132EF3560077250F /* HGMarkdownHighlightingStyle.h */,
+				C90AECB1132EF3560077250F /* HGMarkdownHighlightingStyle.m */,
 			);
 			name = Highlighter;
 			sourceTree = "<group>";
@@ -214,6 +221,7 @@
 				C9B5A5571319C41E00A1DEB6 /* HGMarkdownHighlighter.m in Sources */,
 				C9B5A8EE131C4CD600A1DEB6 /* HGMarkdownParser.m in Sources */,
 				C98C790A131FE46800943A0C /* markdown_parser.c in Sources */,
+				C90AECB2132EF3560077250F /* HGMarkdownHighlightingStyle.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

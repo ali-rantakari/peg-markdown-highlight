@@ -8,7 +8,7 @@
 
 #import "HGMarkdownHighlighter.h"
 #import "HGMarkdownParser.h"
-
+#import "HGMarkdownHighlightingStyle.h"
 
 // 'private members' category
 @interface HGMarkdownHighlighter()
@@ -27,6 +27,7 @@
 @synthesize isHighlighting;
 @synthesize highlightAutomatically;
 @synthesize extensions;
+@synthesize styles;
 
 - (id) initWithTextView:(NSTextView *)textView
 {
@@ -35,6 +36,7 @@
 	
 	cachedElements = NULL;
 	
+	self.styles = nil;
 	self.isHighlighting = NO;
 	self.highlightAutomatically = YES;
 	self.updateTimer = nil;
@@ -79,33 +81,9 @@
 	NSMutableAttributedString *attrStr = [self.targetTextView textStorage];
 	unsigned long sourceLength = [attrStr length];
 	
-	int order[] = {
-		H1, H2, H3, H4, H5, H6,  
-		SINGLEQUOTED,
-		DOUBLEQUOTED,
-		LINK,
-		AUTO_LINK_URL,
-		AUTO_LINK_EMAIL,
-		IMAGE,
-		HTML,
-		EMPH,
-		STRONG,
-		CODE,
-		LIST_BULLET,
-		LIST_ENUMERATOR,
-		BLOCKQUOTE,
-		VERBATIM,
-		HTMLBLOCK,
-		HRULE,
-		REFERENCE,
-		NOTE
-	};
-	int order_len = 24;
-	
-	int i;
-	for (i = 0; i < order_len; i++)
+	for (HGMarkdownHighlightingStyle *style in self.styles)
 	{
-		element *cursor = elements[order[i]];
+		element *cursor = elements[style.elementType];
 		
 		while (cursor != NULL)
 		{
@@ -123,68 +101,17 @@
 			if (cursor->pos >= rangeEnd)
 				break;
 			
-			NSColor *fgColor = nil;
-			NSColor *bgColor = nil;
-			BOOL removeFgColor = NO;
-			BOOL removeBgColor = NO;
+			unsigned long rangePosLowLimited = MAX(cursor->pos, (unsigned long)0);
+			unsigned long rangePos = MIN(rangePosLowLimited, sourceLength);
+			unsigned long len = cursor->end - cursor->pos;
+			if (rangePos+len > sourceLength)
+				len = sourceLength-rangePos;
+			NSRange hlRange = NSMakeRange(rangePos, len);
 			
-			switch (cursor->type)
-			{
-				case H1:
-				case H2:
-				case H3:
-				case H4:
-				case H5:
-				case H6:		fgColor = [NSColor blueColor]; break;
-				case EMPH:		fgColor = [NSColor yellowColor]; break;
-				case STRONG:	fgColor = [NSColor magentaColor]; break;
-				case CODE:
-				case VERBATIM:	fgColor = [NSColor greenColor]; break;
-				case HRULE:		fgColor = [NSColor cyanColor]; break;
-				case LIST_ENUMERATOR:
-				case LIST_BULLET:fgColor = [NSColor magentaColor]; break;
-				case AUTO_LINK_EMAIL:
-				case AUTO_LINK_URL:fgColor = [NSColor cyanColor]; break;
-				case IMAGE:
-				case LINK:		bgColor = [NSColor grayColor];
-					fgColor = [NSColor cyanColor]; break;
-				case BLOCKQUOTE:removeBgColor = YES;
-					fgColor = [NSColor magentaColor]; break;
-				default: break;
-			}
+			for (NSString *attrName in style.attributesToRemove)
+				[attrStr removeAttribute:attrName range:hlRange];
 			
-			if (fgColor != nil || bgColor != nil) {
-				unsigned long rangePosLowLimited = MAX(cursor->pos, (unsigned long)0);
-				unsigned long rangePos = MIN(rangePosLowLimited, sourceLength);
-				unsigned long len = cursor->end - cursor->pos;
-				if (rangePos+len > sourceLength)
-					len = sourceLength-rangePos;
-				NSRange hlRange = NSMakeRange(rangePos, len);
-				
-				if (removeBgColor)
-					[attrStr
-					 removeAttribute:NSBackgroundColorAttributeName
-					 range:hlRange
-					 ];
-				else if (bgColor != nil)
-					[attrStr
-					 addAttribute:NSBackgroundColorAttributeName
-					 value:bgColor
-					 range:hlRange
-					 ];
-				
-				if (removeFgColor)
-					[attrStr
-					 removeAttribute:NSForegroundColorAttributeName
-					 range:hlRange
-					 ];
-				else if (fgColor != nil)
-					[attrStr
-					 addAttribute:NSForegroundColorAttributeName
-					 value:fgColor
-					 range:hlRange
-					 ];
-			}
+			[attrStr addAttributes:style.attributesToAdd range:hlRange];
 			
 			cursor = cursor->next;
 		}
@@ -256,6 +183,36 @@
 }
 
 
+- (NSArray *) getDefaultStyles
+{
+	static NSArray *defaultStyles = nil;
+	if (defaultStyles != nil)
+		return defaultStyles;
+	
+	defaultStyles = [NSArray arrayWithObjects:
+		HG_MKSTYLE(H1, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil),
+		HG_MKSTYLE(H2, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil),
+		HG_MKSTYLE(H3, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil),
+		HG_MKSTYLE(H4, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil),
+		HG_MKSTYLE(H5, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil),
+		HG_MKSTYLE(H6, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil),
+		HG_MKSTYLE(HRULE, HG_D(HG_DARK_GRAY,HG_FORE, HG_LIGHT_GRAY,HG_BACK), nil),
+		HG_MKSTYLE(LIST_BULLET, HG_D(HG_DARK(HG_MAGENTA),HG_FORE), nil),
+		HG_MKSTYLE(LIST_ENUMERATOR, HG_D(HG_DARK(HG_MAGENTA),HG_FORE), nil),
+		HG_MKSTYLE(LINK, HG_D(HG_DARK(HG_CYAN),HG_FORE, HG_LIGHT(HG_CYAN),HG_BACK), nil),
+		HG_MKSTYLE(AUTO_LINK_URL, HG_D(HG_DARK(HG_CYAN),HG_FORE, HG_LIGHT(HG_CYAN),HG_BACK), nil),
+		HG_MKSTYLE(AUTO_LINK_EMAIL, HG_D(HG_DARK(HG_CYAN),HG_FORE, HG_LIGHT(HG_CYAN),HG_BACK), nil),
+		HG_MKSTYLE(CODE, HG_D(HG_DARK(HG_GREEN),HG_FORE, HG_LIGHT(HG_GREEN),HG_BACK), nil),
+		HG_MKSTYLE(EMPH, HG_D(HG_DARK(HG_YELLOW),HG_FORE), nil),
+		HG_MKSTYLE(STRONG, HG_D(HG_DARK(HG_MAGENTA),HG_FORE), nil),
+		HG_MKSTYLE(VERBATIM, HG_D(HG_DARK(HG_GREEN),HG_FORE, HG_LIGHT(HG_GREEN),HG_BACK), nil),
+		HG_MKSTYLE(BLOCKQUOTE, HG_D(HG_DARK(HG_MAGENTA),HG_FORE), HG_A(HG_BACK)),
+		nil];
+	
+	return defaultStyles;
+}
+
+
 - (void) parseAndHighlightNow
 {
 	[[HGMarkdownParser sharedInstance] requestParsing:self];
@@ -264,6 +221,9 @@
 - (void) startHighlighting
 {
 	// todo: throw exception if targetTextView is nil?
+	
+	if (self.styles == nil)
+		self.styles = [self getDefaultStyles];
 	
 	[[HGMarkdownParser sharedInstance] requestParsing:self];
 	

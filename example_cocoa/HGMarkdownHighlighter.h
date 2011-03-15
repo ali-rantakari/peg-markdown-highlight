@@ -16,11 +16,21 @@
 	int extensions;
 	BOOL isHighlighting;
 	BOOL highlightAutomatically;
+	NSArray *styles;
 
 @private
 	NSTimer *updateTimer;
 	element **cachedElements;
 }
+
+/** \brief The styles to highlight different language elements with.
+ * Values must be instances of HGMarkdownHighlightingStyle. The
+ * order of objects in this array determines the highlighting order
+ * for element types.
+ * 
+ * \sa element_type
+ */
+@property(copy) NSArray *styles;
 
 /** \brief The delay between editing text and it getting highlighted. */
 @property NSTimeInterval waitInterval;
