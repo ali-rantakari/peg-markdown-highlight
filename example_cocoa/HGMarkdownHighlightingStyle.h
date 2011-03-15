@@ -19,8 +19,10 @@
 
 #define HG_COLOR_RGB(r,g,b)	[NSColor colorWithCalibratedRed:(r) green:(g) blue:(b) alpha:1.0]
 #define HG_COLOR_HSB(h,s,b)	[NSColor colorWithCalibratedHue:(h) saturation:(s) brightness:(b) alpha:1.0]
+#define HG_COLOR_HEX(hex)	HG_COLOR_RGB(((hex & 0xFF0000) >> 16)/255.0, ((hex & 0xFF00) >> 8)/255.0, (hex & 0xFF)/255.0)
 
 // brightness/saturation
+#define HG_VDARK(h)	HG_COLOR_HSB(h, 0.7, 0.1)
 #define HG_DARK(h)	HG_COLOR_HSB(h, 1, 0.4)
 #define HG_MED(h)	HG_COLOR_HSB(h, 1, 1)
 #define HG_LIGHT(h)	HG_COLOR_HSB(h, 0.2, 1)

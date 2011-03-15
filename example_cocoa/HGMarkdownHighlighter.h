@@ -19,6 +19,7 @@
 
 @private
 	NSFontTraitMask clearFontTraitMask;
+	NSColor *defaultTextColor;
 	NSTimer *updateTimer;
 	element **cachedElements;
 }

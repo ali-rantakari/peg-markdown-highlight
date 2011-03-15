@@ -14,6 +14,7 @@
 @interface HGMarkdownHighlighter()
 
 @property(retain) NSTimer *updateTimer;
+@property(copy) NSColor *defaultTextColor;
 
 @end
 
@@ -27,6 +28,7 @@
 @synthesize highlightAutomatically;
 @synthesize extensions;
 @synthesize styles;
+@synthesize defaultTextColor;
 
 - (id) initWithTextView:(NSTextView *)textView
 {
@@ -35,6 +37,7 @@
 	
 	cachedElements = NULL;
 	
+	self.defaultTextColor = nil;
 	self.styles = nil;
 	self.isHighlighting = NO;
 	self.highlightAutomatically = YES;
@@ -48,8 +51,10 @@
 
 - (void) dealloc
 {
+	self.defaultTextColor = nil;
 	self.targetTextView = nil;
 	self.updateTimer = nil;
+	self.styles = nil;
 	[super dealloc];
 }
 
@@ -84,7 +89,10 @@
 	
 	[textStorage applyFontTraits:clearFontTraitMask range:range];
 	[textStorage removeAttribute:NSBackgroundColorAttributeName range:range];
-	[textStorage removeAttribute:NSForegroundColorAttributeName range:range];
+	if (self.defaultTextColor != nil)
+		[textStorage addAttribute:NSForegroundColorAttributeName value:self.defaultTextColor range:range];
+	else
+		[textStorage removeAttribute:NSForegroundColorAttributeName range:range];
 }
 
 - (void) applyHighlighting:(element **)elements withRange:(NSRange)range
@@ -248,6 +256,7 @@
 		self.styles = [self getDefaultStyles];
 	
 	clearFontTraitMask = [self getClearFontTraitMask:[[NSFontManager sharedFontManager] traitsOfFont:[self.targetTextView font]]];
+	self.defaultTextColor = [self.targetTextView textColor];
 	
 	[[HGMarkdownParser sharedInstance] requestParsing:self];
 	

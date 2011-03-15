@@ -7,6 +7,7 @@
 //
 
 #import "MDHExampleAppDelegate.h"
+#import "HGMarkdownHighlightingStyle.h"
 
 float roundToQuarter(float val) {
 	return (round(val * 4) / 4);
@@ -38,9 +39,36 @@ float roundToQuarter(float val) {
 	[delayLabel setFloatValue:roundToQuarter([delaySlider floatValue])];
 }
 
+
+- (NSArray *) getDarkStyles
+{
+	return [NSArray arrayWithObjects:
+			HG_MKSTYLE(H1, HG_D(HG_LIGHT(HG_BLUE),HG_FORE, HG_VDARK(HG_BLUE),HG_BACK), nil, NSBoldFontMask),
+			HG_MKSTYLE(H2, HG_D(HG_LIGHT(HG_BLUE),HG_FORE, HG_VDARK(HG_BLUE),HG_BACK), nil, NSBoldFontMask),
+			HG_MKSTYLE(H3, HG_D(HG_LIGHT(HG_BLUE),HG_FORE, HG_VDARK(HG_BLUE),HG_BACK), nil, NSBoldFontMask),
+			HG_MKSTYLE(H4, HG_D(HG_LIGHT(HG_BLUE),HG_FORE, HG_VDARK(HG_BLUE),HG_BACK), nil, NSBoldFontMask),
+			HG_MKSTYLE(H5, HG_D(HG_LIGHT(HG_BLUE),HG_FORE, HG_VDARK(HG_BLUE),HG_BACK), nil, NSBoldFontMask),
+			HG_MKSTYLE(H6, HG_D(HG_LIGHT(HG_BLUE),HG_FORE, HG_VDARK(HG_BLUE),HG_BACK), nil, NSBoldFontMask),
+			HG_MKSTYLE(HRULE, HG_D(HG_LIGHT_GRAY,HG_FORE, HG_DARK_GRAY,HG_BACK), nil, 0),
+			HG_MKSTYLE(LIST_BULLET, HG_D(HG_MED(HG_MAGENTA),HG_FORE), nil, 0),
+			HG_MKSTYLE(LIST_ENUMERATOR, HG_D(HG_MED(HG_MAGENTA),HG_FORE), nil, 0),
+			HG_MKSTYLE(LINK, HG_D(HG_LIGHT(HG_CYAN),HG_FORE, HG_VDARK(HG_CYAN),HG_BACK), nil, 0),
+			HG_MKSTYLE(AUTO_LINK_URL, HG_D(HG_LIGHT(HG_CYAN),HG_FORE, HG_VDARK(HG_CYAN),HG_BACK), nil, 0),
+			HG_MKSTYLE(AUTO_LINK_EMAIL, HG_D(HG_LIGHT(HG_CYAN),HG_FORE, HG_VDARK(HG_CYAN),HG_BACK), nil, 0),
+			HG_MKSTYLE(CODE, HG_D(HG_LIGHT(HG_GREEN),HG_FORE, HG_VDARK(HG_GREEN),HG_BACK), nil, 0),
+			HG_MKSTYLE(EMPH, HG_D(HG_MED(HG_YELLOW),HG_FORE), nil, NSItalicFontMask),
+			HG_MKSTYLE(STRONG, HG_D(HG_MED(HG_MAGENTA),HG_FORE), nil, NSBoldFontMask),
+			HG_MKSTYLE(VERBATIM, HG_D(HG_LIGHT(HG_GREEN),HG_FORE, HG_VDARK(HG_GREEN),HG_BACK), nil, 0),
+			HG_MKSTYLE(BLOCKQUOTE, HG_D(HG_LIGHT(HG_MAGENTA),HG_FORE), HG_A(HG_BACK), 0),
+			nil];
+}
+
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
 	[textView1 setFont:[NSFont fontWithName:@"courier" size:12]];
+	[textView1 setTextColor:[NSColor whiteColor]];
+	[textView1 setBackgroundColor:HG_COLOR_HEX(0x191e24)];
+	[textView1 setInsertionPointColor:[NSColor whiteColor]];
 	
 	NSString *s = [NSString
 				   stringWithContentsOfFile:[[NSBundle mainBundle]
@@ -53,6 +81,7 @@ float roundToQuarter(float val) {
 	
 	hl1 = [[HGMarkdownHighlighter alloc] initWithTextView:textView1];
 	hl1.waitInterval = [delaySlider intValue];
+	hl1.styles = [self getDarkStyles];
 	[hl1 startHighlighting];
 	
 	hl2 = [[HGMarkdownHighlighter alloc] initWithTextView:textView2];
