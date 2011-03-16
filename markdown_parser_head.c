@@ -24,6 +24,25 @@ typedef struct
 	element **head_elems;
 } parser_data;
 
+parser_data *mk_parser_data(char *charbuf, element *parsing_elems, unsigned long offset, int extensions, element **head_elems)
+{
+	parser_data *p_data = malloc(sizeof(parser_data));
+	p_data->extensions = extensions;
+	p_data->charbuf = charbuf;
+	p_data->offset = offset;
+	p_data->elem_head = p_data->elem = parsing_elems;
+	if (head_elems != NULL)
+		p_data->head_elems = head_elems;
+	else {
+		p_data->head_elems = (element **)malloc(sizeof(element *) * NUM_TYPES);
+		int i;
+		for (i = 0; i < NUM_TYPES; i++)
+			p_data->head_elems[i] = NULL;
+	}
+	return p_data;
+}
+
+
 
 void parse_markdown(parser_data *p_data);
 
@@ -126,15 +145,12 @@ void process_raw_blocks(parser_data *p_data)
 				MKD_PRINTF("    subspan process: "); print_raw_spans_inline(subspan_list); MKD_PRINTF("\n");
 				#endif
 				
-				parser_data *raw_p_data = malloc(sizeof(parser_data));
-				raw_p_data->extensions = p_data->extensions;
-				raw_p_data->charbuf = p_data->charbuf;
-				raw_p_data->offset = subspan_list->pos;
-				raw_p_data->head_elems = p_data->head_elems;
-				raw_p_data->elem_head = raw_p_data->elem = subspan_list;
-				
+				parser_data *raw_p_data = mk_parser_data(p_data->charbuf,
+														 subspan_list,
+														 subspan_list->pos,
+														 p_data->extensions,
+														 p_data->head_elems);
 				parse_markdown(raw_p_data);
-				
 				free(raw_p_data);
 				
 				MKD_PRINTF("parse over\n");
@@ -206,25 +222,16 @@ void markdown_to_elements(char *text, int extensions, element **out_result[])
 {
 	char *text_copy = strcpy_without_continuation_bytes(text);
 	
-    parser_data *p_data = malloc(sizeof(parser_data));
-    p_data->extensions = extensions;
-    p_data->charbuf = text_copy;
-    
-	p_data->head_elems = (element **)malloc(sizeof(element *) * NUM_TYPES);
-	int i;
-	for (i = 0; i < NUM_TYPES; i++)
-		p_data->head_elems[i] = NULL;
-	
 	element *parsing_elem = (element *)malloc(sizeof(element));
 	parsing_elem->type = RAW;
 	parsing_elem->pos = 0;
 	parsing_elem->end = strlen(text_copy)-1;
 	parsing_elem->next = NULL;
 	
-    p_data->offset = parsing_elem->pos;
-    p_data->elem_head = p_data->elem = parsing_elem;
+    parser_data *p_data = mk_parser_data(text_copy, parsing_elem, 0, extensions, NULL);
 	
     parse_markdown(p_data);
+    
     element **result = p_data->head_elems;
     
     #if MKD_DEBUG_OUTPUT
