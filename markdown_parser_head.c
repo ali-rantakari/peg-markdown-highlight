@@ -229,16 +229,18 @@ void markdown_to_elements(char *text, int extensions, element **out_result[])
 	parsing_elem->next = NULL;
 	
     parser_data *p_data = mk_parser_data(text_copy, parsing_elem, 0, extensions, NULL);
+	element **result = p_data->head_elems;
 	
-    parse_markdown(p_data);
-    
-    element **result = p_data->head_elems;
-    
-    #if MKD_DEBUG_OUTPUT
-    print_raw_blocks(text_copy, result);
-    #endif
-    
-    process_raw_blocks(p_data);
+    if (*text_copy != '\0')
+    {
+		parse_markdown(p_data);
+		
+		#if MKD_DEBUG_OUTPUT
+		print_raw_blocks(text_copy, result);
+		#endif
+		
+		process_raw_blocks(p_data);
+	}
     
     free(p_data);
     free(parsing_elem);
@@ -569,7 +571,7 @@ void yy_input_func(char *buf, int *result, int max_size, parser_data *p_data)
     		(*result) = (EOF == yyc) ? 0 :(*(buf) = yyc, 1);
     	} else {
     		*(buf) = *(p_data->charbuf + p_data->offset);
-			(*result) = 1;
+   			(*result) = (*buf != '\0');
 			p_data->offset++;
 			MKD_PRINTF("\e[43;30m"); MKD_PUTCHAR(*buf); MKD_PRINTF("\e[0m");
 			MKD_IF(*buf == '\n') MKD_PRINTF("\e[42m \e[0m");
