@@ -669,6 +669,4 @@ RawNoteBlock =  ( !BlankLine OptionallyIndentedLine )+
 
 %%
 
-/// footer_code_here
-
 

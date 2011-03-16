@@ -33,8 +33,8 @@ Using the Parser in Your Application
 
 The parser has been written in ANSI/ISO C89 with GNU extensions, which means
 that you need a _GCC-compatible compiler_ (see section on MSVC below, though).
-You also need _Python_ due to a utility script that is used to combine some
-files in a `make` step.
+You also need _Bourne Shell_ and some common Unix utilities due to a utility
+shell script that is used to combine some files in a `make` step.
 
 
 ### Files You Need

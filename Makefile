@@ -26,9 +26,9 @@ markdown_parser_core.c : markdown_grammar.leg $(GREG)
 	@echo '------- generating parser core from grammar'
 	$(GREG) -o $@ $<
 
-markdown_parser.c : markdown_parser_core.c markdown_parser_head.c markdown_parser_foot.c tools/combine_parser_files.py
+markdown_parser.c : markdown_parser_core.c markdown_parser_head.c markdown_parser_foot.c tools/combine_parser_files.sh
 	@echo '------- combining parser code'
-	./tools/combine_parser_files.py > $@
+	./tools/combine_parser_files.sh > $@
 
 markdown_parser.o : markdown_parser.c
 	@echo '------- building markdown_parser.o'
