@@ -1,0 +1,6 @@
+Name: greg
+Version: head
+Variant: src
+Origin: git://github.com/nddrylliog/greg.git
+Description: recursive descent parser generator
+SourcePath: .
