@@ -515,7 +515,9 @@ AutoLinkUrl =  < s:LocMarker '<' [A-Za-z]+ "://" ( !Newline !'>' . )+ '>' >
 AutoLinkEmail = < s:LocMarker '<' [-A-Za-z0-9+_.]+ '@' ( !Newline !'>' . )+ '>' >
                 { add(elem_s(AUTO_LINK_EMAIL)); }
 
-Reference = NonindentSpace !"[]" Label ':' Spnl RefSrc Spnl RefTitle BlankLine*
+Reference = < s:LocMarker
+			  NonindentSpace !"[]" Label ':' Spnl RefSrc Spnl RefTitle > BlankLine*
+			  { add(elem_s(REFERENCE)); }
 
 Label = < s:LocMarker
         '[' ( !'^' &{ extension(EXT_NOTES) } | &. &{ !extension(EXT_NOTES) } )
