@@ -21,7 +21,10 @@
 	NSFontTraitMask clearFontTraitMask;
 	NSColor *defaultTextColor;
 	NSTimer *updateTimer;
+	NSThread *workerThread;
 	element **cachedElements;
+	char *currentHighlightText;
+	BOOL workerThreadResultsInvalid;
 }
 
 /** \brief The order and styles for higlighting different elements.

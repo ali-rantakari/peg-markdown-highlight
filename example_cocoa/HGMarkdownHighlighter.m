@@ -7,7 +7,6 @@
 //
 
 #import "HGMarkdownHighlighter.h"
-#import "HGMarkdownParser.h"
 #import "HGMarkdownHighlightingStyle.h"
 
 // 'private members' category
@@ -15,6 +14,7 @@
 
 @property(retain) NSTimer *updateTimer;
 @property(copy) NSColor *defaultTextColor;
+@property(retain) NSThread *workerThread;
 
 @end
 
@@ -29,6 +29,7 @@
 @synthesize extensions;
 @synthesize styles;
 @synthesize defaultTextColor;
+@synthesize workerThread;
 
 - (id) initWithTextView:(NSTextView *)textView
 {
@@ -36,7 +37,9 @@
 		return nil;
 	
 	cachedElements = NULL;
+	currentHighlightText = NULL;
 	
+	self.workerThread = nil;
 	self.defaultTextColor = nil;
 	self.styles = nil;
 	self.isHighlighting = NO;
@@ -51,6 +54,7 @@
 
 - (void) dealloc
 {
+	self.workerThread = nil;
 	self.defaultTextColor = nil;
 	self.targetTextView = nil;
 	self.updateTimer = nil;
@@ -62,11 +66,72 @@
 #pragma mark -
 
 
+- (element **) parse
+{
+	element **result = NULL;
+	markdown_to_elements(currentHighlightText, self.extensions, &result);
+	sort_elements_by_pos(result);
+	return result;
+}
+
+
+
+- (void) threadParseAndHighlight
+{
+	NSAutoreleasePool *autoReleasePool = [[NSAutoreleasePool alloc] init];
+	
+	element **result = [self parse];
+	
+	[self
+	 performSelectorOnMainThread:@selector(parserDidParse:)
+	 withObject:[NSValue valueWithPointer:result]
+	 waitUntilDone:YES];
+	
+	[autoReleasePool drain];
+}
+
+- (void) threadDidExit:(NSNotification *)notification
+{
+	[[NSNotificationCenter defaultCenter]
+	 removeObserver:self
+	 name:NSThreadWillExitNotification
+	 object:self.workerThread];
+	self.workerThread = nil;
+	currentHighlightText = NULL;
+	if (workerThreadResultsInvalid)
+		[self
+		 performSelectorOnMainThread:@selector(requestParsing)
+		 withObject:nil
+		 waitUntilDone:NO];
+}
 
 - (void) requestParsing
 {
-	[[HGMarkdownParser sharedInstance] requestParsing:self];
+	if (self.workerThread != nil) {
+		workerThreadResultsInvalid = YES;
+		return;
+	}
+	
+	self.workerThread = [[NSThread alloc]
+						 initWithTarget:self
+						 selector:@selector(threadParseAndHighlight)
+						 object:nil];
+	
+	[[NSNotificationCenter defaultCenter]
+	 addObserver:self
+	 selector:@selector(threadDidExit:)
+	 name:NSThreadWillExitNotification
+	 object:self.workerThread];
+	
+	currentHighlightText = (char *)[[self.targetTextView string] UTF8String];
+	
+	workerThreadResultsInvalid = NO;
+	[self.workerThread start];
 }
+
+
+#pragma mark -
+
 
 
 - (NSFontTraitMask) getClearFontTraitMask:(NSFontTraitMask)currentFontTraitMask
@@ -189,10 +254,8 @@
 
 - (void) parserDidParse:(NSValue *)resultPointer
 {
-	if ([[HGMarkdownParser sharedInstance] isInLine:self]) {
-		[self requestParsing];
+	if (workerThreadResultsInvalid)
 		return;
-	}
 	[self cacheElementList:(element **)[resultPointer pointerValue]];
 	[self applyVisibleRangeHighlighting];
 }
@@ -273,7 +336,7 @@
 	clearFontTraitMask = [self getClearFontTraitMask:[[NSFontManager sharedFontManager] traitsOfFont:[self.targetTextView font]]];
 	self.defaultTextColor = [self.targetTextView textColor];
 	
-	[[HGMarkdownParser sharedInstance] requestParsing:self];
+	[self requestParsing];
 	
 	if (self.highlightAutomatically)
 		[[NSNotificationCenter defaultCenter]
