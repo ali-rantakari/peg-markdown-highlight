@@ -6,6 +6,7 @@ peg/peg
 markdown_parser.c
 markdown_parser_core.c
 tester
+multithread_tester
 highlighter
 testclient
 bench

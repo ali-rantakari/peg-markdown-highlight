@@ -2,6 +2,7 @@ ALL : tester testclient highlighter
 
 BENCH=bench
 TESTER=tester
+MULTITHREAD_TESTER=multithread_tester
 TEST_CLIENT=testclient
 HIGHLIGHTER=highlighter
 CFLAGS ?= -Wall -Wswitch -Wshadow -Wsign-compare -O3 -std=gnu89
@@ -47,7 +48,11 @@ $(TEST_CLIENT) : testclient.m ANSIEscapeHelper.o ANSIEscapeHelper.h
 
 $(HIGHLIGHTER) : highlighter.c markdown_parser.o markdown_parser.h
 	@echo '------- building highlighter'
-	$(CC) $(CFLAGS) -ansi -DMKD_DEBUG_OUTPUT=0 -o $@ markdown_parser.o $<
+	$(CC) $(CFLAGS) -DMKD_DEBUG_OUTPUT=0 -o $@ markdown_parser.o $<
+
+$(MULTITHREAD_TESTER) : multithread_tester.c markdown_parser.o markdown_parser.h
+	@echo '------- building multithread_tester'
+	$(CC) $(CFLAGS) -DMKD_DEBUG_OUTPUT=0 -o $@ markdown_parser.o $<
 
 $(BENCH) : bench.c markdown_parser.o markdown_parser.h
 	@echo '------- building bench'
@@ -60,7 +65,7 @@ docs: markdown_parser.h markdown_definitions.h doxygen.cfg example_cocoa/HGMarkd
 .PHONY: clean test
 
 clean:
-	rm -f markdown_parser_core.c markdown_parser.c $(TESTER) $(TEST_CLIENT) $(HIGHLIGHTER) $(BENCH) *.o; \
+	rm -f markdown_parser_core.c markdown_parser.c *.o $(TESTER) $(TEST_CLIENT) $(HIGHLIGHTER) $(BENCH) $(MULTITHREAD_TESTER); \
 	rm -rf *.dSYM; \
 	make -C $(PEGDIR) clean
 	make -C $(GREGDIR) clean
