@@ -123,7 +123,11 @@
 	 name:NSThreadWillExitNotification
 	 object:self.workerThread];
 	
-	currentHighlightText = (char *)[[self.targetTextView string] UTF8String];
+	if (currentHighlightText != NULL)
+		free(currentHighlightText);
+	char *textViewContents = (char *)[[self.targetTextView string] UTF8String];
+	currentHighlightText = malloc(sizeof(char)*strlen(textViewContents)+1);
+	strcpy(currentHighlightText, textViewContents);
 	
 	workerThreadResultsInvalid = NO;
 	[self.workerThread start];
