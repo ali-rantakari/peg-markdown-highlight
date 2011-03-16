@@ -35,7 +35,7 @@ float roundToQuarter(float val) {
 
 - (void) awakeFromNib
 {
-	[delaySlider setFloatValue:1.0];
+	[delaySlider setFloatValue:0.25];
 	[delayLabel setFloatValue:roundToQuarter([delaySlider floatValue])];
 }
 
