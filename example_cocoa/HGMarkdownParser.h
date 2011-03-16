@@ -17,11 +17,13 @@
 	NSThread *workerThread;
 	NSMutableArray *queue;
 	HGMarkdownHighlighter *currentHighlightTarget;
+	char *currentHighlightText;
 }
 
 + (HGMarkdownParser *) sharedInstance;
 
 - (void) requestParsing:(HGMarkdownHighlighter *)sender;
+- (BOOL) isInLine:(HGMarkdownHighlighter *)highlighter;
 - (element **) parse:(NSString *)content extensions:(int)extensions;
 
 @end

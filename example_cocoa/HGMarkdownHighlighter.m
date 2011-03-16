@@ -45,7 +45,6 @@
 	self.targetTextView = textView;
 	self.waitInterval = 1;
 	self.extensions = 0;
-	isDirty = NO;
 	
 	return self;
 }
@@ -61,6 +60,14 @@
 
 
 #pragma mark -
+
+
+
+- (void) requestParsing
+{
+	[[HGMarkdownParser sharedInstance] requestParsing:self];
+}
+
 
 - (NSFontTraitMask) getClearFontTraitMask:(NSFontTraitMask)currentFontTraitMask
 {
@@ -182,17 +189,12 @@
 
 - (void) parserDidParse:(NSValue *)resultPointer
 {
-	if (isDirty)
+	if ([[HGMarkdownParser sharedInstance] isInLine:self]) {
+		[self requestParsing];
 		return;
+	}
 	[self cacheElementList:(element **)[resultPointer pointerValue]];
 	[self applyVisibleRangeHighlighting];
-}
-
-
-- (void) requestParsing
-{
-	isDirty = NO;
-	[[HGMarkdownParser sharedInstance] requestParsing:self];
 }
 
 
@@ -205,7 +207,6 @@
 
 - (void) textViewTextDidChange:(NSNotification *)notification
 {
-	isDirty = YES;
 	if (self.updateTimer != nil)
 		[self.updateTimer invalidate], self.updateTimer = nil;
 	self.updateTimer = [NSTimer

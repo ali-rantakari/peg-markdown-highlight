@@ -22,7 +22,6 @@
 	NSColor *defaultTextColor;
 	NSTimer *updateTimer;
 	element **cachedElements;
-	BOOL isDirty;
 }
 
 /** \brief The order and styles for higlighting different elements.

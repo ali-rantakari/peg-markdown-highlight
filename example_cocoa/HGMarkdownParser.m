@@ -33,6 +33,7 @@
 	self.queue = [NSMutableArray array];
 	self.workerThread = nil;
 	self.currentHighlightTarget = nil;
+	currentHighlightText = NULL;
 	
 	return self;
 }
@@ -42,6 +43,7 @@
 	self.workerThread = nil;
 	self.currentHighlightTarget = nil;
 	self.queue = nil;
+	currentHighlightText = NULL;
 	[super dealloc];
 }
 
@@ -52,7 +54,7 @@
 - (element **) parse:(NSString *)content extensions:(int)extensions
 {
 	element **result = NULL;
-	markdown_to_elements((char *)[content UTF8String], extensions, &result);
+	markdown_to_elements(currentHighlightText, extensions, &result);
 	sort_elements_by_pos(result);
 	return result;
 }
@@ -83,6 +85,7 @@
 	 object:self.workerThread];
 	self.workerThread = nil;
 	self.currentHighlightTarget = nil;
+	currentHighlightText = NULL;
 	[self
 	 performSelectorOnMainThread:@selector(processNextFromQueue)
 	 withObject:nil
@@ -109,19 +112,24 @@
 	 object:self.workerThread];
 	
 	self.currentHighlightTarget = highlighter;
+	currentHighlightText = (char *)[[highlighter.targetTextView string] UTF8String];
 	
 	[self.workerThread start];
 }
 
 - (void) requestParsing:(HGMarkdownHighlighter *)sender
 {
-	if ([self.queue containsObject:sender] || self.currentHighlightTarget == sender)
+	if ([self.queue containsObject:sender])
 		return;
 	
 	[self.queue addObject:sender];
 	[self processNextFromQueue];
 }
 
+- (BOOL) isInLine:(HGMarkdownHighlighter *)highlighter
+{
+	return [self.queue containsObject:highlighter];
+}
 
 
 
