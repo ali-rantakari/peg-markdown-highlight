@@ -200,7 +200,7 @@ void free_elements(element **elems)
 
 #define IS_CONTINUATION_BYTE(x)		((x & 0xc0) == 0x80)
 
-char *strcpy_without_continuation_bytes(char *str)
+int strcpy_without_continuation_bytes(char *str, char **out)
 {
 	char *new_str = (char *)malloc(sizeof(char) * strlen(str) + 1);
 	char *c = str;
@@ -213,19 +213,21 @@ char *strcpy_without_continuation_bytes(char *str)
 	}
 	*(new_str+i) = '\0';
 	
-	return new_str;
+	*out = new_str;
+	return i;
 }
 
 
 
 void markdown_to_elements(char *text, int extensions, element **out_result[])
 {
-	char *text_copy = strcpy_without_continuation_bytes(text);
+	char *text_copy = NULL;
+	int text_copy_len = strcpy_without_continuation_bytes(text, &text_copy);
 	
 	element *parsing_elem = (element *)malloc(sizeof(element));
 	parsing_elem->type = RAW;
 	parsing_elem->pos = 0;
-	parsing_elem->end = strlen(text_copy)-1;
+	parsing_elem->end = text_copy_len-1;
 	parsing_elem->next = NULL;
 	
     parser_data *p_data = mk_parser_data(text_copy, parsing_elem, 0, extensions, NULL);
