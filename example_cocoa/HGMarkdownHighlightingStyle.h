@@ -26,6 +26,7 @@
 #define HG_DARK(h)	HG_COLOR_HSB(h, 1, 0.4)
 #define HG_MED(h)	HG_COLOR_HSB(h, 1, 1)
 #define HG_LIGHT(h)	HG_COLOR_HSB(h, 0.2, 1)
+#define HG_DIM(h)	HG_COLOR_HSB(h, 0.2, 0.5)
 
 // hues
 #define HG_GREEN	0.34
