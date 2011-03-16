@@ -20,12 +20,12 @@ void apply_highlighting(NSMutableAttributedString *attrStr, element *elem[])
 		CODE,
 		LIST_BULLET,
 		LIST_ENUMERATOR,
-		BLOCKQUOTE,
 		VERBATIM,
 		HTMLBLOCK,
 		HRULE,
 		REFERENCE,
-		NOTE
+		NOTE,
+		BLOCKQUOTE,
 	};
 	int order_len = 22;
 	
