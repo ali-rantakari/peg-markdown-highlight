@@ -9,9 +9,7 @@
 #import "MDHExampleAppDelegate.h"
 #import "HGMarkdownHighlightingStyle.h"
 
-float roundToQuarter(float val) {
-	return (round(val * 4) / 4);
-}
+#define ROUND_QUARTER(x)	(round((x) * 4) / 4)
 
 
 @implementation MDHExampleAppDelegate
@@ -36,7 +34,7 @@ float roundToQuarter(float val) {
 - (void) awakeFromNib
 {
 	[delaySlider setFloatValue:0.25];
-	[delayLabel setFloatValue:roundToQuarter([delaySlider floatValue])];
+	[delayLabel setFloatValue:ROUND_QUARTER([delaySlider floatValue])];
 }
 
 
@@ -93,7 +91,7 @@ float roundToQuarter(float val) {
 
 - (IBAction) delaySliderMove:(id)sender
 {
-	float interval = roundToQuarter([delaySlider floatValue]);
+	float interval = ROUND_QUARTER([delaySlider floatValue]);
 	[delayLabel setFloatValue:interval];
 	hl1.waitInterval = interval;
 }
