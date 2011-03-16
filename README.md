@@ -15,8 +15,9 @@ This project contains:
 _Copyright 2011 Ali Rantakari_ -- <http://hasseg.org>
 
 This program uses the PEG grammar from John McFarlane's `peg-markdown` project,
-and the `peg/leg` parser generator by Ian Piumarta. Thanks to these gentlemen
-(and everyone who contributed to their projects) for making this possible.
+and the `greg` parser generator by Amos Wenger and \_why (which is heavily
+based on `peg/leg` by Ian Piumarta). Thanks to these gentlemen (and everyone
+who contributed to their projects) for making this one possible.
 
 
 
