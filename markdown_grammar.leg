@@ -23,8 +23,8 @@
 
  ***********************************************************************/
 
-#define elem(x)			mk_element(x, yystartoffset, yyendoffset)
-#define elem_s(x)		mk_element(x, s->pos, yyendoffset)
+#define elem(x)			mk_element(x, thunk->begin, thunk->end)
+#define elem_s(x)		mk_element(x, s->pos, thunk->end)
 #define mk_sep			mk_element(SEPARATOR, 0,0)
 #define mk_notype		mk_element(NO_TYPE, 0,0)
 

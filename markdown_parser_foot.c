@@ -1,7 +1,5 @@
 
 
-int yyparse(void);
-
 /**
 * Parse a Markdown document.
 * 
@@ -21,19 +19,14 @@ element ** parse_markdown(char *string, element *elem, int extensions)
 	
     charbuf = string;
     
-    yybuflen = 0;
-    MKD_PRINTF("\n");
-    MKD_PRINTF("(starting at %i -- yybuflen:%i yypos:%i)\n", p_offset, yybuflen, yypos);
-    MKD_PRINTF("PARSER: ");
+    MKD_PRINTF("\nPARSER: ");
     
-    yyparsefrom(yy_Doc);
+    GREG *g = yyparse_new(charbuf);
+    yyparse(g);
+    yyparse_free(g);
     
     MKD_PRINTF("\n\n");
     
-    free(yybuf);
-    free(yytext_g);
-    free(yythunks);
-    free(yyvals);
     charbuf = NULL;
     
     return head_elements;
