@@ -1,7 +1,34 @@
 
 #include "markdown_parser.h"
 
-element ** parse_markdown(char *string, element *elem, int extensions);
+
+
+typedef struct
+{
+	/* Buffer of characters to be parsed: */
+	char *charbuf;
+	
+	/* Linked list of {start, end} offset pairs determining which parts */
+	/* of charbuf to actually parse: */
+	element *elem;
+	element *elem_head;
+	
+	/* Current parsing offset within charbuf: */
+	unsigned long offset;
+	
+	/* The extensions to use for parsing (bitfield */
+	/* of enum markdown_extensions): */
+	int extensions;
+	
+	/* Array of parsing result elements, indexed by type: */
+	element **head_elems;
+} parser_data;
+
+
+void parse_markdown(parser_data *p_data);
+
+
+
 
 
 void remove_zero_length_raw_spans(element *elem)
@@ -62,14 +89,14 @@ void print_raw_spans_inline(element *elem)
 
 /* Perform postprocessing parsing runs for RAW_LIST elements in `elem`, */
 /* iteratively until no such elements exist. */
-element ** process_raw_blocks(char *text, element *elem[], int extensions)
+void process_raw_blocks(parser_data *p_data)
 {
 	MKD_PRINTF("--------process_raw_blocks---------\n");
-	while (elem[RAW_LIST] != NULL)
+	while (p_data->head_elems[RAW_LIST] != NULL)
 	{
 		MKD_PRINTF("new iteration.\n");
-		element *cursor = elem[RAW_LIST];
-		elem[RAW_LIST] = NULL;
+		element *cursor = p_data->head_elems[RAW_LIST];
+		p_data->head_elems[RAW_LIST] = NULL;
 		while (cursor != NULL)
 		{
 			element *span_list = cursor->children;
@@ -99,14 +126,23 @@ element ** process_raw_blocks(char *text, element *elem[], int extensions)
 				MKD_PRINTF("    subspan process: "); print_raw_spans_inline(subspan_list); MKD_PRINTF("\n");
 				#endif
 				
-				parse_markdown(text, subspan_list, extensions);
+				parser_data *raw_p_data = malloc(sizeof(parser_data));
+				raw_p_data->extensions = p_data->extensions;
+				raw_p_data->charbuf = p_data->charbuf;
+				raw_p_data->offset = subspan_list->pos;
+				raw_p_data->head_elems = p_data->head_elems;
+				raw_p_data->elem_head = raw_p_data->elem = subspan_list;
+				
+				parse_markdown(raw_p_data);
+				
+				free(raw_p_data);
+				
 				MKD_PRINTF("parse over\n");
 			}
 			
 			cursor = cursor->next;
 		}
 	}
-	return elem;
 }
 
 void print_raw_blocks(char *text, element *elem[])
@@ -124,29 +160,6 @@ void print_raw_blocks(char *text, element *elem[])
 
 
 
-
-
-
-
-
-
-/* Buffer of characters to be parsed: */
-static char *charbuf = "";
-
-/* Linked list of {start, end} offset pairs determining which parts */
-/* of charbuf to actually parse: */
-static element *p_elem;
-static element *p_elem_head;
-
-/* Current parsing offset within charbuf: */
-static unsigned long p_offset;
-
-/* The extensions to use for parsing (bitfield */
-/* of enum markdown_extensions): */
-static int p_extensions;
-
-/* Array of parsing result elements, indexed by type: */
-element **head_elements;
 
 /* Free all elements created while parsing */
 void free_elements(element **elems)
@@ -193,27 +206,38 @@ void markdown_to_elements(char *text, int extensions, element **out_result[])
 {
 	char *text_copy = strcpy_without_continuation_bytes(text);
 	
-	head_elements = (element **)malloc(sizeof(element *) * NUM_TYPES);
+    parser_data *p_data = malloc(sizeof(parser_data));
+    p_data->extensions = extensions;
+    p_data->charbuf = text_copy;
+    
+	p_data->head_elems = (element **)malloc(sizeof(element *) * NUM_TYPES);
 	int i;
 	for (i = 0; i < NUM_TYPES; i++)
-		head_elements[i] = NULL;
+		p_data->head_elems[i] = NULL;
 	
 	element *parsing_elem = (element *)malloc(sizeof(element));
 	parsing_elem->type = RAW;
 	parsing_elem->pos = 0;
 	parsing_elem->end = strlen(text_copy)-1;
 	parsing_elem->next = NULL;
-    element **result = parse_markdown(text_copy, parsing_elem, extensions);
-    free(parsing_elem);
+	
+    p_data->offset = parsing_elem->pos;
+    p_data->elem_head = p_data->elem = parsing_elem;
+	
+    parse_markdown(p_data);
+    element **result = p_data->head_elems;
     
     #if MKD_DEBUG_OUTPUT
     print_raw_blocks(text_copy, result);
     #endif
     
-    result = process_raw_blocks(text_copy, result, extensions);
+    process_raw_blocks(p_data);
+    
+    free(p_data);
+    free(parsing_elem);
+    free(text_copy);
     
     *out_result = result;
-    free(text_copy);
 }
 
 
@@ -342,9 +366,9 @@ char *type_name(element_type type)
 }
 
 /* return true if extension is selected */
-bool extension(int ext)
+bool extension(parser_data *p_data, int ext)
 {
-    return (p_extensions & ext);
+    return (p_data->extensions & ext);
 }
 
 
@@ -380,7 +404,7 @@ static element *reverse(element *list)
 
 
 /* construct element */
-element * mk_element(element_type type, long pos, long end)
+element * mk_element(parser_data *p_data, element_type type, long pos, long end)
 {
     element *result = (element *)malloc(sizeof(element));
     result->type = type;
@@ -388,8 +412,8 @@ element * mk_element(element_type type, long pos, long end)
     result->end = end;
     result->next = NULL;
     
-    element *old_all_elements_head = head_elements[ALL];
-    head_elements[ALL] = result;
+    element *old_all_elements_head = p_data->head_elems[ALL];
+    p_data->head_elems[ALL] = result;
     result->allElemsNext = old_all_elements_head;
     
 	MKD_PRINTF("  mk_element: %s [%ld - %ld]\n", type_name(type), pos, end);
@@ -398,11 +422,11 @@ element * mk_element(element_type type, long pos, long end)
 }
 
 /* construct EXTRA_TEXT element */
-element * mk_etext(char *string)
+element * mk_etext(parser_data *p_data, char *string)
 {
     element *result;
     assert(string != NULL);
-    result = mk_element(EXTRA_TEXT, 0,0);
+    result = mk_element(p_data, EXTRA_TEXT, 0,0);
     result->text = strdup(string);
     return result;
 }
@@ -410,9 +434,9 @@ element * mk_etext(char *string)
 
 /* Given an element where the offsets {pos, end} represent */
 /* locations in the *parsed text* (defined by the linked list of RAW and */
-/* EXTRA_TEXT elements in p_elem), fix these offsets to represent */
-/* corresponding offsets in the original input (charbuf). */
-void fix_offsets(element *elem)
+/* EXTRA_TEXT elements in p_data->elem), fix these offsets to represent */
+/* corresponding offsets in the original input (p_data->charbuf). */
+void fix_offsets(parser_data *p_data, element *elem)
 {
 	if (elem->type == EXTRA_TEXT)
 		return;
@@ -424,7 +448,7 @@ void fix_offsets(element *elem)
 	
 	unsigned long previous_end = 0;
 	unsigned long c = 0;
-	element *cursor = p_elem_head;
+	element *cursor = p_data->elem_head;
 	while (cursor != NULL)
 	{
 		int thislen = (cursor->type == EXTRA_TEXT)
@@ -459,15 +483,15 @@ void fix_offsets(element *elem)
 }
 
 
-/* Add an element to head_elements. */
-void add(element *elem)
+/* Add an element to p_data->head_elems. */
+void add(parser_data *p_data, element *elem)
 {
-	if (head_elements[elem->type] == NULL)
-		head_elements[elem->type] = elem;
+	if (p_data->head_elems[elem->type] == NULL)
+		p_data->head_elems[elem->type] = elem;
 	else
 	{
-		elem->next = head_elements[elem->type];
-		head_elements[elem->type] = elem;
+		elem->next = p_data->head_elems[elem->type];
+		p_data->head_elems[elem->type] = elem;
 	}
 	
 	/*
@@ -479,7 +503,7 @@ void add(element *elem)
 	*/
 	if (elem->type != RAW_LIST) {
 		MKD_PRINTF("  add: %s [%ld - %ld]\n", type_name(elem->type), elem->pos, elem->end);
-		fix_offsets(elem);
+		fix_offsets(p_data, elem);
 		MKD_PRINTF("     : %s [%ld - %ld]\n", type_name(elem->type), elem->pos, elem->end);
 	}
 	else {
@@ -487,7 +511,7 @@ void add(element *elem)
 		element *cursor = elem->children;
 		while (cursor != NULL) {
 			MKD_PRINTF("(%ld-%ld)>", cursor->pos, cursor->end);
-			fix_offsets(cursor);
+			fix_offsets(p_data, cursor);
 			MKD_PRINTF("(%ld-%ld) ", cursor->pos, cursor->end);
 			cursor = cursor->next;
 		}
@@ -495,64 +519,60 @@ void add(element *elem)
 	}
 }
 
-element * add_element(element_type type, long pos, long end)
+element * add_element(parser_data *p_data, element_type type, long pos, long end)
 {
-	element *new_element = mk_element(type, pos, end);
-	add(new_element);
+	element *new_element = mk_element(p_data, type, pos, end);
+	add(p_data, new_element);
 	return new_element;
 }
 
-void add_raw(long pos, long end)
+void add_raw(parser_data *p_data, long pos, long end)
 {
-	add_element(RAW, pos, end);
+	add_element(p_data, RAW, pos, end);
 }
 
 
 
-/**********************************************************************
 
-  Definitions for leg parser generator.
-  YY_INPUT is the function the parser calls to get new input.
-  We take all new input from (static) charbuf.
-
- ***********************************************************************/
 
 # define YYSTYPE element *
 #ifdef __DEBUG__
 # define YY_DEBUG 1
 #endif
 
-#define YY_INPUT(buf, result, max_size)              \
-{                                                    \
-    if (p_elem == NULL) {              \
-    	result = 0;                    \
-    } else {                           \
-    	if (p_elem->type == EXTRA_TEXT) {\
-    		int yyc;\
-    		if (p_elem->text && *p_elem->text != '\0') {\
-    			yyc = *p_elem->text++;\
-				MKD_PRINTF("\e[47;30m"); MKD_PUTCHAR(yyc); MKD_PRINTF("\e[0m");\
-				MKD_IF(yyc == '\n') MKD_PRINTF("\e[47m \e[0m");\
-    		} else {\
-    			yyc = EOF;\
-    			p_elem = p_elem->next;\
-				MKD_PRINTF("\e[41m \e[0m");\
-				if (p_elem != NULL) p_offset = p_elem->pos;\
-    		}\
-    		result = (EOF == yyc) ? 0 :(*(buf) = yyc, 1);\
-    	} else {\
-    		*(buf) = *(charbuf+p_offset);  \
-			result = 1;                    \
-			p_offset++;                    \
-			MKD_PRINTF("\e[43;30m"); MKD_PUTCHAR(*buf); MKD_PRINTF("\e[0m");\
-			MKD_IF(*buf == '\n') MKD_PRINTF("\e[42m \e[0m");\
-			if (p_offset >= p_elem->end) {  \
-				p_elem = p_elem->next;     \
-				MKD_PRINTF("\e[41m \e[0m");\
-				if (p_elem != NULL) p_offset = p_elem->pos;\
-			}                              \
-		} \
-	}                                  \
+#define YY_INPUT(buf, result, max_size) yy_input_func(buf, &result, max_size, G->data)
+
+void yy_input_func(char *buf, int *result, int max_size, parser_data *p_data)
+{
+    if (p_data->elem == NULL) {
+    	(*result) = 0;
+    } else {
+    	if (p_data->elem->type == EXTRA_TEXT) {
+    		int yyc;
+    		if (p_data->elem->text && *p_data->elem->text != '\0') {
+    			yyc = *p_data->elem->text++;
+				MKD_PRINTF("\e[47;30m"); MKD_PUTCHAR(yyc); MKD_PRINTF("\e[0m");
+				MKD_IF(yyc == '\n') MKD_PRINTF("\e[47m \e[0m");
+    		} else {
+    			yyc = EOF;
+    			p_data->elem = p_data->elem->next;
+				MKD_PRINTF("\e[41m \e[0m");
+				if (p_data->elem != NULL) p_data->offset = p_data->elem->pos;
+    		}
+    		(*result) = (EOF == yyc) ? 0 :(*(buf) = yyc, 1);
+    	} else {
+    		*(buf) = *(p_data->charbuf + p_data->offset);
+			(*result) = 1;
+			p_data->offset++;
+			MKD_PRINTF("\e[43;30m"); MKD_PUTCHAR(*buf); MKD_PRINTF("\e[0m");
+			MKD_IF(*buf == '\n') MKD_PRINTF("\e[42m \e[0m");
+			if (p_data->offset >= p_data->elem->end) {
+				p_data->elem = p_data->elem->next;
+				MKD_PRINTF("\e[41m \e[0m");
+				if (p_data->elem != NULL) p_data->offset = p_data->elem->pos;
+			}
+		}
+	}
 }
 
 

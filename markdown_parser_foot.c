@@ -11,25 +11,15 @@
 *         original input (`string`).
 * extensions -- A bitfield specifying which extensions to use
 */
-element ** parse_markdown(char *string, element *elem, int extensions)
+void parse_markdown(parser_data *p_data)
 {
-	p_extensions = extensions;
-	p_elem_head = p_elem = elem;
-	p_offset = elem->pos;
-	
-    charbuf = string;
-    
     MKD_PRINTF("\nPARSER: ");
     
-    GREG *g = yyparse_new(charbuf);
+    GREG *g = yyparse_new(p_data);
     yyparse(g);
     yyparse_free(g);
     
     MKD_PRINTF("\n\n");
-    
-    charbuf = NULL;
-    
-    return head_elements;
 }
 
 

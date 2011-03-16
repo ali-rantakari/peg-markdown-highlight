@@ -23,10 +23,12 @@
 
  ***********************************************************************/
 
-#define elem(x)			mk_element(x, thunk->begin, thunk->end)
-#define elem_s(x)		mk_element(x, s->pos, thunk->end)
-#define mk_sep			mk_element(SEPARATOR, 0,0)
-#define mk_notype		mk_element(NO_TYPE, 0,0)
+#define elem(x)			mk_element(G->data, x, thunk->begin, thunk->end)
+#define elem_s(x)		mk_element(G->data, x, s->pos, thunk->end)
+#define mk_sep			mk_element(G->data, SEPARATOR, 0,0)
+#define mk_notype		mk_element(G->data, NO_TYPE, 0,0)
+#define ADD(x)			add(G->data, x)
+#define EXT(x)			extension(G->data, x)
 
 %}
 
@@ -62,7 +64,7 @@ AtxStart =  < ( "######" | "#####" | "####" | "###" | "##" | "#" ) >
 			{ $$ = elem((element_type)(H1 + (strlen(yytext) - 1))); }
 
 AtxHeading = < s:AtxStart Sp? ( AtxInline )+ (Sp? '#'* Sp)? Newline >
-            { add(elem_s(s->type)); }
+            { ADD(elem_s(s->type)); }
 
 SetextHeading = SetextHeading1 | SetextHeading2
 
@@ -74,24 +76,24 @@ SetextHeading1 =  &(RawLine SetextBottom1)
                   s:LocMarker
                   < ( !Endline Inline )+ Sp? Newline
                   SetextBottom1 >
-	              { add(elem_s(H1)); }
+	              { ADD(elem_s(H1)); }
 
 SetextHeading2 =  &(RawLine SetextBottom2)
                   s:LocMarker
                   < ( !Endline Inline )+ Sp? Newline
                   SetextBottom2 >
-	              { add(elem_s(H2)); }
+	              { ADD(elem_s(H2)); }
 
 Heading = SetextHeading | AtxHeading
 
 BlockQuote = a:BlockQuoteRaw
-            { element *rawlist = mk_element(RAW_LIST, 0,0);
+            { element *rawlist = mk_element(G->data, RAW_LIST, 0,0);
               rawlist->children = reverse(a);
-              add(rawlist);
+              ADD(rawlist);
             }
 
 BlockQuoteRaw =  a:StartList
-                 (( < '>' ' '? > { add(elem(BLOCKQUOTE)); } Line { a = cons($$, a); } )
+                 (( < '>' ' '? > { ADD(elem(BLOCKQUOTE)); } Line { a = cons($$, a); } )
                   ( !'>' !BlankLine Line { a = cons($$, a); } )*
                   ( < BlankLine > { a = cons(elem(RAW), a); /*a = cons(mk_str("\n"), a);*/ } )*
                  )+
@@ -105,17 +107,17 @@ VerbatimChunk = ( BlankLine )*
 
 Verbatim =     < s:LocMarker
 				 ( VerbatimChunk )+ >
-                 { add(elem_s(VERBATIM)); }
+                 { ADD(elem_s(VERBATIM)); }
 
 HorizontalRule = < NonindentSpace
                  ( '*' Sp '*' Sp '*' (Sp '*')*
                  | '-' Sp '-' Sp '-' (Sp '-')*
                  | '_' Sp '_' Sp '_' (Sp '_')*)
                  Sp Newline > BlankLine+
-                 { add(elem(HRULE)); }
+                 { ADD(elem(HRULE)); }
 
 Bullet = !HorizontalRule NonindentSpace < ('+' | '*' | '-') > Spacechar+
-         { add(elem(LIST_BULLET)); }
+         { ADD(elem(LIST_BULLET)); }
 
 BulletList = &Bullet (ListTight | ListLoose)
             
@@ -129,25 +131,25 @@ ListTight = a:StartList
             BlankLine* !(Bullet | Enumerator)
             { element *cur = a;
               while (cur != NULL) {
-				  element *rawlist = mk_element(RAW_LIST, 0,0);
+				  element *rawlist = mk_element(G->data, RAW_LIST, 0,0);
 				  rawlist->children = reverse(cur->children);
-				  add(rawlist);
+				  ADD(rawlist);
 				  cur = cur->next;
               }
             }
 
 ListLoose = a:StartList
             ( b:ListItem BlankLine*
-              { b = cons(mk_etext("\n\n"), b); /* In loose list, \n\n added to end of each element */
+              { b = cons(mk_etext(G->data, "\n\n"), b); /* In loose list, \n\n added to end of each element */
                 element *el = mk_notype;
                 el->children = b;
                 a = cons(el, a);
               } )+
             { element *cur = a;
               while (cur != NULL) {
-				  element *rawlist = mk_element(RAW_LIST, 0,0);
+				  element *rawlist = mk_element(G->data, RAW_LIST, 0,0);
 				  rawlist->children = reverse(cur->children);
-				  add(rawlist);
+				  ADD(rawlist);
 				  cur = cur->next;
               }
             }
@@ -184,7 +186,7 @@ ListContinuationBlock = a:StartList
 						{ $$ = a; }
 
 Enumerator = NonindentSpace < [0-9]+ '.' > Spacechar+
-             { add(elem(LIST_ENUMERATOR)); }
+             { ADD(elem(LIST_ENUMERATOR)); }
 
 OrderedList = &Enumerator (ListTight | ListLoose)
              
@@ -232,32 +234,32 @@ HtmlBlockForm = HtmlBlockOpenForm (HtmlBlockForm | !HtmlBlockCloseForm .)* HtmlB
 HtmlBlockOpenH1 = '<' Spnl ("h1" | "H1") Spnl HtmlAttribute* '>'
 HtmlBlockCloseH1 = '<' Spnl '/' ("h1" | "H1") Spnl '>'
 HtmlBlockH1 = < s:LocMarker HtmlBlockOpenH1 (HtmlBlockH1 | !HtmlBlockCloseH1 .)* HtmlBlockCloseH1 >
-				{ add(elem_s(H1)); }
+				{ ADD(elem_s(H1)); }
 
 HtmlBlockOpenH2 = '<' Spnl ("h2" | "H2") Spnl HtmlAttribute* '>'
 HtmlBlockCloseH2 = '<' Spnl '/' ("h2" | "H2") Spnl '>'
 HtmlBlockH2 = < s:LocMarker HtmlBlockOpenH2 (HtmlBlockH2 | !HtmlBlockCloseH2 .)* HtmlBlockCloseH2 >
-				{ add(elem_s(H2)); }
+				{ ADD(elem_s(H2)); }
 
 HtmlBlockOpenH3 = '<' Spnl ("h3" | "H3") Spnl HtmlAttribute* '>'
 HtmlBlockCloseH3 = '<' Spnl '/' ("h3" | "H3") Spnl '>'
 HtmlBlockH3 = < s:LocMarker HtmlBlockOpenH3 (HtmlBlockH3 | !HtmlBlockCloseH3 .)* HtmlBlockCloseH3 >
-				{ add(elem_s(H3)); }
+				{ ADD(elem_s(H3)); }
 
 HtmlBlockOpenH4 = '<' Spnl ("h4" | "H4") Spnl HtmlAttribute* '>'
 HtmlBlockCloseH4 = '<' Spnl '/' ("h4" | "H4") Spnl '>'
 HtmlBlockH4 = < s:LocMarker HtmlBlockOpenH4 (HtmlBlockH4 | !HtmlBlockCloseH4 .)* HtmlBlockCloseH4 >
-				{ add(elem_s(H4)); }
+				{ ADD(elem_s(H4)); }
 
 HtmlBlockOpenH5 = '<' Spnl ("h5" | "H5") Spnl HtmlAttribute* '>'
 HtmlBlockCloseH5 = '<' Spnl '/' ("h5" | "H5") Spnl '>'
 HtmlBlockH5 = < s:LocMarker HtmlBlockOpenH5 (HtmlBlockH5 | !HtmlBlockCloseH5 .)* HtmlBlockCloseH5 >
-				{ add(elem_s(H5)); }
+				{ ADD(elem_s(H5)); }
 
 HtmlBlockOpenH6 = '<' Spnl ("h6" | "H6") Spnl HtmlAttribute* '>'
 HtmlBlockCloseH6 = '<' Spnl '/' ("h6" | "H6") Spnl '>'
 HtmlBlockH6 = < s:LocMarker HtmlBlockOpenH6 (HtmlBlockH6 | !HtmlBlockCloseH6 .)* HtmlBlockCloseH6 >
-				{ add(elem_s(H6)); }
+				{ ADD(elem_s(H6)); }
 
 HtmlBlockOpenMenu = '<' Spnl ("menu" | "MENU") Spnl HtmlAttribute* '>'
 HtmlBlockCloseMenu = '<' Spnl '/' ("menu" | "MENU") Spnl '>'
@@ -448,7 +450,7 @@ OneStarClose =  !Spacechar !Newline Inline !StrongStar < '*' > { $$ = elem(NO_TY
 EmphStar =  s:OneStarOpen
             ( !OneStarClose Inline )*
             OneStarClose
-            { add(elem_s(EMPH)); }
+            { ADD(elem_s(EMPH)); }
            
 
 OneUlOpen  =  !UlLine < '_' > !Spacechar !Newline { $$ = elem(NO_TYPE); }
@@ -457,7 +459,7 @@ OneUlClose =  !Spacechar !Newline Inline !StrongUl < '_' > !Alphanumeric { $$ = 
 EmphUl =    s:OneUlOpen
             ( !OneUlClose Inline )*
             OneUlClose
-            { add(elem_s(EMPH)); }
+            { ADD(elem_s(EMPH)); }
 
 Strong = StrongStar | StrongUl
 
@@ -467,7 +469,7 @@ TwoStarClose =  !Spacechar !Newline Inline < "**" > { $$ = elem(NO_TYPE); }
 StrongStar =    s:TwoStarOpen
                 ( !TwoStarClose Inline )*
                 TwoStarClose
-                { add(elem_s(STRONG)); }
+                { ADD(elem_s(STRONG)); }
 
 TwoUlOpen =     !UlLine < "__" > !Spacechar !Newline { $$ = elem(NO_TYPE); }
 TwoUlClose =    !Spacechar !Newline Inline < "__" > !Alphanumeric { $$ = elem(NO_TYPE); }
@@ -475,13 +477,13 @@ TwoUlClose =    !Spacechar !Newline Inline < "__" > !Alphanumeric { $$ = elem(NO
 StrongUl =  s:TwoUlOpen
             ( !TwoUlClose Inline )*
             TwoUlClose
-            { add(elem_s(STRONG)); }
+            { ADD(elem_s(STRONG)); }
 
 Image = '!' ( ExplicitLink | ReferenceLink )
-		{ $$->type = IMAGE; $$->pos -= 1; add($$); }
+		{ $$->type = IMAGE; $$->pos -= 1; ADD($$); }
 
 Link =  ( ExplicitLink | ReferenceLink | AutoLink )
-		{ if ($$) add($$); } # AutoLink does not return $$
+		{ if ($$) ADD($$); } # AutoLink does not return $$
 
 ReferenceLink = ReferenceLinkDouble | ReferenceLinkSingle
 
@@ -510,17 +512,17 @@ TitleDouble = '"' ( !( '"' Sp ( ')' | Newline ) ) . )* '"'
 AutoLink = AutoLinkUrl | AutoLinkEmail
 
 AutoLinkUrl =  < s:LocMarker '<' [A-Za-z]+ "://" ( !Newline !'>' . )+ '>' >
-               { add(elem_s(AUTO_LINK_URL)); }
+               { ADD(elem_s(AUTO_LINK_URL)); }
 
 AutoLinkEmail = < s:LocMarker '<' [-A-Za-z0-9+_.]+ '@' ( !Newline !'>' . )+ '>' >
-                { add(elem_s(AUTO_LINK_EMAIL)); }
+                { ADD(elem_s(AUTO_LINK_EMAIL)); }
 
 Reference = < s:LocMarker
 			  NonindentSpace !"[]" Label ':' Spnl RefSrc Spnl RefTitle > BlankLine*
-			  { add(elem_s(REFERENCE)); }
+			  { ADD(elem_s(REFERENCE)); }
 
 Label = < s:LocMarker
-        '[' ( !'^' &{ extension(EXT_NOTES) } | &. &{ !extension(EXT_NOTES) } )
+        '[' ( !'^' &{ EXT(EXT_NOTES) } | &. &{ !EXT(EXT_NOTES) } )
         ( !']' Inline )*
         ']' >
         { $$ = elem_s(NO_TYPE); }
@@ -555,7 +557,7 @@ Code = < ( s:Ticks1 Sp ( ( !'`' Nonspacechar )+ | !Ticks1 '`'+ | !( Sp Ticks1 ) 
        | s:Ticks4 Sp ( ( !'`' Nonspacechar )+ | !Ticks4 '`'+ | !( Sp Ticks4 ) ( Spacechar | Newline !BlankLine ) )+ Sp Ticks4
        | s:Ticks5 Sp ( ( !'`' Nonspacechar )+ | !Ticks5 '`'+ | !( Sp Ticks5 ) ( Spacechar | Newline !BlankLine ) )+ Sp Ticks5
        ) >
-       { add(elem_s(CODE)); }
+       { ADD(elem_s(CODE)); }
 
 RawHtml =   (HtmlComment | HtmlTag)
 
@@ -593,7 +595,7 @@ StartList = &.
             { $$ = NULL; }
 
 Line =  RawLine
-       { $$ = mk_element(RAW, $$->pos, $$->end); }
+       { $$ = mk_element(G->data, RAW, $$->pos, $$->end); }
 
 RawLine = ( < (!'\r' !'\n' .)* Newline > | < .+ > Eof )
 	      { $$ = elem(RAW); }
@@ -604,10 +606,10 @@ RawLine = ( < (!'\r' !'\n' .)* Newline > | < .+ > Eof )
 
 # Syntax extensions
 
-ExtendedSpecialChar = &{ extension(EXT_SMART) } ('.' | '-' | '\'' | '"')
-                    | &{ extension(EXT_NOTES) } ( '^' )
+ExtendedSpecialChar = &{ EXT(EXT_SMART) } ('.' | '-' | '\'' | '"')
+                    | &{ EXT(EXT_NOTES) } ( '^' )
 
-Smart = &{ extension(EXT_SMART) }
+Smart = &{ EXT(EXT_SMART) }
         ( Ellipsis | Dash | SingleQuoted | DoubleQuoted | Apostrophe )
 
 Apostrophe = '\''
@@ -642,18 +644,18 @@ DoubleQuoted =  DoubleQuoteStart
                 DoubleQuoteEnd
                
 
-NoteReference = &{ extension(EXT_NOTES) }
+NoteReference = &{ EXT(EXT_NOTES) }
                 RawNoteReference
 
 RawNoteReference = "[^" ( !Newline !']' . )+ ']'
                   
 
-Note =          &{ extension(EXT_NOTES) }
+Note =          &{ EXT(EXT_NOTES) }
                 NonindentSpace RawNoteReference ':' Sp
                 ( RawNoteBlock )
                 ( &Indent RawNoteBlock )*
 
-InlineNote =    &{ extension(EXT_NOTES) }
+InlineNote =    &{ EXT(EXT_NOTES) }
                 "^["
                 ( !']' Inline )+
                 ']'
