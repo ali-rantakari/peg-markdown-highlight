@@ -115,7 +115,7 @@
 
 - (void) requestParsing:(HGMarkdownHighlighter *)sender
 {
-	if ([self.queue containsObject:sender])
+	if ([self.queue containsObject:sender] || self.currentHighlightTarget == sender)
 		return;
 	
 	[self.queue addObject:sender];

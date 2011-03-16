@@ -45,6 +45,7 @@
 	self.targetTextView = textView;
 	self.waitInterval = 1;
 	self.extensions = 0;
+	isDirty = NO;
 	
 	return self;
 }
@@ -181,19 +182,30 @@
 
 - (void) parserDidParse:(NSValue *)resultPointer
 {
+	if (isDirty)
+		return;
 	[self cacheElementList:(element **)[resultPointer pointerValue]];
 	[self applyVisibleRangeHighlighting];
 }
 
+
+- (void) requestParsing
+{
+	isDirty = NO;
+	[[HGMarkdownParser sharedInstance] requestParsing:self];
+}
+
+
 - (void) textViewUpdateTimerFire:(NSTimer*)timer
 {
 	self.updateTimer = nil;
-	[[HGMarkdownParser sharedInstance] requestParsing:self];
+	[self requestParsing];
 }
 
 
 - (void) textViewTextDidChange:(NSNotification *)notification
 {
+	isDirty = YES;
 	if (self.updateTimer != nil)
 		[self.updateTimer invalidate], self.updateTimer = nil;
 	self.updateTimer = [NSTimer
@@ -245,7 +257,7 @@
 
 - (void) parseAndHighlightNow
 {
-	[[HGMarkdownParser sharedInstance] requestParsing:self];
+	[self requestParsing];
 }
 
 - (void) startHighlighting
