@@ -10,8 +10,6 @@ void apply_highlighting(NSMutableAttributedString *attrStr, element *elem[])
 	
 	int order[] = {
 		H1, H2, H3, H4, H5, H6,  
-		SINGLEQUOTED,
-		DOUBLEQUOTED,
 		LINK,
 		AUTO_LINK_URL,
 		AUTO_LINK_EMAIL,
@@ -29,7 +27,7 @@ void apply_highlighting(NSMutableAttributedString *attrStr, element *elem[])
 		REFERENCE,
 		NOTE
 	};
-	int order_len = 24;
+	int order_len = 22;
 	
 	int i;
 	for (i = 0; i < order_len; i++)

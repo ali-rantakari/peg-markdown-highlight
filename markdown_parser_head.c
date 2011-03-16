@@ -317,8 +317,6 @@ char *type_name(element_type type)
 		case RAW_LIST:			 return "RAW_LIST"; break;
 		case RAW:                return "RAW"; break;
 		
-		case SINGLEQUOTED:       return "SINGLEQUOTED"; break;
-		case DOUBLEQUOTED:       return "DOUBLEQUOTED"; break;
 		case LINK:               return "LINK"; break;
 		case IMAGE:              return "IMAGE"; break;
 		case CODE:               return "CODE"; break;

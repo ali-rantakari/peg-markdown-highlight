@@ -15,9 +15,7 @@
 */
 typedef enum
 {
-	SINGLEQUOTED,		/**< .. */
-	DOUBLEQUOTED,		/**< .. */
-	LINK,				/**< .. */
+	LINK,				/**< Link */
 	AUTO_LINK_URL,		/**< Automatic URL link */
 	AUTO_LINK_EMAIL,	/**< Automatic email link */
 	IMAGE,				/**< Image definition */
