@@ -198,13 +198,20 @@ void free_elements(element **elems)
 
 
 
-#define IS_CONTINUATION_BYTE(x)		((x & 0xc0) == 0x80)
+#define IS_CONTINUATION_BYTE(x)	((x & 0xC0) == 0x80)
+#define HAS_UTF8_BOM(x)			(((*x & 0xFF) == 0xEF) && ((*(x+1) & 0xFF) == 0xBB) && ((*(x+2) & 0xFF) == 0xBF))
 
-int strcpy_without_continuation_bytes(char *str, char **out)
+// Copy `str` to `out`, removing UTF-8 continuation bytes
+// and a possible UTF-8 BOM (byte order mark).
+int strcpy_sanitize(char *str, char **out)
 {
 	char *new_str = (char *)malloc(sizeof(char) * strlen(str) + 1);
 	char *c = str;
 	int i = 0;
+	
+	if (HAS_UTF8_BOM(c))
+		c += 3;
+	
 	while (*c != '\0')
 	{
 		if (!IS_CONTINUATION_BYTE(*c))
@@ -222,7 +229,7 @@ int strcpy_without_continuation_bytes(char *str, char **out)
 void markdown_to_elements(char *text, int extensions, element **out_result[])
 {
 	char *text_copy = NULL;
-	int text_copy_len = strcpy_without_continuation_bytes(text, &text_copy);
+	int text_copy_len = strcpy_sanitize(text, &text_copy);
 	
 	element *parsing_elem = (element *)malloc(sizeof(element));
 	parsing_elem->type = RAW;
