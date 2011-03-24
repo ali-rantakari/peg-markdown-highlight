@@ -5,7 +5,7 @@ TESTER=tester
 MULTITHREAD_TESTER=multithread_tester
 TEST_CLIENT=testclient
 HIGHLIGHTER=highlighter
-CFLAGS ?= -Wall -Wswitch -Wshadow -Wsign-compare -O3 -std=gnu89
+CFLAGS ?= -Wall -Wswitch -Wshadow -Wsign-compare -Werror -O3 -std=gnu89
 OBJC_CFLAGS=-framework Foundation -framework AppKit
 
 PEGDIR=peg
