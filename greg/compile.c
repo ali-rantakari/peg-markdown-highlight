@@ -449,7 +449,6 @@ typedef struct _GREG {\n\
 YY_LOCAL(int) yyrefill(GREG *G)\n\
 {\n\
   int yyn;\n\
-  YY_XTYPE YY_XVAR = (YY_XTYPE) G->data;\n\
   while (G->buflen - G->pos < 512)\n\
     {\n\
       G->buflen *= 2;\n\
