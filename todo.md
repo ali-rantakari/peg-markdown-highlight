@@ -1,10 +1,9 @@
 
 ### Primary stuff:
 
-- Interface in Obj-C for specifying highlighting styles
-    - GUI widget for this?
+- GUI widget for specifying highlighting styles
 - Implement (stress) tests for modifying several NSTextViews simultaneously
-- HTML highlighting?
+- Highlight HTML?
 
 
 ### Secondary stuff:
@@ -17,12 +16,11 @@
 
 ### Nice to have
 
-- Handle UTF-8 BOM?
 - GTK+ or Qt example of highlighting a rich text widget
 - Reduce memory usage (profile with valgrind)
 - .NET (C#) example of highlighting a `RichTextBox`
     - Need to create a wrapper assembly for the parser
-
+- Handle cases where memory could not be allocated (`malloc` etc. return `NULL`)
 
 
 ### Maybe (or then maybe not):
