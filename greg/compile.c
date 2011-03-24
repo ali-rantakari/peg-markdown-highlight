@@ -452,7 +452,7 @@ YY_LOCAL(int) yyrefill(GREG *G)\n\
   while (G->buflen - G->pos < 512)\n\
     {\n\
       G->buflen *= 2;\n\
-      G->buf= YY_REALLOC(G->buf, G->buflen, G->data);\n\
+      G->buf= (char *)YY_REALLOC(G->buf, G->buflen, G->data);\n\
     }\n\
   YY_INPUT((G->buf + G->pos), yyn, (G->buflen - G->pos));\n\
   if (!yyn) return 0;\n\
@@ -517,7 +517,7 @@ YY_LOCAL(void) yyDo(GREG *G, yyaction action, int begin, int end)\n\
   while (G->thunkpos >= G->thunkslen)\n\
     {\n\
       G->thunkslen *= 2;\n\
-      G->thunks= YY_REALLOC(G->thunks, sizeof(yythunk) * G->thunkslen, G->data);\n\
+      G->thunks= (yythunk *)YY_REALLOC(G->thunks, sizeof(yythunk) * G->thunkslen, G->data);\n\
     }\n\
   G->thunks[G->thunkpos].begin=  begin;\n\
   G->thunks[G->thunkpos].end=    end;\n\
@@ -535,7 +535,7 @@ YY_LOCAL(int) yyText(GREG *G, int begin, int end)\n\
       while (G->textlen < (yyleng - 1))\n\
         {\n\
           G->textlen *= 2;\n\
-          G->text= YY_REALLOC(G->text, G->textlen, G->data);\n\
+          G->text= (char *)YY_REALLOC(G->text, G->textlen, G->data);\n\
         }\n\
       memcpy(G->text, G->buf + begin, yyleng);\n\
     }\n\
@@ -605,13 +605,13 @@ YY_PARSE(int) YY_NAME(parse_from)(GREG *G, yyrule yystart)\n\
   if (!G->buflen)\n\
     {\n\
       G->buflen= YY_BUFFER_START_SIZE;\n\
-      G->buf= YY_ALLOC(G->buflen, G->data);\n\
+      G->buf= (char *)YY_ALLOC(G->buflen, G->data);\n\
       G->textlen= YY_BUFFER_START_SIZE;\n\
-      G->text= YY_ALLOC(G->textlen, G->data);\n\
+      G->text= (char *)YY_ALLOC(G->textlen, G->data);\n\
       G->thunkslen= YY_STACK_SIZE;\n\
-      G->thunks= YY_ALLOC(sizeof(yythunk) * G->thunkslen, G->data);\n\
+      G->thunks= (yythunk *)YY_ALLOC(sizeof(yythunk) * G->thunkslen, G->data);\n\
       G->valslen= YY_STACK_SIZE;\n\
-      G->vals= YY_ALLOC(sizeof(YYSTYPE) * G->valslen, G->data);\n\
+      G->vals= (YYSTYPE*)YY_ALLOC(sizeof(YYSTYPE) * G->valslen, G->data);\n\
       G->begin= G->end= G->pos= G->limit= G->thunkpos= 0;\n\
     }\n\
   G->pos = 0;\n\

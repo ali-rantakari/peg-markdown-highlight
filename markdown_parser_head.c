@@ -26,7 +26,7 @@ typedef struct
 
 parser_data *mk_parser_data(char *charbuf, element *parsing_elems, unsigned long offset, int extensions, element **head_elems)
 {
-	parser_data *p_data = malloc(sizeof(parser_data));
+	parser_data *p_data = (parser_data *)malloc(sizeof(parser_data));
 	p_data->extensions = extensions;
 	p_data->charbuf = charbuf;
 	p_data->offset = offset;
@@ -570,7 +570,7 @@ void add_raw(parser_data *p_data, long pos, long end)
 # define YY_DEBUG 1
 #endif
 
-#define YY_INPUT(buf, result, max_size) yy_input_func(buf, &result, max_size, G->data)
+#define YY_INPUT(buf, result, max_size) yy_input_func(buf, &result, max_size, (parser_data *)G->data)
 
 void yy_input_func(char *buf, int *result, int max_size, parser_data *p_data)
 {

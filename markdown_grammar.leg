@@ -23,12 +23,12 @@
 
  ***********************************************************************/
 
-#define elem(x)			mk_element(G->data, x, thunk->begin, thunk->end)
-#define elem_s(x)		mk_element(G->data, x, s->pos, thunk->end)
-#define mk_sep			mk_element(G->data, SEPARATOR, 0,0)
-#define mk_notype		mk_element(G->data, NO_TYPE, 0,0)
-#define ADD(x)			add(G->data, x)
-#define EXT(x)			extension(G->data, x)
+#define elem(x)			mk_element((parser_data *)G->data, x, thunk->begin, thunk->end)
+#define elem_s(x)		mk_element((parser_data *)G->data, x, s->pos, thunk->end)
+#define mk_sep			mk_element((parser_data *)G->data, SEPARATOR, 0,0)
+#define mk_notype		mk_element((parser_data *)G->data, NO_TYPE, 0,0)
+#define ADD(x)			add((parser_data *)G->data, x)
+#define EXT(x)			extension((parser_data *)G->data, x)
 
 %}
 
@@ -87,7 +87,7 @@ SetextHeading2 =  &(RawLine SetextBottom2)
 Heading = SetextHeading | AtxHeading
 
 BlockQuote = a:BlockQuoteRaw
-            { element *rawlist = mk_element(G->data, RAW_LIST, 0,0);
+            { element *rawlist = mk_element((parser_data *)G->data, RAW_LIST, 0,0);
               rawlist->children = reverse(a);
               ADD(rawlist);
             }
@@ -131,7 +131,7 @@ ListTight = a:StartList
             BlankLine* !(Bullet | Enumerator)
             { element *cur = a;
               while (cur != NULL) {
-				  element *rawlist = mk_element(G->data, RAW_LIST, 0,0);
+				  element *rawlist = mk_element((parser_data *)G->data, RAW_LIST, 0,0);
 				  rawlist->children = reverse(cur->children);
 				  ADD(rawlist);
 				  cur = cur->next;
@@ -147,7 +147,7 @@ ListLoose = a:StartList
               } )+
             { element *cur = a;
               while (cur != NULL) {
-				  element *rawlist = mk_element(G->data, RAW_LIST, 0,0);
+				  element *rawlist = mk_element((parser_data *)G->data, RAW_LIST, 0,0);
 				  rawlist->children = reverse(cur->children);
 				  ADD(rawlist);
 				  cur = cur->next;
@@ -594,7 +594,7 @@ StartList = &.
             { $$ = NULL; }
 
 Line =  RawLine
-       { $$ = mk_element(G->data, RAW, $$->pos, $$->end); }
+       { $$ = mk_element((parser_data *)G->data, RAW, $$->pos, $$->end); }
 
 RawLine = ( < (!'\r' !'\n' .)* Newline > | < .+ > Eof )
 	      { $$ = elem(RAW); }
