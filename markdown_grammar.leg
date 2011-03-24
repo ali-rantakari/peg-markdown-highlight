@@ -500,7 +500,6 @@ Source  = ( '<' SourceContents '>' | SourceContents )
          
 
 SourceContents = ( ( !'(' !')' !'>' Nonspacechar )+ | '(' SourceContents ')')*
-                 | ""
 
 Title = ( TitleSingle | TitleDouble | "" )
        
