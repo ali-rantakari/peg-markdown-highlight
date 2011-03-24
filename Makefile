@@ -8,18 +8,12 @@ HIGHLIGHTER=highlighter
 CFLAGS ?= -Wall -Wswitch -Wshadow -Wsign-compare -Werror -O3 -std=gnu89
 OBJC_CFLAGS=-framework Foundation -framework AppKit
 
-PEGDIR=peg
-LEG=$(PEGDIR)/leg
 GREGDIR=greg
 GREG=$(GREGDIR)/greg
 
 ifdef DEBUG
 	CFLAGS += -g
 endif
-
-$(LEG):
-	@echo '------- building peg/leg'
-	CC=gcc make -C $(PEGDIR)
 
 $(GREG):
 	@echo '------- building greg'
@@ -70,11 +64,9 @@ docs: markdown_parser.h markdown_definitions.h doxygen.cfg example_cocoa/HGMarkd
 clean:
 	rm -f markdown_parser_core.c markdown_parser.c *.o $(TESTER) $(TEST_CLIENT) $(HIGHLIGHTER) $(BENCH) $(MULTITHREAD_TESTER); \
 	rm -rf *.dSYM; \
-	make -C $(PEGDIR) clean
 	make -C $(GREGDIR) clean
 
 distclean: clean
-	make -C $(PEGDIR) spotless
 	make -C $(GREGDIR) spotless
 
 leak-check: $(TESTER)
