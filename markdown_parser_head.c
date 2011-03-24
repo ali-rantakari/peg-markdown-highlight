@@ -72,8 +72,10 @@ void remove_zero_length_raw_spans(element *elem)
 	}
 }
 
-/* Print null-terminated string s.t. some characters are */
-/* represented by their corresponding espace sequences */
+/*
+Print null-terminated string s.t. some characters are
+represented by their corresponding espace sequences
+*/
 void print_str_literal_escapes(char *str)
 {
 	char *c = str;
@@ -88,8 +90,10 @@ void print_str_literal_escapes(char *str)
 	MKD_PRINTF("'");
 }
 
-/* Print elements in a linked list of */
-/* RAW, SEPARATOR, EXTRA_TEXT elements */
+/*
+Print elements in a linked list of
+RAW, SEPARATOR, EXTRA_TEXT elements
+*/
 void print_raw_spans_inline(element *elem)
 {
 	element *cur = elem;
@@ -106,8 +110,10 @@ void print_raw_spans_inline(element *elem)
 	}
 }
 
-/* Perform postprocessing parsing runs for RAW_LIST elements in `elem`, */
-/* iteratively until no such elements exist. */
+/*
+Perform postprocessing parsing runs for RAW_LIST elements in `elem`,
+iteratively until no such elements exist.
+*/
 void process_raw_blocks(parser_data *p_data)
 {
 	MKD_PRINTF("--------process_raw_blocks---------\n");
@@ -201,8 +207,10 @@ void free_elements(element **elems)
 #define IS_CONTINUATION_BYTE(x)	((x & 0xC0) == 0x80)
 #define HAS_UTF8_BOM(x)			(((*x & 0xFF) == 0xEF) && ((*(x+1) & 0xFF) == 0xBB) && ((*(x+2) & 0xFF) == 0xBF))
 
-// Copy `str` to `out`, removing UTF-8 continuation bytes
-// and a possible UTF-8 BOM (byte order mark).
+/*
+Copy `str` to `out`, removing UTF-8 continuation bytes
+and a possible UTF-8 BOM (byte order mark).
+*/
 int strcpy_sanitize(char *str, char **out)
 {
 	char *new_str = (char *)malloc(sizeof(char) * strlen(str) + 1);
@@ -260,8 +268,10 @@ void markdown_to_elements(char *text, int extensions, element **out_result[])
 
 
 
-/* Mergesort linked list of elements (using comparison function `compare`), */
-/* return new head. (Adapted slightly from Simon Tatham's algorithm.) */
+/*
+Mergesort linked list of elements (using comparison function `compare`),
+return new head. (Adapted slightly from Simon Tatham's algorithm.)
+*/
 element *ll_mergesort(element *list, int (*compare)(const element*, const element*))
 {
 	if (!list)
@@ -450,10 +460,12 @@ element * mk_etext(parser_data *p_data, char *string)
 }
 
 
-/* Given an element where the offsets {pos, end} represent */
-/* locations in the *parsed text* (defined by the linked list of RAW and */
-/* EXTRA_TEXT elements in p_data->elem), fix these offsets to represent */
-/* corresponding offsets in the original input (p_data->charbuf). */
+/*
+Given an element where the offsets {pos, end} represent
+locations in the *parsed text* (defined by the linked list of RAW and
+EXTRA_TEXT elements in p_data->elem), fix these offsets to represent
+corresponding offsets in the original input (p_data->charbuf).
+*/
 void fix_offsets(parser_data *p_data, element *elem)
 {
 	if (elem->type == EXTRA_TEXT)
