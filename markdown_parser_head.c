@@ -396,7 +396,7 @@ char *type_name(element_type type)
 /* return true if extension is selected */
 bool extension(parser_data *p_data, int ext)
 {
-    return (p_data->extensions & ext);
+    return ((p_data->extensions & ext) != 0);
 }
 
 
