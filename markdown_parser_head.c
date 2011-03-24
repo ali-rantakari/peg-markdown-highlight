@@ -455,7 +455,7 @@ element * mk_etext(parser_data *p_data, char *string)
     element *result;
     assert(string != NULL);
     result = mk_element(p_data, EXTRA_TEXT, 0,0);
-    result->text = strdup(string);
+    result->text = string;
     return result;
 }
 
