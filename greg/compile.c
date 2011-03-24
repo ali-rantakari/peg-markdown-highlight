@@ -652,6 +652,10 @@ YY_PARSE(GREG *) YY_NAME(parse_new)(YY_XTYPE data)\n\
 \n\
 YY_PARSE(void) YY_NAME(parse_free)(GREG *G)\n\
 {\n\
+  YY_FREE(G->buf);\n\
+  YY_FREE(G->text);\n\
+  YY_FREE(G->thunks);\n\
+  YY_FREE(G->vals);\n\
   YY_FREE(G);\n\
 }\n\
 \n\
