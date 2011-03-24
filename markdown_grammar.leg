@@ -140,7 +140,7 @@ ListTight = a:StartList
 
 ListLoose = a:StartList
             ( b:ListItem BlankLine*
-              { b = cons(mk_etext(G->data, "\n\n"), b); /* In loose list, \n\n added to end of each element */
+              { b = cons(mk_etext((parser_data *)G->data, "\n\n"), b); /* In loose list, \n\n added to end of each element */
                 element *el = mk_notype;
                 el->children = b;
                 a = cons(el, a);
