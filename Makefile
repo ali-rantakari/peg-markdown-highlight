@@ -13,6 +13,9 @@ LEG=$(PEGDIR)/leg
 GREGDIR=greg
 GREG=$(GREGDIR)/greg
 
+ifdef DEBUG
+	CFLAGS += -g
+endif
 
 $(LEG):
 	@echo '------- building peg/leg'
