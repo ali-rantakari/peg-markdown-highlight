@@ -2,8 +2,9 @@
 PEG Markdown Highlight
 ========================
 
+
 Description
-------------------
+-------------------------------------------------------------------------------
 
 This project contains:
 
@@ -15,22 +16,24 @@ This project contains:
 _Copyright 2011 Ali Rantakari_ -- <http://hasseg.org>
 
 This program uses the PEG grammar from John McFarlane's `peg-markdown` project,
-and the `greg` parser generator by Amos Wenger and \_why (which is heavily
+and the `greg` parser generator by Amos Wenger and \_why (`greg` is heavily
 based on `peg/leg` by Ian Piumarta). Thanks to these gentlemen (and everyone
 who contributed to their projects) for making this one possible.
 
 
 
 API Documentation
-----------------------
+-------------------------------------------------------------------------------
 
-The public APIs are documented using Doxygen. If you have it installed, just
-run `make docs` and they should be available under the `docs/` directory.
+The public APIs are documented using [Doxygen][dox]. If you have it installed,
+just run `make docs` and they should be available under the `docs/` directory.
+
+[dox]: http://doxygen.org
 
 
 
 Using the Parser in Your Application
--------------------------------------
+-------------------------------------------------------------------------------
 
 The parser has been written in ANSI/ISO C89 with GNU extensions, which means
 that you need a _GCC-compatible compiler_ (see section on MSVC below, though).
@@ -46,11 +49,8 @@ You need to add the following files into your project:
 - `markdown_parser.h`
 - `markdown_parser.c`
 
-`markdown_parser.c` must be generated with `make`, and is the only source code
-file that you should compile as part of your project (it imports the other
-two). `markdown_parser.h` contains the parser's public interface (see the
-API docs for more info).
-
+`markdown_parser.c` must be generated with `make`. `markdown_parser.h` contains
+the parser's public interface (see the API docs for more info).
 
 
 ### Compiling in Microsoft Visual C++
@@ -63,9 +63,9 @@ ways to do this:
 
 Whichever way you go, the command you run is `make markdown_parser.c`.
 
-MSVC does not support some of the GNU extensions the code uses, but the it
-should compile nicely as C++ (just change the extensions to `.cpp` or set some
-magic switch in the project settings to make them compile as C++).
+MSVC does not support some of the GNU extensions the code uses, but it should
+compile it nicely as C++ (just change the extensions to `.cpp` or set some
+magic switch in the project settings to get the same effect).
 
 
 
