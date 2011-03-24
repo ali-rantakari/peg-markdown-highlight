@@ -49,7 +49,8 @@ int main(int argc, char * argv[])
 	int extensions = 0;
 	
 	double starttime = get_time();
-	for (int i = 0; i < iterations; i++)
+	int i;
+	for (i = 0; i < iterations; i++)
 	{
 		element **result;
 		markdown_to_elements(md_source, extensions, &result);
