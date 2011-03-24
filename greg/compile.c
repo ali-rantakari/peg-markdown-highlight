@@ -622,19 +622,19 @@ YY_PARSE(int) YY_NAME(parse_from)(GREG *G, yyrule yystart)\n\
   if (yyok) yyDone(G);\n\
   yyCommit(G);\n\
   return yyok;\n\
-  (void)yyrefill;\n\
-  (void)yymatchDot;\n\
-  (void)yymatchChar;\n\
-  (void)yymatchString;\n\
-  (void)yymatchClass;\n\
-  (void)yyDo;\n\
-  (void)yyText;\n\
-  (void)yyDone;\n\
-  (void)yyCommit;\n\
-  (void)yyAccept;\n\
-  (void)yyPush;\n\
-  (void)yyPop;\n\
-  (void)yySet;\n\
+  (void)yyrefill(NULL);\n\
+  (void)yymatchDot(NULL);\n\
+  (void)yymatchChar(NULL, 0);\n\
+  (void)yymatchString(NULL, NULL);\n\
+  (void)yymatchClass(NULL, NULL);\n\
+  (void)yyDo(NULL, NULL, 0, 0);\n\
+  (void)yyText(NULL, 0, 0);\n\
+  (void)yyDone(NULL);\n\
+  (void)yyCommit(NULL);\n\
+  (void)yyAccept(NULL, 0);\n\
+  (void)yyPush(NULL, NULL, 0, NULL, NULL);\n\
+  (void)yyPop(NULL, NULL, 0, NULL, NULL);\n\
+  (void)yySet(NULL, NULL, 0, NULL, NULL);\n\
 }\n\
 \n\
 YY_PARSE(int) YY_NAME(parse)(GREG *G)\n\
