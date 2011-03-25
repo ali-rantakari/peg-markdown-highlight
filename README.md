@@ -10,8 +10,8 @@ This project contains:
 
 - A Markdown parser for syntax highlighting, written in C. The parser itself
   should compile as is on OS X, Linux and Windows (at least).
-- Helper classes for syntax highlighting an `NSTextView` in a Cocoa GUI
-  application
+- Helper classes for syntax highlighting `NSTextView`s in Cocoa applications.
+- Simple example on how to highlight a `GtkTextView` in a GTK+ application.
 
 _Copyright 2011 Ali Rantakari_ -- <http://hasseg.org>
 
@@ -49,8 +49,10 @@ You need to add the following files into your project:
 - `markdown_parser.h`
 - `markdown_parser.c`
 
-`markdown_parser.c` must be generated with `make`. `markdown_parser.h` contains
-the parser's public interface (see the API docs for more info).
+`markdown_parser.c` implements the parser and must be generated with `make`.
+`markdown_parser.h` contains the parser's public interface and
+`markdown_definitions.h` some public definitions you might want to use in files
+where you don't wish to import the parser interface itself.
 
 
 ### Compiling in Microsoft Visual C++
