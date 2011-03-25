@@ -15,6 +15,7 @@
 @property(retain) NSTimer *updateTimer;
 @property(copy) NSColor *defaultTextColor;
 @property(retain) NSThread *workerThread;
+@property(retain) NSDictionary *defaultTypingAttributes;
 
 @end
 
@@ -24,12 +25,14 @@
 @synthesize waitInterval;
 @synthesize targetTextView;
 @synthesize updateTimer;
-@synthesize isHighlighting;
+@synthesize isActive;
 @synthesize highlightAutomatically;
 @synthesize extensions;
 @synthesize styles;
 @synthesize defaultTextColor;
 @synthesize workerThread;
+@synthesize defaultTypingAttributes;
+@synthesize resetTypingAttributes;
 
 - (id) initWithTextView:(NSTextView *)textView
 {
@@ -39,10 +42,12 @@
 	cachedElements = NULL;
 	currentHighlightText = NULL;
 	
+	self.defaultTypingAttributes = nil;
 	self.workerThread = nil;
 	self.defaultTextColor = nil;
 	self.styles = nil;
-	self.isHighlighting = NO;
+	self.isActive = NO;
+	self.resetTypingAttributes = YES;
 	self.highlightAutomatically = YES;
 	self.updateTimer = nil;
 	self.targetTextView = textView;
@@ -54,6 +59,7 @@
 
 - (void) dealloc
 {
+	self.defaultTypingAttributes = nil;
 	self.workerThread = nil;
 	self.defaultTextColor = nil;
 	self.targetTextView = nil;
@@ -174,12 +180,8 @@
 
 - (void) applyHighlighting:(element **)elements withRange:(NSRange)range
 {
-	//NSLog(@"applyHighlighting: %@", NSStringFromRange(range));
 	NSUInteger rangeEnd = NSMaxRange(range);
-	
-	// todo: disable undo registration
 	[[self.targetTextView textStorage] beginEditing];
-	
 	[self clearHighlightingForRange:range];
 	
 	NSMutableAttributedString *attrStr = [self.targetTextView textStorage];
@@ -225,7 +227,6 @@
 	}
 	
 	[[self.targetTextView textStorage] endEditing];
-	// todo: re-enable undo registration
 }
 
 - (void) applyVisibleRangeHighlighting
@@ -236,6 +237,8 @@
 	if (cachedElements == NULL)
 		return;
 	[self applyHighlighting:cachedElements withRange:visibleRange];
+	if (self.resetTypingAttributes)
+		[self.targetTextView setTypingAttributes:self.defaultTypingAttributes];
 }
 
 
@@ -330,7 +333,7 @@
 	[self requestParsing];
 }
 
-- (void) startHighlighting
+- (void) activate
 {
 	// todo: throw exception if targetTextView is nil?
 	
@@ -339,6 +342,11 @@
 	
 	clearFontTraitMask = [self getClearFontTraitMask:[[NSFontManager sharedFontManager] traitsOfFont:[self.targetTextView font]]];
 	self.defaultTextColor = [self.targetTextView textColor];
+	self.defaultTypingAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
+									[self.targetTextView backgroundColor], NSBackgroundColorAttributeName,
+									[self.targetTextView textColor], NSForegroundColorAttributeName,
+									[self.targetTextView font], NSFontAttributeName,
+									nil];
 	
 	[self requestParsing];
 	
@@ -361,12 +369,12 @@
 		 ];
 	}
 	
-	self.isHighlighting = YES;
+	self.isActive = YES;
 }
 
-- (void) stopHighlighting
+- (void) deactivate
 {
-	if (!self.isHighlighting)
+	if (!self.isActive)
 		return;
 	
 	[[NSNotificationCenter defaultCenter]
@@ -388,7 +396,7 @@
 	}
 	
 	[self clearElementsCache];
-	self.isHighlighting = NO;
+	self.isActive = NO;
 }
 
 

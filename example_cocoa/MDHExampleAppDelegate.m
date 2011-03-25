@@ -82,12 +82,12 @@
 	hl1 = [[HGMarkdownHighlighter alloc] initWithTextView:textView1];
 	hl1.waitInterval = [delaySlider intValue];
 	hl1.styles = [self getDarkStyles];
-	[hl1 startHighlighting];
+	[hl1 activate];
 	
 	hl2 = [[HGMarkdownHighlighter alloc] initWithTextView:textView2];
 	hl2.waitInterval = 2; // only relevant if highlightAutomatically == YES
 	hl2.highlightAutomatically = NO;
-	[hl2 startHighlighting];
+	[hl2 activate];
 }
 
 
