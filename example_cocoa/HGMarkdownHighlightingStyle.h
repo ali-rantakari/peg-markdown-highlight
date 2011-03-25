@@ -40,6 +40,14 @@
 #define HG_LIGHT_GRAY	HG_COLOR_HSB(0, 0, 0.9)
 
 
+/**
+ * \brief Highlighting style definition for a Markdown language element.
+ *
+ * Contains information on the styles to use to highlight occurrences
+ * of a specific Markdown language element. You populate
+ * HGMarkdownHighlighter::styles with instances of this class to set
+ * the highlighting styles.
+ */
 @interface HGMarkdownHighlightingStyle : NSObject
 {
 	NSDictionary *attributesToAdd;
@@ -48,11 +56,36 @@
 	element_type elementType;
 }
 
-- (id) initWithType:(element_type)elemType attributesToAdd:(NSDictionary *)toAdd toRemove:(NSArray *)toRemove fontTraitsToAdd:(NSFontTraitMask)traits;
+/** \brief Init a new instance. */
+- (id) initWithType:(element_type)elemType
+	attributesToAdd:(NSDictionary *)toAdd
+		   toRemove:(NSArray *)toRemove
+	fontTraitsToAdd:(NSFontTraitMask)traits;
 
+/** \brief The Markdown language element type these styles pertain to. */
 @property element_type elementType;
+
+/** \brief A bitmask of the font traits to add.
+ * 
+ * If you want to remove certain font traits in this
+ * style, use the 'opposite' traits (e.g. NSUnboldFontMask
+ * to remove the 'bold' trait).
+ */
 @property NSFontTraitMask fontTraitsToAdd;
+
+/** \brief The string attributes to add.
+ * 
+ * This dictionary should be in the same format you would
+ * use for manipulating styles in an NSMutableAttributedString
+ * directly.
+ */
 @property(copy) NSDictionary *attributesToAdd;
+
+/** \brief The names of attributes to remove.
+ * 
+ * Populate this array with attribute names (such as
+ * NSForegroundColorAttributeName).
+ */
 @property(copy) NSArray *attributesToRemove;
 
 @end
