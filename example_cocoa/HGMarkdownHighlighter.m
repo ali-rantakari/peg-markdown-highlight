@@ -361,6 +361,11 @@
 	[self requestParsing];
 }
 
+- (void) highlightNow
+{
+	[self applyVisibleRangeHighlighting];
+}
+
 - (void) activate
 {
 	// todo: throw exception if targetTextView is nil?

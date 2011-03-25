@@ -87,6 +87,11 @@
  */
 - (void) parseAndHighlightNow;
 
+/** \brief Manually highlight (without parsing) the NSTextView contents.
+ * 
+ */
+- (void) highlightNow;
+
 /** \brief Begin highlighting the NSTextView.
  * 
  * 
