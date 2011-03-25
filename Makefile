@@ -55,8 +55,8 @@ $(BENCH) : bench.c markdown_parser.o markdown_parser.h
 	@echo '------- building bench'
 	$(CC) $(CFLAGS) -DMKD_DEBUG_OUTPUT=0 -o $@ markdown_parser.o $<
 
-docs: markdown_parser.h markdown_definitions.h doxygen.cfg example_cocoa/HGMarkdownHighlighter.h
-	doxygen doxygen.cfg
+docs: markdown_parser.h markdown_definitions.h doxygen/doxygen.cfg doxygen/doxygen.h doxygen/doxygen_footer.html example_cocoa/HGMarkdownHighlighter.h
+	doxygen doxygen/doxygen.cfg
 	touch docs
 
 .PHONY: clean test
