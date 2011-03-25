@@ -1,3 +1,12 @@
+/* PEG Markdown Highlight
+ * Copyright 2011 Ali Rantakari -- http://hasseg.org
+ * Licensed under the GPL2+ and MIT licenses (see LICENSE for more info).
+ * 
+ * markdown_parser_head.c
+ * 
+ * Code to be inserted into the beginning of the parser code generated
+ * from the PEG grammar.
+ */
 
 #include "markdown_parser.h"
 

@@ -1,3 +1,13 @@
+/* PEG Markdown Highlight
+ * Copyright 2011 Ali Rantakari -- http://hasseg.org
+ * Licensed under the GPL2+ and MIT licenses (see LICENSE for more info).
+ * 
+ * testclient.m
+ * 
+ * Test program that runs `highlighter` as a child process, reads and
+ * parses its stdout, and highlights the given Markdown content based on
+ * that.
+ */
 
 #import <Foundation/Foundation.h>
 #import "ANSIEscapeHelper.h"

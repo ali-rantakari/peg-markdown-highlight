@@ -1,3 +1,13 @@
+/* PEG Markdown Highlight
+ * Copyright 2011 Ali Rantakari -- http://hasseg.org
+ * Licensed under the GPL2+ and MIT licenses (see LICENSE for more info).
+ * 
+ * multithread_tester.c
+ * 
+ * Test program that spawns multiple threads that run the parser
+ * simultaneously for a given number of iterations each.
+ */
+
 #include <stdio.h>
 #include <pthread.h>
 #include <unistd.h>

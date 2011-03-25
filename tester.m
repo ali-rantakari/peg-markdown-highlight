@@ -1,3 +1,13 @@
+/* PEG Markdown Highlight
+ * Copyright 2011 Ali Rantakari -- http://hasseg.org
+ * Licensed under the GPL2+ and MIT licenses (see LICENSE for more info).
+ * 
+ * tester.m
+ * 
+ * Test program that runs the parser on the given Markdown document and
+ * highlights the contents using Cocoa's NSMutableAttributedString, outputting
+ * the results as ANSI escape -formatted text into stdout.
+ */
 
 #import <Foundation/Foundation.h>
 #import "ANSIEscapeHelper.h"

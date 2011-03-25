@@ -1,3 +1,12 @@
+/* PEG Markdown Highlight
+ * Copyright 2011 Ali Rantakari -- http://hasseg.org
+ * Licensed under the GPL2+ and MIT licenses (see LICENSE for more info).
+ * 
+ * bench.c
+ * 
+ * Used for measuring the execution speed of the parser.
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>

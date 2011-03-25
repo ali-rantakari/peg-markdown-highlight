@@ -1,34 +1,22 @@
 %{
-/**********************************************************************
-
-  markdown_parser.leg - markdown parser in C using a PEG grammar.
-  (c) 2008 John MacFarlane (jgm at berkeley dot edu).
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License or the MIT
-  license.  See LICENSE for details.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
- ***********************************************************************/
+/* PEG Markdown Highlight
+ * Copyright 2011 Ali Rantakari -- http://hasseg.org
+ * Licensed under the GPL2+ and MIT licenses (see LICENSE for more info).
+ * 
+ * markdown_grammar.leg
+ * 
+ * This is a slightly adapted version of the PEG grammar from John McFarlane's
+ * peg-markdown compiler.
+ */
 
 /// header_code_here
 
-/**********************************************************************
-
-  PEG grammar and parser actions for markdown syntax.
-
- ***********************************************************************/
-
-#define elem(x)			mk_element((parser_data *)G->data, x, thunk->begin, thunk->end)
-#define elem_s(x)		mk_element((parser_data *)G->data, x, s->pos, thunk->end)
-#define mk_sep			mk_element((parser_data *)G->data, SEPARATOR, 0,0)
-#define mk_notype		mk_element((parser_data *)G->data, NO_TYPE, 0,0)
-#define ADD(x)			add((parser_data *)G->data, x)
-#define EXT(x)			extension((parser_data *)G->data, x)
+#define elem(x)		mk_element((parser_data *)G->data, x, thunk->begin, thunk->end)
+#define elem_s(x)	mk_element((parser_data *)G->data, x, s->pos, thunk->end)
+#define mk_sep		mk_element((parser_data *)G->data, SEPARATOR, 0,0)
+#define mk_notype	mk_element((parser_data *)G->data, NO_TYPE, 0,0)
+#define ADD(x)		add((parser_data *)G->data, x)
+#define EXT(x)		extension((parser_data *)G->data, x)
 
 %}
 

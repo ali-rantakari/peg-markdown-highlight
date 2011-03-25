@@ -1,3 +1,13 @@
+/* PEG Markdown Highlight
+ * Copyright 2011 Ali Rantakari -- http://hasseg.org
+ * Licensed under the GPL2+ and MIT licenses (see LICENSE for more info).
+ * 
+ * highlighter.c
+ * 
+ * Test program that parses the Markdown content from stdin and outputs
+ * the positions of found language elements.
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include "markdown_parser.h"
