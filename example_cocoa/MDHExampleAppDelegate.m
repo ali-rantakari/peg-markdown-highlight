@@ -86,7 +86,7 @@
 	
 	hl2 = [[HGMarkdownHighlighter alloc] init];
 	hl2.targetTextView = textView2;
-	hl2.highlightAutomatically = NO;
+	hl2.parseAndHighlightAutomatically = NO;
 	[hl2 activate];
 }
 

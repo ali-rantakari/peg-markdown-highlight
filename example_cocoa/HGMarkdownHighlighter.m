@@ -26,7 +26,7 @@
 @synthesize targetTextView;
 @synthesize updateTimer;
 @synthesize isActive;
-@synthesize highlightAutomatically;
+@synthesize parseAndHighlightAutomatically;
 @synthesize extensions;
 @synthesize styles;
 @synthesize defaultTextColor;
@@ -49,7 +49,7 @@
 	self.styles = nil;
 	self.isActive = NO;
 	self.resetTypingAttributes = YES;
-	self.highlightAutomatically = YES;
+	self.parseAndHighlightAutomatically = YES;
 	self.updateTimer = nil;
 	self.targetTextView = nil;
 	self.waitInterval = 1;
@@ -383,7 +383,7 @@
 	
 	[self requestParsing];
 	
-	if (self.highlightAutomatically)
+	if (self.parseAndHighlightAutomatically)
 		[[NSNotificationCenter defaultCenter]
 		 addObserver:self
 		 selector:@selector(textViewTextDidChange:)
