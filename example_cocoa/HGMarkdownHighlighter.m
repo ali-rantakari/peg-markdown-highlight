@@ -34,7 +34,8 @@
 @synthesize defaultTypingAttributes;
 @synthesize resetTypingAttributes;
 
-- (id) initWithTextView:(NSTextView *)textView
+
+- (id) init
 {
 	if (!(self = [super init]))
 		return nil;
@@ -50,10 +51,37 @@
 	self.resetTypingAttributes = YES;
 	self.highlightAutomatically = YES;
 	self.updateTimer = nil;
-	self.targetTextView = textView;
+	self.targetTextView = nil;
 	self.waitInterval = 1;
 	self.extensions = 0;
 	
+	return self;
+}
+
+- (id) initWithTextView:(NSTextView *)textView
+{
+	if (!(self = [self init]))
+		return nil;
+	self.targetTextView = textView;
+	return self;
+}
+
+- (id) initWithTextView:(NSTextView *)textView
+		   waitInterval:(NSTimeInterval)interval
+{
+	if (!(self = [self initWithTextView:textView]))
+		return nil;
+	self.waitInterval = interval;
+	return self;
+}
+
+- (id) initWithTextView:(NSTextView *)textView
+		   waitInterval:(NSTimeInterval)interval
+				 styles:(NSArray *)inStyles
+{
+	if (!(self = [self initWithTextView:textView waitInterval:interval]))
+		return nil;
+	self.styles = inStyles;
 	return self;
 }
 

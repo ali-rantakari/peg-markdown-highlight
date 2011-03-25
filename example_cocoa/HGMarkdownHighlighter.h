@@ -77,11 +77,10 @@
 
 
 
-/**
- * 
- * 
- */
 - (id) initWithTextView:(NSTextView *)textView;
+- (id) initWithTextView:(NSTextView *)textView waitInterval:(NSTimeInterval)interval;
+- (id) initWithTextView:(NSTextView *)textView waitInterval:(NSTimeInterval)interval styles:(NSArray *)inStyles;
+
 
 /** \brief Manually parse and highlight the NSTextView contents.
  * 
