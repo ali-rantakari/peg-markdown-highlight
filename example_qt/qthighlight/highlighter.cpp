@@ -134,8 +134,10 @@ void HGMarkdownHighlighter::highlight()
         element *elem_cursor = cached_elements[style.type];
         while (elem_cursor != NULL)
         {
-            if (elem_cursor->end <= elem_cursor->pos)
+            if (elem_cursor->end <= elem_cursor->pos) {
+                elem_cursor = elem_cursor->next;
                 continue;
+            }
 
             // "The QTextLayout object can only be modified from the
             // documentChanged implementation of a QAbstractTextDocumentLayout
