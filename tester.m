@@ -68,6 +68,7 @@ void apply_highlighting(NSMutableAttributedString *attrStr, element *elem[])
 				case CODE:
 				case VERBATIM:	fgColor = [NSColor greenColor]; break;
 				case HRULE:		fgColor = [NSColor cyanColor]; break;
+				case REFERENCE:	fgColor = [NSColor colorWithCalibratedHue:0.67 saturation:0.5 brightness:1.0 alpha:1.0]; break;
 				case LIST_ENUMERATOR:
 				case LIST_BULLET:fgColor = [NSColor magentaColor]; break;
 				case AUTO_LINK_EMAIL:
@@ -75,8 +76,7 @@ void apply_highlighting(NSMutableAttributedString *attrStr, element *elem[])
 				case IMAGE:
 				case LINK:		bgColor = [NSColor blackColor];
 								fgColor = [NSColor cyanColor]; break;
-				case BLOCKQUOTE:removeBgColor = YES;
-								fgColor = [NSColor magentaColor]; break;
+				case BLOCKQUOTE:fgColor = [NSColor magentaColor]; break;
 				default: break;
 			}
 			
