@@ -98,6 +98,9 @@ void HGMarkdownHighlighter::setDefaultStyles()
     strong.setFontWeight(QFont::Bold);
     STY(STRONG, strong);
 
+    QTextCharFormat comment; comment.setForeground(QBrush(Qt::gray));
+    STY(COMMENT, comment);
+
     QTextCharFormat blockquote; blockquote.setForeground(QBrush(Qt::darkRed));
     STY(BLOCKQUOTE, blockquote);
 

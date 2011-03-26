@@ -73,6 +73,8 @@ tag_listelem **make_tags_table(GtkTextBuffer *buffer)
 	ADDTAG(REFERENCE, "foreground", "#9f92ad");
 	ADDTAG(REFERENCE, "background", "#e9e1f2");
 	
+	ADDTAG(COMMENT, "foreground", "#999999");
+	
 	return tags_table;
 }
 

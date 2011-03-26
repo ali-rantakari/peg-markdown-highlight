@@ -27,6 +27,7 @@ void apply_highlighting(NSMutableAttributedString *attrStr, element *elem[])
 		HTML,
 		EMPH,
 		STRONG,
+		COMMENT,
 		CODE,
 		LIST_BULLET,
 		LIST_ENUMERATOR,
@@ -37,7 +38,7 @@ void apply_highlighting(NSMutableAttributedString *attrStr, element *elem[])
 		NOTE,
 		BLOCKQUOTE,
 	};
-	int order_len = 22;
+	int order_len = 23;
 	
 	int i;
 	for (i = 0; i < order_len; i++)
@@ -65,6 +66,7 @@ void apply_highlighting(NSMutableAttributedString *attrStr, element *elem[])
 				case H6:		fgColor = [NSColor blueColor]; break;
 				case EMPH:		fgColor = [NSColor yellowColor]; break;
 				case STRONG:	fgColor = [NSColor magentaColor]; break;
+				case COMMENT:	fgColor = [NSColor blackColor]; break;
 				case CODE:
 				case VERBATIM:	fgColor = [NSColor greenColor]; break;
 				case HRULE:		fgColor = [NSColor cyanColor]; break;

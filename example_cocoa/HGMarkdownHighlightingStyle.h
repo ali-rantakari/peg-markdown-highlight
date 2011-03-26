@@ -36,6 +36,7 @@
 #define HG_CYAN		0.5
 
 #define HG_DARK_GRAY	HG_COLOR_HSB(0, 0, 0.2)
+#define HG_MED_GRAY		HG_COLOR_HSB(0, 0, 0.5)
 #define HG_LIGHT_GRAY	HG_COLOR_HSB(0, 0, 0.9)
 
 

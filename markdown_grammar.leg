@@ -553,7 +553,8 @@ BlankLine =     Sp Newline
 
 Quoted =        '"' (!'"' .)* '"' | '\'' (!'\'' .)* '\''
 HtmlAttribute = (AlphanumericAscii | '-')+ Spnl ('=' Spnl (Quoted | (!'>' Nonspacechar)+))? Spnl
-HtmlComment =   "<!--" (!"-->" .)* "-->"
+HtmlComment =   < s:LocMarker "<!--" (!"-->" .)* "-->" >
+				{ ADD(elem_s(COMMENT)); }
 HtmlTag =       '<' Spnl '/'? AlphanumericAscii+ Spnl HtmlAttribute* '/'? Spnl '>'
 Eof =           !.
 Spacechar =     ' ' | '\t'

@@ -32,6 +32,7 @@ typedef enum
 	STRONG,				/**< Strong text */
 	LIST_BULLET,		/**< Bullet for a list item */
 	LIST_ENUMERATOR,	/**< Enumerator for a list item */
+	COMMENT,			/**< (HTML) comment */
 	
 	/* Code assumes that H1-6 are in order. */
 	H1,					/**< Header, level 1 */
@@ -66,7 +67,7 @@ typedef enum
 * \brief Number of types in element_type.
 * \sa element_type
 */
-#define NUM_TYPES 28
+#define NUM_TYPES 29
 
 /**
 * \brief Number of *language element* types in element_type.
