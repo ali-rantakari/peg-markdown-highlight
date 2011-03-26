@@ -128,8 +128,8 @@ void HGMarkdownHighlighter::highlight()
             // "The QTextLayout object can only be modified from the
             // documentChanged implementation of a QAbstractTextDocumentLayout
             // subclass. Any changes applied from the outside cause undefined
-            // behavior." -- so we shouldn't do this here?? (this is pretty much
-            // how QSyntaxHighlighter does it):
+            // behavior." -- we are breaking this rule here. There might be
+            // a better (more correct) way to do this.
 
             int startBlockNum = document->findBlock(elem_cursor->pos).blockNumber();
             int endBlockNum = document->findBlock(elem_cursor->end).blockNumber();
