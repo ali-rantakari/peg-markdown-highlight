@@ -14,6 +14,9 @@ GREG=$(GREGDIR)/greg
 ifdef DEBUG
 	CFLAGS += -g
 endif
+ifdef DEBUGOUT
+	CFLAGS += -DMKD_DEBUG_OUTPUT=1
+endif
 
 $(GREG):
 	@echo '------- building greg'
@@ -45,15 +48,15 @@ $(TEST_CLIENT) : testclient.m ANSIEscapeHelper.o ANSIEscapeHelper.h
 
 $(HIGHLIGHTER) : highlighter.c markdown_parser.o markdown_parser.h
 	@echo '------- building highlighter'
-	$(CC) $(CFLAGS) -DMKD_DEBUG_OUTPUT=0 -o $@ markdown_parser.o $<
+	$(CC) $(CFLAGS) -o $@ markdown_parser.o $<
 
 $(MULTITHREAD_TESTER) : multithread_tester.c markdown_parser.o markdown_parser.h
 	@echo '------- building multithread_tester'
-	$(CC) $(CFLAGS) -DMKD_DEBUG_OUTPUT=0 -o $@ markdown_parser.o $<
+	$(CC) $(CFLAGS) -o $@ markdown_parser.o $<
 
 $(BENCH) : bench.c markdown_parser.o markdown_parser.h
 	@echo '------- building bench'
-	$(CC) $(CFLAGS) -DMKD_DEBUG_OUTPUT=0 -o $@ markdown_parser.o $<
+	$(CC) $(CFLAGS) -o $@ markdown_parser.o $<
 
 docs: markdown_parser.h markdown_definitions.h doxygen/doxygen.cfg doxygen/doxygen.h doxygen/doxygen_footer.html example_cocoa/HGMarkdownHighlighter.h
 	doxygen doxygen/doxygen.cfg
