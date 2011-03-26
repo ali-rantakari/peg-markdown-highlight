@@ -1,3 +1,12 @@
+/* PEG Markdown Highlight
+ * Copyright 2011 Ali Rantakari -- http://hasseg.org
+ * Licensed under the GPL2+ and MIT licenses (see LICENSE for more info).
+ * 
+ * highlighter.cpp
+ * 
+ * Qt 4.7 example for highlighting a rich text widget.
+ */
+
 #include <QtGui>
 #include "highlighter.h"
 

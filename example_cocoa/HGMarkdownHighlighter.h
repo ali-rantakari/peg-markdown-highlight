@@ -1,3 +1,10 @@
+/* PEG Markdown Highlight
+ * Copyright 2011 Ali Rantakari -- http://hasseg.org
+ * Licensed under the GPL2+ and MIT licenses (see LICENSE for more info).
+ * 
+ * HGMarkdownHighlighter.h
+ */
+
 #import <Cocoa/Cocoa.h>
 #import "markdown_definitions.h"
 

@@ -1,10 +1,11 @@
-//
-//  MDHExampleAppDelegate.m
-//  MDHExample
-//
-//  Created by Ali Rantakari on 27.2.11.
-//  Copyright 2011 hasseg.org. All rights reserved.
-//
+/* PEG Markdown Highlight
+ * Copyright 2011 Ali Rantakari -- http://hasseg.org
+ * Licensed under the GPL2+ and MIT licenses (see LICENSE for more info).
+ * 
+ * MDHExampleAppDelegate.m
+ * 
+ * Cocoa example for highlighting a rich text widget.
+ */
 
 #import "MDHExampleAppDelegate.h"
 #import "HGMarkdownHighlightingStyle.h"
