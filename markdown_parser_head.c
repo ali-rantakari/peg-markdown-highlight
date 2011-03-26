@@ -453,7 +453,7 @@ element * mk_element(parser_data *p_data, element_type type, long pos, long end)
     p_data->head_elems[ALL] = result;
     result->allElemsNext = old_all_elements_head;
     
-	MKD_PRINTF("  mk_element: %s [%ld - %ld]\n", type_name(type), pos, end);
+	//MKD_PRINTF("  mk_element: %s [%ld - %ld]\n", type_name(type), pos, end);
 	
     return result;
 }
@@ -473,20 +473,25 @@ element * mk_etext(parser_data *p_data, char *string)
 Given an element where the offsets {pos, end} represent
 locations in the *parsed text* (defined by the linked list of RAW and
 EXTRA_TEXT elements in p_data->elem), fix these offsets to represent
-corresponding offsets in the original input (p_data->charbuf).
+corresponding offsets in the original input (p_data->charbuf). Also split
+the given element into multiple parts if its offsets span multiple
+p_data->elem elements. Return the (list of) elements with real offsets.
 */
-void fix_offsets(parser_data *p_data, element *elem)
+element *fix_offsets(parser_data *p_data, element *elem)
 {
 	if (elem->type == EXTRA_TEXT)
-		return;
+		return elem;
 	
-	bool have_new_pos = false;
-	bool have_new_end = false;
-	unsigned long new_pos = 0;
-	unsigned long new_end = 0;
+	element *new_head = mk_element(p_data, elem->type, elem->pos, elem->end);
+	element *tail = new_head;
+	element *prev = NULL;
 	
+	bool found_start = false;
+	bool found_end = false;
+	bool tail_needs_pos = false;
 	unsigned long previous_end = 0;
 	unsigned long c = 0;
+	
 	element *cursor = p_data->elem_head;
 	while (cursor != NULL)
 	{
@@ -494,67 +499,100 @@ void fix_offsets(parser_data *p_data, element *elem)
 						? strlen(cursor->text)
 						: cursor->end - cursor->pos;
 		
-		if (!have_new_pos && (c <= elem->pos && elem->pos <= c+thislen)) {
-			new_pos = (cursor->type == EXTRA_TEXT)
+		if (tail_needs_pos && cursor->type != EXTRA_TEXT) {
+			tail->pos = cursor->pos;
+			tail_needs_pos = false;
+		}
+		
+		unsigned int this_pos = cursor->pos;
+		
+		if (!found_start && (c <= elem->pos && elem->pos <= c+thislen)) {
+			tail->pos = (cursor->type == EXTRA_TEXT)
 						? previous_end
 						: cursor->pos + (elem->pos - c);
-			have_new_pos = true;
+			this_pos = tail->pos;
+			found_start = true;
 		}
 		
-		if (!have_new_end && (c <= elem->end && elem->end <= c+thislen)) {
-			new_end = (cursor->type == EXTRA_TEXT)
+		if (!found_end && (c <= elem->end && elem->end <= c+thislen)) {
+			tail->end = (cursor->type == EXTRA_TEXT)
 						? previous_end
 						: cursor->pos + (elem->end - c);
-			have_new_end = true;
+			found_end = true;
 		}
 		
-		if (have_new_pos && have_new_end)
+		if (found_start && found_end)
 			break;
 		
 		if (cursor->type != EXTRA_TEXT)
 			previous_end = cursor->end;
+		
+		if (found_start) {
+			element *new_elem = mk_element(p_data, tail->type, this_pos, cursor->end);
+			new_elem->next = tail;
+			if (prev != NULL)
+				prev->next = new_elem;
+			if (new_head == tail)
+				new_head = new_elem;
+			prev = new_elem;
+			tail_needs_pos = true;
+		}
+		
 		c += thislen;
 		cursor = cursor->next;
 	}
 	
-	elem->pos = new_pos;
-	elem->end = new_end;
+	return new_head;
 }
+
 
 
 /* Add an element to p_data->head_elems. */
 void add(parser_data *p_data, element *elem)
 {
+	if (elem->type != RAW_LIST)
+	{
+		MKD_PRINTF("  add: %s [%ld - %ld]\n", type_name(elem->type), elem->pos, elem->end);
+		elem = fix_offsets(p_data, elem);
+		MKD_PRINTF("     : %s [%ld - %ld]\n", type_name(elem->type), elem->pos, elem->end);
+	}
+	else
+	{
+		MKD_PRINTF("  add: RAW_LIST ");
+		element *cursor = elem->children;
+		element *previous = NULL;
+		while (cursor != NULL)
+		{
+			element *next = cursor->next;
+			MKD_PRINTF("(%ld-%ld)>", cursor->pos, cursor->end);
+			element *new_cursor = fix_offsets(p_data, cursor);
+			if (previous != NULL)
+				previous->next = new_cursor;
+			else
+				elem->children = new_cursor;
+			MKD_PRINTF("(%ld-%ld)", new_cursor->pos, new_cursor->end);
+			while (new_cursor->next != NULL) {
+				new_cursor = new_cursor->next;
+				MKD_PRINTF("(%ld-%ld)", new_cursor->pos, new_cursor->end);
+			}
+			MKD_PRINTF(" ");
+			if (next != NULL)
+				new_cursor->next = next;
+			previous = new_cursor;
+			cursor = next;
+		}
+		MKD_PRINTF("\n");
+	}
+	
 	if (p_data->head_elems[elem->type] == NULL)
 		p_data->head_elems[elem->type] = elem;
 	else
 	{
-		elem->next = p_data->head_elems[elem->type];
+		element *last = elem;
+		while (last->next != NULL)
+			last = last->next;
+		last->next = p_data->head_elems[elem->type];
 		p_data->head_elems[elem->type] = elem;
-	}
-	
-	/*
-	TODO: split into parts instead of just fixing offsets
-	(so that the color span would be disjoint just as the
-	text in the input is, like:)
-	> text HIGHLIGHTING
-	> CONTINUES text
-	*/
-	if (elem->type != RAW_LIST) {
-		MKD_PRINTF("  add: %s [%ld - %ld]\n", type_name(elem->type), elem->pos, elem->end);
-		fix_offsets(p_data, elem);
-		MKD_PRINTF("     : %s [%ld - %ld]\n", type_name(elem->type), elem->pos, elem->end);
-	}
-	else {
-		MKD_PRINTF("  add: RAW_LIST ");
-		element *cursor = elem->children;
-		while (cursor != NULL) {
-			MKD_PRINTF("(%ld-%ld)>", cursor->pos, cursor->end);
-			fix_offsets(p_data, cursor);
-			MKD_PRINTF("(%ld-%ld) ", cursor->pos, cursor->end);
-			cursor = cursor->next;
-		}
-		MKD_PRINTF("\n");
 	}
 }
 
