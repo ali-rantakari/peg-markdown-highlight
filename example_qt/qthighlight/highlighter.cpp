@@ -35,6 +35,7 @@ HGMarkdownHighlighter::HGMarkdownHighlighter(QTextDocument *parent,
     cached_elements = NULL;
     waitInterval = aWaitInterval;
     timer = new QTimer(this);
+    timer->setSingleShot(true);
     timer->setInterval(aWaitInterval);
     connect(timer, SIGNAL(timeout()), this, SLOT(timerTimeout()));
     document = parent;
