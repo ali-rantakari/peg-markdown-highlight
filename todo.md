@@ -16,11 +16,12 @@
 
 ### Nice to have
 
-- GTK+ or Qt example of highlighting a rich text widget
-- Reduce memory usage (profile with valgrind)
 - .NET (C#) example of highlighting a `RichTextBox`
     - Need to create a wrapper assembly for the parser
+- Reduce memory usage (profile with valgrind)
 - Handle cases where memory could not be allocated (`malloc` etc. return `NULL`)
+- Use same type for offsets in greg-generated parser code and additional
+  parser code (now they're `int` and `unsigned long`).
 
 
 ### Maybe (or then maybe not):
