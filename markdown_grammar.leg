@@ -42,10 +42,8 @@ Block =     BlankLine*
             | Plain )
 
 Para =      NonindentSpace Inlines BlankLine+
-           
 
 Plain =     Inlines
-           
 
 AtxInline = !Newline !(Sp? '#'* Sp Newline) Inline
 
@@ -92,7 +90,6 @@ NonblankIndentedLine = !BlankLine IndentedLine
 
 VerbatimChunk = ( BlankLine )*
                 ( NonblankIndentedLine )+
-               
 
 Verbatim =     < s:LocMarker
 				 ( VerbatimChunk )+ >
@@ -109,7 +106,6 @@ Bullet = !HorizontalRule NonindentSpace < ('+' | '*' | '-') > Spacechar+
          { ADD(elem(LIST_BULLET)); }
 
 BulletList = &Bullet (ListTight | ListLoose)
-            
 
 ListTight = a:StartList
             ( ListItemTight
@@ -147,8 +143,7 @@ ListItem =  ( Bullet | Enumerator )
             a:StartList
             ListBlock { a = cons($$, a); }
             ( ListContinuationBlock { a = cons($$, a); } )*
-            { $$ = a;
-            }
+            { $$ = a; }
 
 ListItemTight =
             ( Bullet | Enumerator )
@@ -178,7 +173,6 @@ Enumerator = NonindentSpace < [0-9]+ '.' > Spacechar+
              { ADD(elem(LIST_ENUMERATOR)); }
 
 OrderedList = &Enumerator (ListTight | ListLoose)
-             
 
 ListBlockLine = !BlankLine
                 !( Indent? (Bullet | Enumerator) )
@@ -381,7 +375,6 @@ StyleBlock =    InStyleTags
 
 Inlines  =  ( !Endline Inline
               | Endline &Inline )+ Endline?
-           
 
 Inline  = Str
         | Endline
@@ -403,13 +396,10 @@ Inline  = Str
 Space = Spacechar+
 
 Str = NormalChar (NormalChar | '_'+ &Alphanumeric)*
-       
 
 EscapedChar =   '\\' !Newline [-\\`|*[\]()#+.!><]
-               
 
 Entity =    ( HexEntity | DecEntity | CharEntity )
-           
 
 Endline =   LineBreak | TerminalEndline | NormalEndline
 
@@ -417,13 +407,10 @@ NormalEndline =   Sp Newline !BlankLine !'>' !AtxStart
                   !(Line ("===" '='* | "---" '-'*) Newline)
 
 TerminalEndline = Sp Newline Eof
-                 
 
 LineBreak = "  " NormalEndline
-           
 
 Symbol =    SpecialChar
-           
 
 # This keeps the parser from getting bogged down on long strings of '*' or '_',
 # or strings of '*' or '_' with space on each side:
@@ -440,7 +427,6 @@ EmphStar =  s:OneStarOpen
             ( !OneStarClose Inline )*
             OneStarClose
             { ADD(elem_s(EMPH)); }
-           
 
 OneUlOpen  =  !UlLine < '_' > !Spacechar !Newline { $$ = elem(NO_TYPE); }
 OneUlClose =  !Spacechar !Newline Inline !StrongUl < '_' > !Alphanumeric { $$ = elem(NO_TYPE); }
@@ -486,12 +472,10 @@ ExplicitLink =  < s:Label Spnl '(' Sp Source Spnl Title Sp ')' >
 				{ $$ = elem_s(LINK); }
 
 Source  = ( '<' SourceContents '>' | SourceContents )
-         
 
 SourceContents = ( ( !'(' !')' !'>' Nonspacechar )+ | '(' SourceContents ')')*
 
 Title = ( TitleSingle | TitleDouble | "" )
-       
 
 TitleSingle = '\'' ( !( '\'' Sp ( ')' | Newline ) ) . )* '\''
 
@@ -514,12 +498,10 @@ Label = < s:LocMarker
         ( !']' Inline )*
         ']' >
         { $$ = elem_s(NO_TYPE); }
-       
 
 RefSrc = Nonspacechar+
 
 RefTitle =  ( RefTitleSingle | RefTitleDouble | RefTitleParens | EmptyTitle )
-           
 
 EmptyTitle = ""
 
@@ -531,7 +513,6 @@ RefTitleParens = '(' ( !(')' Sp Newline | Newline) . )* ')'
 
 # Not used anywhere in grammar:
 #References = ( Reference | SkipBlock )*
-            
 
 Ticks1 = < "`" > !'`' { $$ = elem(NO_TYPE); }
 Ticks2 = < "``" > !'`' { $$ = elem(NO_TYPE); }
@@ -602,18 +583,14 @@ Smart = &{ EXT(EXT_SMART) }
         ( Ellipsis | Dash | SingleQuoted | DoubleQuoted | Apostrophe )
 
 Apostrophe = '\''
-            
 
 Ellipsis = ("..." | ". . .")
-          
 
 Dash = EmDash | EnDash
 
 EnDash = '-' &Digit
-        
 
 EmDash = ("---" | "--")
-        
 
 SingleQuoteStart = '\'' ![)!\],.;:-? \t\n] !( ( "s" | "t" | "m" | "ve" | "ll" | "re" ) !Alphanumeric )
 
@@ -622,7 +599,6 @@ SingleQuoteEnd = '\'' !Alphanumeric
 SingleQuoted = SingleQuoteStart
                ( !SingleQuoteEnd Inline )+
                SingleQuoteEnd
-              
 
 DoubleQuoteStart = '"'
 
@@ -631,13 +607,11 @@ DoubleQuoteEnd = '"'
 DoubleQuoted =  DoubleQuoteStart
                 ( !DoubleQuoteEnd Inline )+
                 DoubleQuoteEnd
-               
 
 NoteReference = &{ EXT(EXT_NOTES) }
                 RawNoteReference
 
 RawNoteReference = "[^" ( !Newline !']' . )+ ']'
-                  
 
 Note =          &{ EXT(EXT_NOTES) }
                 NonindentSpace RawNoteReference ':' Sp
@@ -651,7 +625,6 @@ InlineNote =    &{ EXT(EXT_NOTES) }
 
 # Not used anywhere in grammar:
 #Notes =         ( Note | SkipBlock )*
-               
 
 RawNoteBlock =  ( !BlankLine OptionallyIndentedLine )+
                 ( BlankLine* )
