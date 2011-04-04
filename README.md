@@ -11,14 +11,20 @@ This project contains:
 - A Markdown parser for syntax highlighting, written in C. The parser itself
   should compile as is on OS X, Linux and Windows (at least).
 - Helper classes for syntax highlighting `NSTextView`s in Cocoa applications.
-- Simple example on how to highlight a `GtkTextView` in a GTK+ application.
+- A simple example on how to highlight a `GtkTextView` in a GTK+ application.
+- A simple example on how to highlight a `QTextEdit` in a Qt application.
 
 _Copyright 2011 Ali Rantakari_ -- <http://hasseg.org>
 
 This program uses the PEG grammar from John McFarlane's `peg-markdown` project,
-and the `greg` parser generator by Amos Wenger and \_why (`greg` is heavily
-based on `peg/leg` by Ian Piumarta). Thanks to these gentlemen (and everyone
-who contributed to their projects) for making this one possible.
+and the `greg` parser generator by Why The Lucky Stiff and Amos Wenger (`greg`
+is heavily based on `peg/leg` by Ian Piumarta). It also contains an
+implementation of the merge sort algorithm for linked lists by Simon Tatham.
+
+Thanks to these gentlemen (and everyone who contributed to their projects) for
+making this one possible.
+
+_See the `LICENSE` file for licensing information._
 
 
 
