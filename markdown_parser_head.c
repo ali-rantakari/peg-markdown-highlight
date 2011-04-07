@@ -480,7 +480,7 @@ p_data->elem elements. Return the (list of) elements with real offsets.
 element *fix_offsets(parser_data *p_data, element *elem)
 {
 	if (elem->type == EXTRA_TEXT)
-		return elem;
+		return mk_etext(p_data, elem->text);
 	
 	element *new_head = mk_element(p_data, elem->type, elem->pos, elem->end);
 	element *tail = new_head;
@@ -554,7 +554,7 @@ void add(parser_data *p_data, element *elem)
 	{
 		MKD_PRINTF("  add: %s [%ld - %ld]\n", type_name(elem->type), elem->pos, elem->end);
 		elem = fix_offsets(p_data, elem);
-		MKD_PRINTF("     : %s [%ld - %ld]\n", type_name(elem->type), elem->pos, elem->end);
+		MKD_PRINTF("     > %s [%ld - %ld]\n", type_name(elem->type), elem->pos, elem->end);
 	}
 	else
 	{
