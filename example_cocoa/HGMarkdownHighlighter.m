@@ -270,6 +270,10 @@
 		[self.targetTextView setTypingAttributes:self.defaultTypingAttributes];
 }
 
+- (void) clearHighlighting
+{
+	[self clearHighlightingForRange:NSMakeRange(0, [[self.targetTextView textStorage] length])];
+}
 
 
 - (void) cacheElementList:(element **)list

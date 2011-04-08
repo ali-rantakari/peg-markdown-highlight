@@ -101,6 +101,8 @@
 /** \brief Manually invoke highlighting (without parsing) of the NSTextView contents. */
 - (void) highlightNow;
 
+- (void) clearHighlighting;
+
 /** \brief Begin tracking changes in the NSTextView.
  * 
  * Begin listening for scroll events in the NSTextView's enclosing
