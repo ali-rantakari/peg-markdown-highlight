@@ -130,6 +130,8 @@
 	 name:NSThreadWillExitNotification
 	 object:self.workerThread];
 	self.workerThread = nil;
+	if (currentHighlightText != NULL)
+		free(currentHighlightText);
 	currentHighlightText = NULL;
 	if (workerThreadResultsInvalid)
 		[self
