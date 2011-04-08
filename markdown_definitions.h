@@ -96,9 +96,7 @@ typedef struct Element element;
 enum markdown_extensions
 {
     EXT_SMART            = 0x01, /**< Smart quotes, dashes, and ellipses */
-    EXT_NOTES            = 0x02, /**< A footnote syntax like that of Pandoc or PHP Markdown Extra */
-    EXT_FILTER_HTML      = 0x04, /**< Filter HTML */
-    EXT_FILTER_STYLES    = 0x08  /**< Filter styles */
+    EXT_NOTES            = 0x02  /**< A footnote syntax like that of Pandoc or PHP Markdown Extra */
 };
 
 
