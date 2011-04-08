@@ -30,7 +30,7 @@ markdown_parser.c : markdown_parser_core.c markdown_parser_head.c markdown_parse
 	@echo '------- combining parser code'
 	./tools/combine_parser_files.sh > $@
 
-markdown_parser.o : markdown_parser.c
+markdown_parser.o : markdown_parser.c markdown_parser.h markdown_definitions.h
 	@echo '------- building markdown_parser.o'
 	$(CC) $(CFLAGS) -c -o $@ $<
 
@@ -38,7 +38,7 @@ ANSIEscapeHelper.o : ANSIEscapeHelper.m ANSIEscapeHelper.h
 	@echo '------- building ANSIEscapeHelper.o'
 	clang -Wall -O3 -c -o $@ $<
 
-$(TESTER) : tester.m markdown_parser.o markdown_parser.h ANSIEscapeHelper.o ANSIEscapeHelper.h
+$(TESTER) : tester.m markdown_parser.o ANSIEscapeHelper.o ANSIEscapeHelper.h
 	@echo '------- building tester'
 	clang $(CFLAGS) $(OBJC_CFLAGS) -o $@ markdown_parser.o ANSIEscapeHelper.o $<
 
@@ -46,15 +46,15 @@ $(TEST_CLIENT) : testclient.m ANSIEscapeHelper.o ANSIEscapeHelper.h
 	@echo '------- building testclient'
 	clang $(CFLAGS) $(OBJC_CFLAGS) -o $@ ANSIEscapeHelper.o $<
 
-$(HIGHLIGHTER) : highlighter.c markdown_parser.o markdown_parser.h
+$(HIGHLIGHTER) : highlighter.c markdown_parser.o
 	@echo '------- building highlighter'
 	$(CC) $(CFLAGS) -o $@ markdown_parser.o $<
 
-$(MULTITHREAD_TESTER) : multithread_tester.c markdown_parser.o markdown_parser.h
+$(MULTITHREAD_TESTER) : multithread_tester.c markdown_parser.o
 	@echo '------- building multithread_tester'
 	$(CC) $(CFLAGS) -o $@ markdown_parser.o $<
 
-$(BENCH) : bench.c markdown_parser.o markdown_parser.h
+$(BENCH) : bench.c markdown_parser.o
 	@echo '------- building bench'
 	$(CC) $(CFLAGS) -o $@ markdown_parser.o $<
 
