@@ -16,6 +16,8 @@
 @property(retain) NSThread *workerThread;
 @property(retain) NSDictionary *defaultTypingAttributes;
 
+- (NSFontTraitMask) getClearFontTraitMask:(NSFontTraitMask)currentFontTraitMask;
+
 @end
 
 
@@ -62,6 +64,14 @@
 	if (!(self = [self init]))
 		return nil;
 	self.targetTextView = textView;
+	
+	clearFontTraitMask = [self getClearFontTraitMask:[[NSFontManager sharedFontManager] traitsOfFont:[self.targetTextView font]]];
+	self.defaultTextColor = [self.targetTextView textColor];
+	self.defaultTypingAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
+									[self.targetTextView backgroundColor], NSBackgroundColorAttributeName,
+									[self.targetTextView textColor], NSForegroundColorAttributeName,
+									[self.targetTextView font], NSFontAttributeName,
+									nil];
 	return self;
 }
 
@@ -378,14 +388,6 @@
 	
 	if (self.styles == nil)
 		self.styles = [self getDefaultStyles];
-	
-	clearFontTraitMask = [self getClearFontTraitMask:[[NSFontManager sharedFontManager] traitsOfFont:[self.targetTextView font]]];
-	self.defaultTextColor = [self.targetTextView textColor];
-	self.defaultTypingAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
-									[self.targetTextView backgroundColor], NSBackgroundColorAttributeName,
-									[self.targetTextView textColor], NSForegroundColorAttributeName,
-									[self.targetTextView font], NSFontAttributeName,
-									nil];
 	
 	[self requestParsing];
 	
