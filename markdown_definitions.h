@@ -80,13 +80,13 @@ typedef enum
 */
 struct Element
 {
-    element_type type;            /**< type of element */
-    unsigned long pos;            /**< start offset in input */
-    unsigned long end;            /**< end offset in input */
-    struct Element *next;         /**< next element in list */
-    struct Element *allElemsNext; /**< next element in list of all elements */
-    char *text;                   /**< text content (relevant only for elements of type EXTRA_TEXT) */
-    struct Element *children;     /**< children of element (relevant only for elements of type RAW_LIST) */
+    element_type type;            /**< \brief type of element */
+    unsigned long pos;            /**< \brief start offset in input */
+    unsigned long end;            /**< \brief end offset in input */
+    struct Element *next;         /**< \brief next element in list */
+    struct Element *allElemsNext; /**< \brief next element in list of all elements */
+    char *text;                   /**< \brief text content (relevant only for elements of type EXTRA_TEXT) */
+    struct Element *children;     /**< \brief children of element (relevant only for elements of type RAW_LIST) */
 };
 typedef struct Element element;
 
