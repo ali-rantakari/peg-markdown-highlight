@@ -12,7 +12,7 @@ GREGDIR=greg
 GREG=$(GREGDIR)/greg
 
 ifdef DEBUG
-	CFLAGS += -g
+	CFLAGS += -g -O0
 endif
 ifdef DEBUGOUT
 	CFLAGS += -DMKD_DEBUG_OUTPUT=1
