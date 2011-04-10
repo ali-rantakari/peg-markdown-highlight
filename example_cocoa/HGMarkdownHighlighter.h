@@ -75,6 +75,8 @@
  * 
  * Whether to reset the typing attributes of the NSTextView to
  * its default styles after each time highlighting is performed.
+ * 
+ * This feature depends on the values stored by readClearTextStylesFromTextView().
  */
 @property BOOL resetTypingAttributes;
 
@@ -112,6 +114,10 @@
 /** \brief Manually invoke highlighting (without parsing) of the NSTextView contents. */
 - (void) highlightNow;
 
+/** \brief Clear highlighting from the NSTextView.
+ * 
+ * This method depends on the values stored by readClearTextStylesFromTextView().
+ */
 - (void) clearHighlighting;
 
 /** \brief Begin tracking changes in the NSTextView.
