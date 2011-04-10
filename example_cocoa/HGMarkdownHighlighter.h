@@ -94,6 +94,17 @@
 /** \brief Init new instance while setting targetTextView, waitInterval and styles. */
 - (id) initWithTextView:(NSTextView *)textView waitInterval:(NSTimeInterval)interval styles:(NSArray *)inStyles;
 
+/** \brief Read and store the representation of "clear" text
+ *         from the current state of the NSTextView.
+ * 
+ * Use this method to tell this highlighter what "clear" formatting
+ * should look like. The values stored by this method are used by
+ * clearHighlighting().
+ * 
+ * Note that if you provide the target NSTextView in the init method
+ * call, this method will be called automatically at that time.
+ */
+- (void) readClearTextStylesFromTextView;
 
 /** \brief Manually invoke parsing and highlighting of the NSTextView contents. */
 - (void) parseAndHighlightNow;

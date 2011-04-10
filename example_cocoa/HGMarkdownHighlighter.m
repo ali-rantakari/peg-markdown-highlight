@@ -64,14 +64,7 @@
 	if (!(self = [self init]))
 		return nil;
 	self.targetTextView = textView;
-	
-	clearFontTraitMask = [self getClearFontTraitMask:[[NSFontManager sharedFontManager] traitsOfFont:[self.targetTextView font]]];
-	self.defaultTextColor = [self.targetTextView textColor];
-	self.defaultTypingAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
-									[self.targetTextView backgroundColor], NSBackgroundColorAttributeName,
-									[self.targetTextView textColor], NSForegroundColorAttributeName,
-									[self.targetTextView font], NSFontAttributeName,
-									nil];
+	[self readClearTextStylesFromTextView];
 	return self;
 }
 
@@ -215,6 +208,19 @@
 		[textStorage addAttribute:NSForegroundColorAttributeName value:self.defaultTextColor range:range];
 	else
 		[textStorage removeAttribute:NSForegroundColorAttributeName range:range];
+}
+
+- (void) readClearTextStylesFromTextView
+{
+	clearFontTraitMask = [self getClearFontTraitMask:
+						  [[NSFontManager sharedFontManager]
+						   traitsOfFont:[self.targetTextView font]]];
+	self.defaultTextColor = [self.targetTextView textColor];
+	self.defaultTypingAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
+									[self.targetTextView backgroundColor], NSBackgroundColorAttributeName,
+									[self.targetTextView textColor], NSForegroundColorAttributeName,
+									[self.targetTextView font], NSFontAttributeName,
+									nil];
 }
 
 - (void) applyHighlighting:(element **)elements withRange:(NSRange)range
