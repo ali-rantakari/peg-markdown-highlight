@@ -505,11 +505,11 @@ RefTitle =  ( RefTitleSingle | RefTitleDouble | RefTitleParens | EmptyTitle )
 
 EmptyTitle = ""
 
-RefTitleSingle = '\'' ( !( '\'' Sp Newline | Newline ) . )* '\''
+RefTitleSingle = '\'' ( !('\'' | '\'' Sp Newline | Newline ) . )* '\''
 
-RefTitleDouble = '"' ( !('"' Sp Newline | Newline) . )* '"'
+RefTitleDouble = '"' ( !('"' | '"' Sp Newline | Newline) . )* '"'
 
-RefTitleParens = '(' ( !(')' Sp Newline | Newline) . )* ')'
+RefTitleParens = '(' ( !(')' | ')' Sp Newline | Newline) . )* ')'
 
 # Not used anywhere in grammar:
 #References = ( Reference | SkipBlock )*
