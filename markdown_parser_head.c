@@ -634,9 +634,10 @@ void yy_input_func(char *buf, int *result, int max_size, parser_data *p_data)
     			yyc = EOF;
     			p_data->elem = p_data->elem->next;
 				MKD_PRINTF("\e[41m \e[0m");
-				if (p_data->elem != NULL) p_data->offset = p_data->elem->pos;
+				if (p_data->elem != NULL)
+					p_data->offset = p_data->elem->pos;
     		}
-    		(*result) = (EOF == yyc) ? 0 :(*(buf) = yyc, 1);
+    		(*result) = (EOF == yyc) ? 0 : (*(buf) = yyc, 1);
     	} else {
     		*(buf) = *(p_data->charbuf + p_data->offset);
    			(*result) = (*buf != '\0');
@@ -646,7 +647,8 @@ void yy_input_func(char *buf, int *result, int max_size, parser_data *p_data)
 			if (p_data->offset >= p_data->elem->end) {
 				p_data->elem = p_data->elem->next;
 				MKD_PRINTF("\e[41m \e[0m");
-				if (p_data->elem != NULL) p_data->offset = p_data->elem->pos;
+				if (p_data->elem != NULL)
+					p_data->offset = p_data->elem->pos;
 			}
 		}
 	}
