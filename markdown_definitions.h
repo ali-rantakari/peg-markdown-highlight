@@ -27,7 +27,8 @@ typedef enum
 	AUTO_LINK_EMAIL,	/**< Automatic email link */
 	IMAGE,				/**< Image definition */
 	CODE,				/**< Code */
-	HTML,				/**< .. */
+	HTML,				/**< HTML */
+	HTML_ENTITY,		/**< HTML special entity definition */
 	EMPH,				/**< Emphasized text */
 	STRONG,				/**< Strong text */
 	LIST_BULLET,		/**< Bullet for a list item */
@@ -67,7 +68,7 @@ typedef enum
 * \brief Number of types in element_type.
 * \sa element_type
 */
-#define NUM_TYPES 29
+#define NUM_TYPES 30
 
 /**
 * \brief Number of *language element* types in element_type.

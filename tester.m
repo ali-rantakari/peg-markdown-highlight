@@ -36,9 +36,10 @@ void apply_highlighting(NSMutableAttributedString *attrStr, element *elem[])
 		HRULE,
 		REFERENCE,
 		NOTE,
+		HTML_ENTITY,
 		BLOCKQUOTE,
 	};
-	int order_len = 23;
+	int order_len = 24;
 	
 	int i;
 	for (i = 0; i < order_len; i++)
@@ -69,6 +70,7 @@ void apply_highlighting(NSMutableAttributedString *attrStr, element *elem[])
 				case COMMENT:	fgColor = [NSColor blackColor]; break;
 				case CODE:
 				case VERBATIM:	fgColor = [NSColor greenColor]; break;
+				case HTML_ENTITY:
 				case HRULE:		fgColor = [NSColor cyanColor]; break;
 				case REFERENCE:	fgColor = [NSColor colorWithCalibratedHue:0.67 saturation:0.5 brightness:1.0 alpha:1.0]; break;
 				case LIST_ENUMERATOR:

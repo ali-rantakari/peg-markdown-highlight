@@ -399,7 +399,9 @@ Str = NormalChar (NormalChar | '_'+ &Alphanumeric)*
 
 EscapedChar =   '\\' !Newline [-\\`|*_{}[\]()#+.!><]
 
-Entity =    ( HexEntity | DecEntity | CharEntity )
+Entity =    < s:LocMarker
+			( HexEntity | DecEntity | CharEntity ) >
+            { ADD(elem_s(HTML_ENTITY)); }
 
 Endline =   LineBreak | TerminalEndline | NormalEndline
 
