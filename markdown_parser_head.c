@@ -251,7 +251,7 @@ void markdown_to_elements(char *text, int extensions, element **out_result[])
 	element *parsing_elem = (element *)malloc(sizeof(element));
 	parsing_elem->type = RAW;
 	parsing_elem->pos = 0;
-	parsing_elem->end = text_copy_len-1;
+	parsing_elem->end = text_copy_len;
 	parsing_elem->next = NULL;
 	
     parser_data *p_data = mk_parser_data(text_copy, parsing_elem, 0, extensions, NULL);
