@@ -14,14 +14,14 @@
 
 
 #define READ_BUFFER_LEN 1024
-char *utf8_from_stdin()
+char *get_contents(FILE *f)
 {
 	char buffer[READ_BUFFER_LEN];
 	size_t content_len = 1;
 	char *content = malloc(sizeof(char) * READ_BUFFER_LEN);
 	content[0] = '\0';
 	
-	while (fgets(buffer, READ_BUFFER_LEN, stdin))
+	while (fgets(buffer, READ_BUFFER_LEN, f))
 	{
 		content_len += strlen(buffer);
 		content = realloc(content, content_len);
@@ -66,7 +66,10 @@ int main(int argc, char * argv[])
 	int extensions = 0;
 	element **result;
 	
-	char *md_source = utf8_from_stdin();
+	FILE *file = stdin;
+	if (argc > 1)
+		file = fopen(argv[1], "r");
+	char *md_source = get_contents(file);
 	markdown_to_elements(md_source, extensions, &result);
 	sort_elements_by_pos(result);
 	output_result(result);
