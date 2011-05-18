@@ -397,7 +397,7 @@ Space = Spacechar+
 
 Str = NormalChar (NormalChar | '_'+ &Alphanumeric)*
 
-EscapedChar =   '\\' !Newline [-\\`|*[\]()#+.!><]
+EscapedChar =   '\\' !Newline [-\\`|*_{}[\]()#+.!><]
 
 Entity =    ( HexEntity | DecEntity | CharEntity )
 
