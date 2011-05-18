@@ -543,7 +543,7 @@ Nonspacechar =  !Spacechar !Newline .
 Newline =       '\n' | '\r' '\n'?
 Sp =            Spacechar*
 Spnl =          Sp (Newline Sp)?
-SpecialChar =   '*' | '_' | '`' | '&' | '[' | ']' | '<' | '!' | '#' | '\\' | ExtendedSpecialChar
+SpecialChar =   '*' | '_' | '`' | '&' | '[' | ']' | '(' | ')' | '<' | '!' | '#' | '\\' | ExtendedSpecialChar
 NormalChar =    !( SpecialChar | Spacechar | Newline ) .
 # Not used anywhere in grammar:
 #NonAlphanumeric = [\000-\057\072-\100\133-\140\173-\177]
