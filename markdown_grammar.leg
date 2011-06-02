@@ -5,7 +5,7 @@
  * 
  * markdown_grammar.leg
  * 
- * This is a slightly adapted version of the PEG grammar from John McFarlane's
+ * This is a slightly adapted version of the PEG grammar from John MacFarlane's
  * peg-markdown compiler.
  */
 
