@@ -1,6 +1,11 @@
 
 ### Primary stuff:
 
+- Investigate using temporary attributes
+	- In which way are they temporary? When are they removed?
+- When copying to clipboard, remove highlights if possible (make this an option?)
+- When an edit event comes to the highlighter, **don't do the timer if there
+  is a parser running at the moment**, but act on the changes immediately
 - Smarter matching:
     - Match whole blockquote area separately from blockquote indicator
     - Match actual content separately from syntax characters
@@ -21,7 +26,6 @@
 
 - Option to remove whitespace after newlines for inline elements
 - Reduce memory usage (profile with valgrind)
-- Handle cases where memory could not be allocated (`malloc` etc. return `NULL`)
 - .NET (C#) example of highlighting a `RichTextBox`
     - Need to create a wrapper assembly for the parser
 
