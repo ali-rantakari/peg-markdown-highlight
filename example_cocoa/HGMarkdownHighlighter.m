@@ -7,6 +7,7 @@
 
 #import "HGMarkdownHighlighter.h"
 #import "HGMarkdownHighlightingStyle.h"
+#import "markdown_parser.h"
 
 // 'private members' category
 @interface HGMarkdownHighlighter()
