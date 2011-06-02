@@ -16,7 +16,7 @@ This project contains:
 
 _Copyright 2011 Ali Rantakari_ -- <http://hasseg.org>
 
-This program uses the PEG grammar from John McFarlane's `peg-markdown` project,
+This program uses the PEG grammar from John MacFarlane's `peg-markdown` project,
 and the `greg` parser generator by Why The Lucky Stiff and Amos Wenger (`greg`
 is heavily based on `peg/leg` by Ian Piumarta). It also contains an
 implementation of the merge sort algorithm for linked lists by Simon Tatham.
