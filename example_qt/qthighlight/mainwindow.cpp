@@ -45,7 +45,7 @@ void MainWindow::setupEditor()
     QFont font;
     font.setFamily("Courier");
     font.setFixedPitch(true);
-    font.setPointSize(10);
+    font.setPointSize(14);
 
     editor = new QTextEdit;
     editor->setFont(font);
