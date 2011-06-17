@@ -492,7 +492,7 @@ AutoLinkEmail = < s:LocMarker '<' [-A-Za-z0-9+_.]+ '@' ( !Newline !'>' . )+ '>' 
                 { ADD(elem_s(AUTO_LINK_EMAIL)); }
 
 Reference = < s:LocMarker
-			  NonindentSpace !"[]" Label ':' Spnl RefSrc Spnl RefTitle > BlankLine*
+			  NonindentSpace !"[]" Label ':' Spnl RefSrc RefTitle > BlankLine+
 			  { ADD(elem_s(REFERENCE)); }
 
 Label = < s:LocMarker
@@ -507,11 +507,11 @@ RefTitle =  ( RefTitleSingle | RefTitleDouble | RefTitleParens | EmptyTitle )
 
 EmptyTitle = ""
 
-RefTitleSingle = '\'' ( !('\'' Sp Newline | Newline ) . )* '\''
+RefTitleSingle = Spnl '\'' ( !('\'' Sp Newline | Newline ) . )* '\''
 
-RefTitleDouble = '"' ( !('"' Sp Newline | Newline) . )* '"'
+RefTitleDouble = Spnl '"' ( !('"' Sp Newline | Newline) . )* '"'
 
-RefTitleParens = '(' ( !(')' Sp Newline | Newline) . )* ')'
+RefTitleParens = Spnl '(' ( !(')' Sp Newline | Newline) . )* ')'
 
 # Not used anywhere in grammar:
 #References = ( Reference | SkipBlock )*
