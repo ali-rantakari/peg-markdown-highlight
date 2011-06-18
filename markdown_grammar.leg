@@ -11,13 +11,13 @@
 
 /// header_code_here
 
-#define elem(x)		mk_element((parser_data *)G->data, x, thunk->begin, thunk->end)
-#define elem_s(x)	mk_element((parser_data *)G->data, x, s->pos, thunk->end)
-#define mk_sep		mk_element((parser_data *)G->data, SEPARATOR, 0,0)
-#define mk_notype	mk_element((parser_data *)G->data, NO_TYPE, 0,0)
-#define etext(x)	mk_etext((parser_data *)G->data, x)
-#define ADD(x)		add((parser_data *)G->data, x)
-#define EXT(x)		extension((parser_data *)G->data, x)
+#define elem(x)     mk_element((parser_data *)G->data, x, thunk->begin, thunk->end)
+#define elem_s(x)   mk_element((parser_data *)G->data, x, s->pos, thunk->end)
+#define mk_sep      mk_element((parser_data *)G->data, SEPARATOR, 0,0)
+#define mk_notype   mk_element((parser_data *)G->data, NO_TYPE, 0,0)
+#define etext(x)    mk_etext((parser_data *)G->data, x)
+#define ADD(x)      add((parser_data *)G->data, x)
+#define EXT(x)      extension((parser_data *)G->data, x)
 #define REF_EXISTS(x) reference_exists((parser_data *)G->data, x)
 #define PARSING_REFERENCES ((parser_data *)G->data)->parsing_only_references
 #define FREE_LABEL_TEXT(l) { free(l->label); l->label = NULL; }
@@ -51,7 +51,7 @@ Plain =     Inlines
 AtxInline = !Newline !(Sp? '#'* Sp Newline) Inline
 
 AtxStart =  < ( "######" | "#####" | "####" | "###" | "##" | "#" ) >
-			{ $$ = elem((element_type)(H1 + (strlen(yytext) - 1))); }
+            { $$ = elem((element_type)(H1 + (strlen(yytext) - 1))); }
 
 AtxHeading = < s:AtxStart Sp? ( AtxInline )+ (Sp? '#'* Sp)? Newline >
             { ADD(elem_s(s->type)); }
@@ -66,13 +66,13 @@ SetextHeading1 =  &(RawLine SetextBottom1)
                   s:LocMarker
                   < ( !Endline Inline )+ Sp? Newline
                   SetextBottom1 >
-	              { ADD(elem_s(H1)); }
+                  { ADD(elem_s(H1)); }
 
 SetextHeading2 =  &(RawLine SetextBottom2)
                   s:LocMarker
                   < ( !Endline Inline )+ Sp? Newline
                   SetextBottom2 >
-	              { ADD(elem_s(H2)); }
+                  { ADD(elem_s(H2)); }
 
 Heading = SetextHeading | AtxHeading
 
@@ -95,7 +95,7 @@ VerbatimChunk = ( BlankLine )*
                 ( NonblankIndentedLine )+
 
 Verbatim =     < s:LocMarker
-				 ( VerbatimChunk )+ >
+                 ( VerbatimChunk )+ >
                  { ADD(elem_s(VERBATIM)); }
 
 HorizontalRule = < NonindentSpace
@@ -119,10 +119,10 @@ ListTight = a:StartList
             BlankLine* !(Bullet | Enumerator)
             { element *cur = a;
               while (cur != NULL) {
-				  element *rawlist = mk_element((parser_data *)G->data, RAW_LIST, 0,0);
-				  rawlist->children = reverse(cur->children);
-				  ADD(rawlist);
-				  cur = cur->next;
+                  element *rawlist = mk_element((parser_data *)G->data, RAW_LIST, 0,0);
+                  rawlist->children = reverse(cur->children);
+                  ADD(rawlist);
+                  cur = cur->next;
               }
             }
 
@@ -135,10 +135,10 @@ ListLoose = a:StartList
               } )+
             { element *cur = a;
               while (cur != NULL) {
-				  element *rawlist = mk_element((parser_data *)G->data, RAW_LIST, 0,0);
-				  rawlist->children = reverse(cur->children);
-				  ADD(rawlist);
-				  cur = cur->next;
+                  element *rawlist = mk_element((parser_data *)G->data, RAW_LIST, 0,0);
+                  rawlist->children = reverse(cur->children);
+                  ADD(rawlist);
+                  cur = cur->next;
               }
             }
 
@@ -165,12 +165,12 @@ ListBlock = a:StartList
 ListContinuationBlock = a:StartList
                         ( < BlankLine* >
                           { if (*yytext == '\0') /* if strlen(yytext) == 0 */
-                          		a = cons(elem(SEPARATOR), a);
+                                a = cons(elem(SEPARATOR), a);
                             else
-                            	a = cons(elem(RAW), a);
+                                a = cons(elem(RAW), a);
                           } )
                         ( Indent ListBlock { a = cons($$, a); } )+
-						{ $$ = a; }
+                        { $$ = a; }
 
 Enumerator = NonindentSpace < [0-9]+ '.' > Spacechar+
              { ADD(elem(LIST_ENUMERATOR)); }
@@ -220,32 +220,32 @@ HtmlBlockForm = HtmlBlockOpenForm (HtmlBlockForm | !HtmlBlockCloseForm .)* HtmlB
 HtmlBlockOpenH1 = '<' Spnl ("h1" | "H1") Spnl HtmlAttribute* '>'
 HtmlBlockCloseH1 = '<' Spnl '/' ("h1" | "H1") Spnl '>'
 HtmlBlockH1 = < s:LocMarker HtmlBlockOpenH1 (HtmlBlockH1 | !HtmlBlockCloseH1 .)* HtmlBlockCloseH1 >
-				{ ADD(elem_s(H1)); }
+                { ADD(elem_s(H1)); }
 
 HtmlBlockOpenH2 = '<' Spnl ("h2" | "H2") Spnl HtmlAttribute* '>'
 HtmlBlockCloseH2 = '<' Spnl '/' ("h2" | "H2") Spnl '>'
 HtmlBlockH2 = < s:LocMarker HtmlBlockOpenH2 (HtmlBlockH2 | !HtmlBlockCloseH2 .)* HtmlBlockCloseH2 >
-				{ ADD(elem_s(H2)); }
+                { ADD(elem_s(H2)); }
 
 HtmlBlockOpenH3 = '<' Spnl ("h3" | "H3") Spnl HtmlAttribute* '>'
 HtmlBlockCloseH3 = '<' Spnl '/' ("h3" | "H3") Spnl '>'
 HtmlBlockH3 = < s:LocMarker HtmlBlockOpenH3 (HtmlBlockH3 | !HtmlBlockCloseH3 .)* HtmlBlockCloseH3 >
-				{ ADD(elem_s(H3)); }
+                { ADD(elem_s(H3)); }
 
 HtmlBlockOpenH4 = '<' Spnl ("h4" | "H4") Spnl HtmlAttribute* '>'
 HtmlBlockCloseH4 = '<' Spnl '/' ("h4" | "H4") Spnl '>'
 HtmlBlockH4 = < s:LocMarker HtmlBlockOpenH4 (HtmlBlockH4 | !HtmlBlockCloseH4 .)* HtmlBlockCloseH4 >
-				{ ADD(elem_s(H4)); }
+                { ADD(elem_s(H4)); }
 
 HtmlBlockOpenH5 = '<' Spnl ("h5" | "H5") Spnl HtmlAttribute* '>'
 HtmlBlockCloseH5 = '<' Spnl '/' ("h5" | "H5") Spnl '>'
 HtmlBlockH5 = < s:LocMarker HtmlBlockOpenH5 (HtmlBlockH5 | !HtmlBlockCloseH5 .)* HtmlBlockCloseH5 >
-				{ ADD(elem_s(H5)); }
+                { ADD(elem_s(H5)); }
 
 HtmlBlockOpenH6 = '<' Spnl ("h6" | "H6") Spnl HtmlAttribute* '>'
 HtmlBlockCloseH6 = '<' Spnl '/' ("h6" | "H6") Spnl '>'
 HtmlBlockH6 = < s:LocMarker HtmlBlockOpenH6 (HtmlBlockH6 | !HtmlBlockCloseH6 .)* HtmlBlockCloseH6 >
-				{ ADD(elem_s(H6)); }
+                { ADD(elem_s(H6)); }
 
 HtmlBlockOpenMenu = '<' Spnl ("menu" | "MENU") Spnl HtmlAttribute* '>'
 HtmlBlockCloseMenu = '<' Spnl '/' ("menu" | "MENU") Spnl '>'
@@ -403,7 +403,7 @@ Str = NormalChar (NormalChar | '_'+ &Alphanumeric)*
 EscapedChar =   '\\' !Newline [-\\`|*_{}[\]()#+.!><]
 
 Entity =    < s:LocMarker
-			( HexEntity | DecEntity | CharEntity ) >
+            ( HexEntity | DecEntity | CharEntity ) >
             { ADD(elem_s(HTML_ENTITY)); }
 
 Endline =   LineBreak | TerminalEndline | NormalEndline
@@ -460,33 +460,33 @@ StrongUl =  s:TwoUlOpen
             { ADD(elem_s(STRONG)); }
 
 Image = '!' ( ExplicitLink | ReferenceLink )
-		{ $$->type = IMAGE; $$->pos -= 1; ADD($$); }
+        { $$->type = IMAGE; $$->pos -= 1; ADD($$); }
 
 Link =  ( ExplicitLink | ReferenceLink | AutoLink )
-		{ if ($$) ADD($$); } # AutoLink does not return $$
+        { if ($$) ADD($$); } # AutoLink does not return $$
 
 ReferenceLink = ReferenceLinkDouble | ReferenceLinkSingle
 
 ReferenceLinkDouble =  < s:Label Spnl !"[]" l:Label >
-						{
-							if (REF_EXISTS(l->label))
-								$$ = elem_s(LINK);
-							FREE_LABEL_TEXT(s);
-							FREE_LABEL_TEXT(l);
-						}
+                        {
+                            if (REF_EXISTS(l->label))
+                                $$ = elem_s(LINK);
+                            FREE_LABEL_TEXT(s);
+                            FREE_LABEL_TEXT(l);
+                        }
 
 ReferenceLinkSingle =  < s:Label (Spnl "[]")? >
-						{
-							if (REF_EXISTS(s->label))
-								$$ = elem_s(LINK);
-							FREE_LABEL_TEXT(s);
-						}
+                        {
+                            if (REF_EXISTS(s->label))
+                                $$ = elem_s(LINK);
+                            FREE_LABEL_TEXT(s);
+                        }
 
 ExplicitLink =  < s:Label Spnl '(' Sp Source Spnl Title Sp ')' >
-				{
-					$$ = elem_s(LINK);
-					FREE_LABEL_TEXT(s);
-				}
+                {
+                    $$ = elem_s(LINK);
+                    FREE_LABEL_TEXT(s);
+                }
 
 Source  = ( '<' SourceContents '>' | SourceContents )
 
@@ -507,14 +507,14 @@ AutoLinkEmail = < s:LocMarker '<' [-A-Za-z0-9+_.]+ '@' ( !Newline !'>' . )+ '>' 
                 { ADD(elem_s(AUTO_LINK_EMAIL)); }
 
 Reference = < s:LocMarker
-			  NonindentSpace !"[]" l:Label ':' Spnl RefSrc RefTitle > BlankLine+
-			  {
-			    element *el = elem_s(REFERENCE);
-			    if (PARSING_REFERENCES)
-					el->label = strdup(l->label);
-			  	ADD(el);
-				FREE_LABEL_TEXT(l);
-			  }
+              NonindentSpace !"[]" l:Label ':' Spnl RefSrc RefTitle > BlankLine+
+              {
+                element *el = elem_s(REFERENCE);
+                if (PARSING_REFERENCES)
+                    el->label = strdup(l->label);
+                ADD(el);
+                FREE_LABEL_TEXT(l);
+              }
 
 Label = < s:LocMarker { $$ = mk_notype; }
         '[' ( !'^' &{ EXT(EXT_NOTES) } | &. &{ !EXT(EXT_NOTES) } )
@@ -522,8 +522,8 @@ Label = < s:LocMarker { $$ = mk_notype; }
         { $$->label = strdup(yytext); }
         ']' >
         {
-        	$$->pos = s->pos;
-        	$$->end = thunk->end;
+            $$->pos = s->pos;
+            $$->end = thunk->end;
         }
 
 RefSrc = Nonspacechar+
@@ -562,7 +562,7 @@ BlankLine =     Sp Newline
 Quoted =        '"' (!'"' .)* '"' | '\'' (!'\'' .)* '\''
 HtmlAttribute = (AlphanumericAscii | '-')+ Spnl ('=' Spnl (Quoted | (!'>' Nonspacechar)+))? Spnl
 HtmlComment =   < s:LocMarker "<!--" (!"-->" .)* "-->" >
-				{ ADD(elem_s(COMMENT)); }
+                { ADD(elem_s(COMMENT)); }
 HtmlTag =       '<' Spnl '/'? AlphanumericAscii+ Spnl HtmlAttribute* '/'? Spnl '>'
 Eof =           !.
 Spacechar =     ' ' | '\t'
@@ -595,7 +595,7 @@ Line =  RawLine
        { $$ = mk_element((parser_data *)G->data, RAW, $$->pos, $$->end); }
 
 RawLine = ( < (!'\r' !'\n' .)* Newline > | < .+ > Eof )
-	      { $$ = elem(RAW); }
+          { $$ = elem(RAW); }
 
 SkipBlock = ( !BlankLine RawLine )+ BlankLine*
           | BlankLine+

@@ -13,9 +13,9 @@ void _parse(parser_data *p_data, yyrule start_rule)
 {
     GREG *g = yyparse_new(p_data);
     if (start_rule == NULL)
-    	yyparse(g);
+        yyparse(g);
     else
-    	yyparse_from(g, start_rule);
+        yyparse_from(g, start_rule);
     yyparse_free(g);
     
     MKD_PRINTF("\n\n");
@@ -32,10 +32,10 @@ void parse_references(parser_data *p_data)
 {
     MKD_PRINTF("\nPARSING REFERENCES: ");
     
-	p_data->parsing_only_references = true;
+    p_data->parsing_only_references = true;
     _parse(p_data, yy_References);
-	p_data->parsing_only_references = false;
-	
+    p_data->parsing_only_references = false;
+    
     p_data->references = p_data->head_elems[REFERENCE];
     p_data->head_elems[REFERENCE] = NULL;
 }

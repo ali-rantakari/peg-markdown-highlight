@@ -16,63 +16,63 @@
 #define READ_BUFFER_LEN 1024
 char *get_contents(FILE *f)
 {
-	char buffer[READ_BUFFER_LEN];
-	size_t content_len = 1;
-	char *content = malloc(sizeof(char) * READ_BUFFER_LEN);
-	content[0] = '\0';
-	
-	while (fgets(buffer, READ_BUFFER_LEN, f))
-	{
-		content_len += strlen(buffer);
-		content = realloc(content, content_len);
-		strcat(content, buffer);
-	}
-	
-	return content;
+    char buffer[READ_BUFFER_LEN];
+    size_t content_len = 1;
+    char *content = malloc(sizeof(char) * READ_BUFFER_LEN);
+    content[0] = '\0';
+    
+    while (fgets(buffer, READ_BUFFER_LEN, f))
+    {
+        content_len += strlen(buffer);
+        content = realloc(content, content_len);
+        strcat(content, buffer);
+    }
+    
+    return content;
 }
 
 
 void output_result(element *elem[])
 {
-	element *cursor;
-	bool firstType = true;
-	int i;
-	for (i = 0; i < NUM_LANG_TYPES; i++)
-	{
-		cursor = elem[i];
-		if (cursor == NULL)
-			continue;
-		
-		if (!firstType)
-			printf("|");
-		printf("%i:", i);
-		
-		bool firstSpan = true;
-		while (cursor != NULL)
-		{
-			if (!firstSpan)
-				printf(",");
-			printf("%ld-%ld", cursor->pos, cursor->end);
-			cursor = cursor->next;
-			firstSpan = false;
-		}
-		firstType = false;
-	}
+    element *cursor;
+    bool firstType = true;
+    int i;
+    for (i = 0; i < NUM_LANG_TYPES; i++)
+    {
+        cursor = elem[i];
+        if (cursor == NULL)
+            continue;
+        
+        if (!firstType)
+            printf("|");
+        printf("%i:", i);
+        
+        bool firstSpan = true;
+        while (cursor != NULL)
+        {
+            if (!firstSpan)
+                printf(",");
+            printf("%ld-%ld", cursor->pos, cursor->end);
+            cursor = cursor->next;
+            firstSpan = false;
+        }
+        firstType = false;
+    }
 }
 
 
 int main(int argc, char * argv[])
 {
-	int extensions = 0;
-	element **result;
-	
-	FILE *file = stdin;
-	if (argc > 1)
-		file = fopen(argv[1], "r");
-	char *md_source = get_contents(file);
-	markdown_to_elements(md_source, extensions, &result);
-	sort_elements_by_pos(result);
-	output_result(result);
-	
+    int extensions = 0;
+    element **result;
+    
+    FILE *file = stdin;
+    if (argc > 1)
+        file = fopen(argv[1], "r");
+    char *md_source = get_contents(file);
+    markdown_to_elements(md_source, extensions, &result);
+    sort_elements_by_pos(result);
+    output_result(result);
+    
     return(0);
 }

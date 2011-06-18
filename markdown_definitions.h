@@ -52,11 +52,11 @@ typedef enum
 	
 	/* Utility types used by the parser itself: */
 	RAW_LIST,	/* List of RAW element lists, each to be processed separately from others
-	             * (for each element in linked lists of this type, `children` points
-	             * to a linked list of RAW elements) */
-	RAW,    	/* Span marker for positions in original input to be post-processed
+				 * (for each element in linked lists of this type, `children` points
+				 * to a linked list of RAW elements) */
+	RAW,		/* Span marker for positions in original input to be post-processed
 				 * in a second parsing step */
-	EXTRA_TEXT,	/* Additional text to be parsed along with spans in the original input
+	EXTRA_TEXT, /* Additional text to be parsed along with spans in the original input
 				 * (these may be added to linked lists of RAW elements) */
 	SEPARATOR,	/* Separates linked lists of RAW elements into parts to be processed
 				 * separate from each other */
@@ -81,14 +81,14 @@ typedef enum
 */
 struct Element
 {
-    element_type type;            /**< \brief type of element */
-    unsigned long pos;            /**< \brief start offset in input */
-    unsigned long end;            /**< \brief end offset in input */
-    struct Element *next;         /**< \brief next element in list */
-    struct Element *allElemsNext; /**< \brief next element in list of all elements */
-    char *text;                   /**< \brief text content (for elements of type EXTRA_TEXT) */
-    char *label;                  /**< \brief label content (for references) */
-    struct Element *children;     /**< \brief children of element (for elements of type RAW_LIST) */
+	element_type type;			  /**< \brief type of element */
+	unsigned long pos;			  /**< \brief start offset in input */
+	unsigned long end;			  /**< \brief end offset in input */
+	struct Element *next;		  /**< \brief next element in list */
+	struct Element *allElemsNext; /**< \brief next element in list of all elements */
+	char *text;					  /**< \brief text content (for elements of type EXTRA_TEXT) */
+	char *label;				  /**< \brief label content (for references) */
+	struct Element *children;	  /**< \brief children of element (for elements of type RAW_LIST) */
 };
 typedef struct Element element;
 
@@ -97,8 +97,8 @@ typedef struct Element element;
 */
 enum markdown_extensions
 {
-    EXT_SMART            = 0x01, /**< Smart quotes, dashes, and ellipses */
-    EXT_NOTES            = 0x02  /**< A footnote syntax like that of Pandoc or PHP Markdown Extra */
+	EXT_SMART			 = 0x01, /**< Smart quotes, dashes, and ellipses */
+	EXT_NOTES			 = 0x02	 /**< A footnote syntax like that of Pandoc or PHP Markdown Extra */
 };
 
 

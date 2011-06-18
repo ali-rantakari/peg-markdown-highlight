@@ -10,13 +10,12 @@ Parser
   parser code (now they're `int` and `unsigned long`).
 - Highlight HTML?
 - Reduce memory usage (profile with valgrind, Instruments or somesuch)
-- Code: Standardize whitespace style (spaces/tabs)
 
 
 Cocoa
 -----
 - Investigate using temporary attributes
-	- In which way are they temporary? When are they removed?
+    - In which way are they temporary? When are they removed?
 - When copying to clipboard, remove highlights if possible (make this an option?)
 - When an edit event comes to the highlighter, **don't do the timer if there
   is a parser running at the moment**, but act on the changes immediately
