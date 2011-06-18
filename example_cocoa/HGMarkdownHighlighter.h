@@ -80,6 +80,13 @@
  */
 @property BOOL resetTypingAttributes;
 
+/** \brief Whether add hyperlink property to links.
+ * 
+ * Whether to make all links clickable (i.e. make them behave
+ * like hyperlinks).
+ */
+@property BOOL makeLinksClickable;
+
 /** \brief The extensions to use for parsing.
  * 
  * A bitfield of markdown_extensions values.

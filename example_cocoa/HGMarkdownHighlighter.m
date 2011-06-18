@@ -35,6 +35,7 @@
 @synthesize workerThread;
 @synthesize defaultTypingAttributes;
 @synthesize resetTypingAttributes;
+@synthesize makeLinksClickable;
 
 
 - (id) init
@@ -51,6 +52,7 @@
 	self.styles = nil;
 	self.isActive = NO;
 	self.resetTypingAttributes = YES;
+	self.makeLinksClickable = NO;
 	self.parseAndHighlightAutomatically = YES;
 	self.updateTimer = nil;
 	self.targetTextView = nil;
@@ -259,6 +261,13 @@
 			if (rangePos+len > sourceLength)
 				len = sourceLength-rangePos;
 			NSRange hlRange = NSMakeRange(rangePos, len);
+			
+			if (self.makeLinksClickable
+				&& style.elementType == LINK
+				&& cursor->address != NULL)
+				[attrStr addAttribute:NSLinkAttributeName
+								value:[NSString stringWithUTF8String:cursor->address]
+								range:hlRange];
 			
 			for (NSString *attrName in style.attributesToRemove)
 				[attrStr removeAttribute:attrName range:hlRange];
