@@ -9,6 +9,7 @@
  * the results as ANSI escape -formatted text into stdout.
  */
 
+#include <sys/time.h>
 #import <Foundation/Foundation.h>
 #import "ANSIEscapeHelper.h"
 #import "markdown_parser.h"
@@ -128,7 +129,7 @@ void apply_highlighting(NSMutableAttributedString *attrStr, element *elem[])
 
 
 
-NSAttributedString *highlight(NSString *str)
+NSAttributedString *highlight(NSString *str, NSMutableAttributedString *attrStr)
 {
 	int extensions = 0;
 	element **result;
@@ -136,7 +137,8 @@ NSAttributedString *highlight(NSString *str)
 	char *md_source = (char *)[str UTF8String];
 	markdown_to_elements(md_source, extensions, &result);
 	
-	NSMutableAttributedString *attrStr = [[[NSMutableAttributedString alloc] initWithString:str] autorelease];
+	if (attrStr == nil)
+		attrStr = [[[NSMutableAttributedString alloc] initWithString:str] autorelease];
 	apply_highlighting(attrStr, result);
 	
 	free_elements(result);
@@ -161,6 +163,13 @@ void print_result(element *elem[])
 void Print(NSString *aStr)
 {
 	[aStr writeToFile:@"/dev/stdout" atomically:NO encoding:NSUTF8StringEncoding error:NULL];
+}
+
+double get_time()
+{
+    struct timeval t;
+    gettimeofday(&t, NULL);
+    return t.tv_sec + t.tv_usec*1e-6;
 }
 
 int main(int argc, char * argv[])
@@ -193,10 +202,16 @@ int main(int argc, char * argv[])
 			
 			NSAttributedString *attrStr = nil;
 			
+			NSMutableAttributedString *as[iterations];
+			for (int j = 0; j < iterations; j++) {
+				as[j] = [[[NSMutableAttributedString alloc] initWithString:contents] autorelease];
+			}
+			
+			double starttime = get_time();
 			int stepProgress = 0;
 			for (int i = 0; i < iterations; i++)
 			{
-				attrStr = highlight(contents);
+				attrStr = highlight(contents, as[i]);
 				
 				if (stepProgress == 9) {
 					Print([NSString stringWithFormat:@"%i", i+1]);
@@ -206,12 +221,14 @@ int main(int argc, char * argv[])
 					stepProgress++;
 				}
 			}
+			double endtime = get_time();
 			
-			Print([ansiHelper ansiEscapedStringWithAttributedString:attrStr]);
+			//Print([ansiHelper ansiEscapedStringWithAttributedString:attrStr]);
+			printf("\n%f\n", (endtime-starttime));
 		}
 	}
 	else
-		Print([ansiHelper ansiEscapedStringWithAttributedString:highlight(contents)]);
+		Print([ansiHelper ansiEscapedStringWithAttributedString:highlight(contents, nil)]);
 	
 	[autoReleasePool release];
     return(0);
