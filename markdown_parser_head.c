@@ -431,8 +431,8 @@ bool extension(parser_data *p_data, int ext)
     return ((p_data->extensions & ext) != 0);
 }
 
-/* return true if reference label exists */
-bool reference_exists(parser_data *p_data, char *label)
+/* return reference element for a given label */
+element *get_reference(parser_data *p_data, char *label)
 {
     if (!label)
         return NULL;
@@ -441,10 +441,10 @@ bool reference_exists(parser_data *p_data, char *label)
     while (cursor != NULL)
     {
         if (cursor->label && strcmp(label, cursor->label) == 0)
-            return true;
+            return cursor;
         cursor = cursor->next;
     }
-    return false;
+    return NULL;
 }
 
 
@@ -487,7 +487,7 @@ element * mk_element(parser_data *p_data, element_type type, long pos, long end)
     result->pos = pos;
     result->end = end;
     result->next = NULL;
-    result->label = result->text = NULL;
+    result->label = result->address = result->text = NULL;
     
     element *old_all_elements_head = p_data->head_elems[ALL];
     p_data->head_elems[ALL] = result;
@@ -503,6 +503,7 @@ element * copy_element(parser_data *p_data, element *elem)
     element *result = mk_element(p_data, elem->type, elem->pos, elem->end);
     result->label = elem->label;
     result->text = elem->text;
+    result->address = elem->address;
     return result;
 }
 

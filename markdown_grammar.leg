@@ -19,8 +19,10 @@
 #define ADD(x)      add((parser_data *)G->data, x)
 #define EXT(x)      extension((parser_data *)G->data, x)
 #define REF_EXISTS(x) reference_exists((parser_data *)G->data, x)
+#define GET_REF(x)  get_reference((parser_data *)G->data, x)
 #define PARSING_REFERENCES ((parser_data *)G->data)->parsing_only_references
-#define FREE_LABEL_TEXT(l) { free(l->label); l->label = NULL; }
+#define FREE_LABEL(l) { free(l->label); l->label = NULL; }
+#define FREE_ADDRESS(l) { free(l->address); l->address = NULL; }
 
 %}
 
@@ -469,26 +471,38 @@ ReferenceLink = ReferenceLinkDouble | ReferenceLinkSingle
 
 ReferenceLinkDouble =  < s:Label Spnl !"[]" l:Label >
                         {
-                            if (REF_EXISTS(l->label))
+                        	element *reference = GET_REF(l->label);
+                            if (reference) {
                                 $$ = elem_s(LINK);
-                            FREE_LABEL_TEXT(s);
-                            FREE_LABEL_TEXT(l);
+                                $$->label = strdup(l->label);
+                                $$->address = reference->address;
+                            }
+                            FREE_LABEL(s);
+                            FREE_LABEL(l);
                         }
 
 ReferenceLinkSingle =  < s:Label (Spnl "[]")? >
                         {
-                            if (REF_EXISTS(s->label))
+                        	element *reference = GET_REF(s->label);
+                            if (reference) {
                                 $$ = elem_s(LINK);
-                            FREE_LABEL_TEXT(s);
+                                $$->label = strdup(s->label);
+                                $$->address = reference->address;
+                            }
+                            FREE_LABEL(s);
                         }
 
-ExplicitLink =  < s:Label Spnl '(' Sp Source Spnl Title Sp ')' >
+ExplicitLink =  < s:Label Spnl '(' Sp l:Source Spnl Title Sp ')' >
                 {
                     $$ = elem_s(LINK);
-                    FREE_LABEL_TEXT(s);
+                    $$->address = strdup(l->address);
+                    FREE_LABEL(s);
+                    FREE_ADDRESS(l);
                 }
 
-Source  = ( '<' SourceContents '>' | SourceContents )
+Source  = { $$ = mk_notype; }
+          ( '<' < SourceContents > { $$->address = strdup(yytext); } '>'
+          | < SourceContents > { $$->address = strdup(yytext); } )
 
 SourceContents = ( ( !'(' !')' !'>' Nonspacechar )+ | '(' SourceContents ')')*
 
@@ -507,13 +521,16 @@ AutoLinkEmail = < s:LocMarker '<' [-A-Za-z0-9+_.]+ '@' ( !Newline !'>' . )+ '>' 
                 { ADD(elem_s(AUTO_LINK_EMAIL)); }
 
 Reference = < s:LocMarker
-              NonindentSpace !"[]" l:Label ':' Spnl RefSrc RefTitle > BlankLine+
+              NonindentSpace !"[]" l:Label ':' Spnl r:RefSrc RefTitle > BlankLine+
               {
                 element *el = elem_s(REFERENCE);
-                if (PARSING_REFERENCES)
+                if (PARSING_REFERENCES) {
                     el->label = strdup(l->label);
+                    el->address = strdup(r->address);
+                }
                 ADD(el);
-                FREE_LABEL_TEXT(l);
+                FREE_LABEL(l);
+                FREE_ADDRESS(r);
               }
 
 Label = < s:LocMarker { $$ = mk_notype; }
@@ -526,7 +543,8 @@ Label = < s:LocMarker { $$ = mk_notype; }
             $$->end = thunk->end;
         }
 
-RefSrc = Nonspacechar+
+RefSrc = < Nonspacechar+ >
+		 { $$ = mk_notype; $$->address = strdup(yytext); }
 
 RefTitle =  ( RefTitleSingle | RefTitleDouble | RefTitleParens | EmptyTitle )
 

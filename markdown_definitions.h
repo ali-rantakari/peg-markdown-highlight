@@ -87,7 +87,8 @@ struct Element
 	struct Element *next;		  /**< \brief next element in list */
 	struct Element *allElemsNext; /**< \brief next element in list of all elements */
 	char *text;					  /**< \brief text content (for elements of type EXTRA_TEXT) */
-	char *label;				  /**< \brief label content (for references) */
+	char *label;				  /**< \brief label (for links and references) */
+	char *address;                /**< \brief address (for links and references) */
 	struct Element *children;	  /**< \brief children of element (for elements of type RAW_LIST) */
 };
 typedef struct Element element;
