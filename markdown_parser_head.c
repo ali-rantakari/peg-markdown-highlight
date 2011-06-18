@@ -39,14 +39,19 @@ typedef struct
 	element *references;
 } parser_data;
 
-parser_data *mk_parser_data(char *charbuf, element *parsing_elems, unsigned long offset, int extensions, element **head_elems)
+parser_data *mk_parser_data(char *charbuf,
+							element *parsing_elems,
+							unsigned long offset,
+							int extensions,
+							element **head_elems,
+							element *references)
 {
 	parser_data *p_data = (parser_data *)malloc(sizeof(parser_data));
 	p_data->extensions = extensions;
 	p_data->charbuf = charbuf;
 	p_data->offset = offset;
 	p_data->elem_head = p_data->elem = parsing_elems;
-	p_data->references = NULL;
+	p_data->references = references;
 	p_data->parsing_only_references = false;
 	if (head_elems != NULL)
 		p_data->head_elems = head_elems;
@@ -173,7 +178,8 @@ void process_raw_blocks(parser_data *p_data)
 														 subspan_list,
 														 subspan_list->pos,
 														 p_data->extensions,
-														 p_data->head_elems);
+														 p_data->head_elems,
+														 p_data->references);
 				parse_markdown(raw_p_data);
 				free(raw_p_data);
 				
@@ -263,7 +269,7 @@ void markdown_to_elements(char *text, int extensions, element **out_result[])
 	parsing_elem->end = text_copy_len;
 	parsing_elem->next = NULL;
 	
-    parser_data *p_data = mk_parser_data(text_copy, parsing_elem, 0, extensions, NULL);
+    parser_data *p_data = mk_parser_data(text_copy, parsing_elem, 0, extensions, NULL, NULL);
 	element **result = p_data->head_elems;
 	
     if (*text_copy != '\0')
