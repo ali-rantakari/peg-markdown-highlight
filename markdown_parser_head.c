@@ -498,6 +498,14 @@ element * mk_element(parser_data *p_data, element_type type, long pos, long end)
     return result;
 }
 
+element * copy_element(parser_data *p_data, element *elem)
+{
+	element *result = mk_element(p_data, elem->type, elem->pos, elem->end);
+	result->label = elem->label;
+	result->text = elem->text;
+	return result;
+}
+
 /* construct EXTRA_TEXT element */
 element * mk_etext(parser_data *p_data, char *string)
 {
@@ -522,8 +530,7 @@ element *fix_offsets(parser_data *p_data, element *elem)
 	if (elem->type == EXTRA_TEXT)
 		return mk_etext(p_data, elem->text);
 	
-	element *new_head = mk_element(p_data, elem->type, elem->pos, elem->end);
-	new_head->label = elem->label;
+	element *new_head = copy_element(p_data, elem);
 	
 	element *tail = new_head;
 	element *prev = NULL;
