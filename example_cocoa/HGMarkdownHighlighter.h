@@ -33,6 +33,7 @@
 	element **cachedElements;
 	char *currentHighlightText;
 	BOOL workerThreadResultsInvalid;
+	BOOL styleDependenciesPending;
 }
 
 /** \brief The order and styles for higlighting different elements.

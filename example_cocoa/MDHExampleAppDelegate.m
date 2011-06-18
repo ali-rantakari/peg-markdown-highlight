@@ -85,6 +85,7 @@
 	hl1 = [[HGMarkdownHighlighter alloc] initWithTextView:textView1
 											 waitInterval:[delaySlider intValue]
 												   styles:[self getDarkStyles]];
+	hl1.makeLinksClickable = YES;
 	[hl1 activate];
 	
 	hl2 = [[HGMarkdownHighlighter alloc] init];

@@ -45,6 +45,7 @@
 	
 	cachedElements = NULL;
 	currentHighlightText = NULL;
+	styleDependenciesPending = NO;
 	
 	self.defaultTypingAttributes = nil;
 	self.workerThread = nil;
@@ -388,6 +389,35 @@
 	return defaultStyles;
 }
 
+- (void) applyStyleDependenciesToTargetTextView
+{
+	if (self.targetTextView == nil)
+		return;
+	
+	// Set NSTextView link styles to match the styles set for
+	// LINK elements, with the "pointing hand cursor" style added:
+	for (HGMarkdownHighlightingStyle *style in self.styles)
+	{
+		if (style.elementType != LINK)
+			continue;
+		NSMutableDictionary *linkAttrs = [[style.attributesToAdd mutableCopy] autorelease];
+		[linkAttrs setObject:[NSCursor pointingHandCursor] forKey:NSCursorAttributeName];
+		[self.targetTextView setLinkTextAttributes:linkAttrs];
+		break;
+	}
+	styleDependenciesPending = NO;
+}
+
+- (void) setStyles:(NSArray *)newStyles
+{
+	[styles autorelease];
+	styles = [newStyles copy];
+	
+	if (self.targetTextView != nil)
+		[self applyStyleDependenciesToTargetTextView];
+	else
+		styleDependenciesPending = YES;
+}
 
 - (void) parseAndHighlightNow
 {
@@ -405,6 +435,8 @@
 	
 	if (self.styles == nil)
 		self.styles = [self getDefaultStyles];
+	if (styleDependenciesPending)
+		[self applyStyleDependenciesToTargetTextView];
 	
 	[self requestParsing];
 	
