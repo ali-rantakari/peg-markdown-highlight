@@ -9,16 +9,32 @@
  */
 
 
-void parse_markdown(parser_data *p_data)
+void _parse(parser_data *p_data, yyrule start_rule)
 {
     MKD_PRINTF("\nPARSER: ");
     
     GREG *g = yyparse_new(p_data);
-    yyparse(g);
+    if (start_rule == NULL)
+    	yyparse(g);
+    else
+    	yyparse_from(g, start_rule);
     yyparse_free(g);
     
     MKD_PRINTF("\n\n");
 }
 
+void parse_markdown(parser_data *p_data)
+{
+    _parse(p_data, NULL);
+}
 
+void parse_references(parser_data *p_data)
+{
+	p_data->parsing_only_references = true;
+    _parse(p_data, yy_References);
+	p_data->parsing_only_references = false;
+	
+    p_data->references = p_data->head_elems[REFERENCE];
+    p_data->head_elems[REFERENCE] = NULL;
+}
 

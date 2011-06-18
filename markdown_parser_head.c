@@ -31,6 +31,12 @@ typedef struct
 	
 	/* Array of parsing result elements, indexed by type: */
 	element **head_elems;
+	
+	/* Whether we are parsing only references: */
+	bool parsing_only_references;
+	
+	/* List of reference elements: */
+	element *references;
 } parser_data;
 
 parser_data *mk_parser_data(char *charbuf, element *parsing_elems, unsigned long offset, int extensions, element **head_elems)
@@ -40,6 +46,8 @@ parser_data *mk_parser_data(char *charbuf, element *parsing_elems, unsigned long
 	p_data->charbuf = charbuf;
 	p_data->offset = offset;
 	p_data->elem_head = p_data->elem = parsing_elems;
+	p_data->references = NULL;
+	p_data->parsing_only_references = false;
 	if (head_elems != NULL)
 		p_data->head_elems = head_elems;
 	else {
@@ -52,8 +60,9 @@ parser_data *mk_parser_data(char *charbuf, element *parsing_elems, unsigned long
 }
 
 
-
+// Forward declarations
 void parse_markdown(parser_data *p_data);
+void parse_references(parser_data *p_data);
 
 
 
@@ -259,6 +268,14 @@ void markdown_to_elements(char *text, int extensions, element **out_result[])
 	
     if (*text_copy != '\0')
     {
+    	// Get reference definitions into p_data->references
+    	parse_references(p_data);
+    	
+    	// Reset parser state to beginning of input
+    	p_data->offset = 0;
+    	p_data->elem = p_data->elem_head;
+    	
+    	// Parse whole document
 		parse_markdown(p_data);
 		
 		#if MKD_DEBUG_OUTPUT
@@ -408,6 +425,22 @@ bool extension(parser_data *p_data, int ext)
     return ((p_data->extensions & ext) != 0);
 }
 
+/* return true if reference label exists */
+bool reference_exists(parser_data *p_data, char *label)
+{
+	if (!label)
+		return NULL;
+	
+    element *cursor = p_data->references;
+    while (cursor != NULL)
+    {
+    	if (cursor->label && strcmp(label, cursor->label) == 0)
+    		return true;
+    	cursor = cursor->next;
+    }
+    return false;
+}
+
 
 /* cons an element/list onto a list, returning pointer to new head */
 static element * cons(element *elem, element *list)
@@ -448,6 +481,7 @@ element * mk_element(parser_data *p_data, element_type type, long pos, long end)
     result->pos = pos;
     result->end = end;
     result->next = NULL;
+    result->label = result->text = NULL;
     
     element *old_all_elements_head = p_data->head_elems[ALL];
     p_data->head_elems[ALL] = result;
@@ -483,6 +517,8 @@ element *fix_offsets(parser_data *p_data, element *elem)
 		return mk_etext(p_data, elem->text);
 	
 	element *new_head = mk_element(p_data, elem->type, elem->pos, elem->end);
+	new_head->label = elem->label;
+	
 	element *tail = new_head;
 	element *prev = NULL;
 	
