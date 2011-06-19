@@ -73,7 +73,11 @@ Whichever way you go, the command you run is `make markdown_parser.c`.
 
 MSVC does not support some of the GNU extensions the code uses, but it should
 compile it nicely as C++ (just change the extensions to `.cpp` or set some
-magic switch in the project settings to get the same effect).
+magic switch in the project settings to get the same effect). You may need to
+insert the following to the beginning of `markdown_parser.c`:
+
+    #include "stdafx.h"
+
 
 
 
