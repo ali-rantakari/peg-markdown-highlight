@@ -11,6 +11,11 @@
 #include "markdown_parser.h"
 
 
+// Alias strdup to _strdup on MSVC:
+#ifdef _MSC_VER
+#define strdup _strdup
+#endif
+
 
 typedef struct
 {
