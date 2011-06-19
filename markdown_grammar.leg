@@ -514,11 +514,29 @@ TitleDouble = '"' ( !( '"' Sp ( ')' | Newline ) ) . )* '"'
 
 AutoLink = AutoLinkUrl | AutoLinkEmail
 
-AutoLinkUrl =  < s:LocMarker '<' [A-Za-z]+ "://" ( !Newline !'>' . )+ '>' >
-               { ADD(elem_s(AUTO_LINK_URL)); }
+AutoLinkUrl =  < s:LocMarker { $$ = elem(AUTO_LINK_URL); }
+               '<'
+                 < [A-Za-z]+ "://" ( !Newline !'>' . )+ >
+                 { $$->address = strdup(yytext); }
+               '>' >
+               {
+                $$->pos = s->pos;
+                $$->end = thunk->end;
+                ADD($$);
+                $$ = NULL;
+               }
 
-AutoLinkEmail = < s:LocMarker '<' [-A-Za-z0-9+_.]+ '@' ( !Newline !'>' . )+ '>' >
-                { ADD(elem_s(AUTO_LINK_EMAIL)); }
+AutoLinkEmail = < s:LocMarker { $$ = elem(AUTO_LINK_EMAIL); }
+                '<'
+                  < [-A-Za-z0-9+_.]+ '@' ( !Newline !'>' . )+ >
+                  { $$->address = strdup(yytext); }
+                '>' >
+               {
+                $$->pos = s->pos;
+                $$->end = thunk->end;
+                ADD($$);
+                $$ = NULL;
+               }
 
 Reference = < s:LocMarker
               NonindentSpace !"[]" l:Label ':' Spnl r:RefSrc RefTitle > BlankLine+
