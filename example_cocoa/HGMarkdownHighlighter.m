@@ -264,11 +264,18 @@
 			NSRange hlRange = NSMakeRange(rangePos, len);
 			
 			if (self.makeLinksClickable
-				&& style.elementType == LINK
+				&& (style.elementType == LINK
+					|| style.elementType == AUTO_LINK_URL
+					|| style.elementType == AUTO_LINK_EMAIL)
 				&& cursor->address != NULL)
+			{
+				NSString *linkAddress = [NSString stringWithUTF8String:cursor->address];
+				if (style.elementType == AUTO_LINK_EMAIL && ![linkAddress hasPrefix:@"mailto:"])
+					linkAddress = [@"mailto:" stringByAppendingString:linkAddress];
 				[attrStr addAttribute:NSLinkAttributeName
-								value:[NSString stringWithUTF8String:cursor->address]
+								value:linkAddress
 								range:hlRange];
+			}
 			
 			for (NSString *attrName in style.attributesToRemove)
 				[attrStr removeAttribute:attrName range:hlRange];
