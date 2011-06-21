@@ -542,10 +542,8 @@ Reference = < s:LocMarker
               NonindentSpace !"[]" l:Label ':' Spnl r:RefSrc RefTitle > BlankLine+
               {
                 element *el = elem_s(REFERENCE);
-                if (PARSING_REFERENCES) {
-                    el->label = strdup(l->label);
-                    el->address = strdup(r->address);
-                }
+                el->label = strdup(l->label);
+                el->address = strdup(r->address);
                 ADD(el);
                 FREE_LABEL(l);
                 FREE_ADDRESS(r);
