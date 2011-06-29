@@ -417,8 +417,10 @@
 
 - (void) setStyles:(NSArray *)newStyles
 {
+	NSArray *stylesToApply = (newStyles != nil) ? newStyles : [self getDefaultStyles];
+	
 	[styles autorelease];
-	styles = [newStyles copy];
+	styles = [stylesToApply copy];
 	
 	if (self.targetTextView != nil)
 		[self applyStyleDependenciesToTargetTextView];
