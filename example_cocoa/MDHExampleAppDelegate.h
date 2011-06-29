@@ -18,9 +18,12 @@
 	
 	IBOutlet NSTextField *delayLabel;
 	IBOutlet NSSlider *delaySlider;
+	IBOutlet NSPopUpButton *stylePopUpButton;
 	
 	HGMarkdownHighlighter *hl1;
 	HGMarkdownHighlighter *hl2;
+	
+	NSDictionary *solarizedColors;
 }
 
 @property (assign) IBOutlet NSWindow *window;
@@ -29,5 +32,9 @@
 
 - (IBAction) delaySliderMove:(id)sender;
 - (IBAction) manualHighlightButtonPress:(id)sender;
+- (IBAction) styleSelected:(id)sender;
+
+
+- (NSDictionary *) getSolarizedColors;
 
 @end
