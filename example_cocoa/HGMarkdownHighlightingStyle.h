@@ -27,6 +27,9 @@
 #define HG_LIGHT(h)	HG_COLOR_HSB(h, 0.2, 1)
 #define HG_DIM(h)	HG_COLOR_HSB(h, 0.2, 0.5)
 
+// version of color 'c' with alpha 'a'
+#define HG_ALPHA(c,a) [NSColor colorWithCalibratedHue:[c hueComponent] saturation:[c saturationComponent] brightness:[c brightnessComponent] alpha:(a)]
+
 // hues
 #define HG_GREEN	0.34
 #define HG_YELLOW	0.15
