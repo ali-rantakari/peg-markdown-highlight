@@ -22,6 +22,7 @@
 	BOOL isActive;
 	BOOL parseAndHighlightAutomatically;
 	BOOL resetTypingAttributes;
+	BOOL makeLinksClickable;
 	NSArray *styles;
 
 @private
