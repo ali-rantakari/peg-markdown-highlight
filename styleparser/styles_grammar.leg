@@ -8,6 +8,7 @@
  */
 
 #include "styleparser.h"
+#include <stdbool.h>
 
 
 attr_argb_color *new_argb_color(int r, int g, int b, int a) {
@@ -15,9 +16,9 @@ attr_argb_color *new_argb_color(int r, int g, int b, int a) {
     c->red = r; c->green = g; c->blue = b; c->alpha = a;
     return c;
 }
-attr_argb_color *new_argb_from_hex(long hex) {
+attr_argb_color *new_argb_from_hex(long hex, bool has_alpha) {
     // 0xaarrggbb
-    int a = ((hex >> 24) & 0xFF);
+    int a = has_alpha ? ((hex >> 24) & 0xFF) : 255;
     int r = ((hex >> 16) & 0xFF);
     int g = ((hex >> 8) & 0xFF);
     int b = (hex & 0xFF);
@@ -26,7 +27,7 @@ attr_argb_color *new_argb_from_hex(long hex) {
 attr_argb_color *new_argb_from_hex_str(char *str) {
     // "aarrggbb"
     long num = strtol(str, NULL, 16);
-    return new_argb_from_hex(num);
+    return new_argb_from_hex(num, (strlen(str) == 8));
 }
 
 attr_value *new_attr_value() {

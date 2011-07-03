@@ -1,6 +1,6 @@
 EMPH
-    foreground: #FF00ff00
-    background: #FF0000ff
+    foreground: #00ff00
+    background: #AB0000ff
 
 STRONG
     dog: 1
