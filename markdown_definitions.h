@@ -5,6 +5,9 @@
  * markdown_definitions.h
  */
 
+#ifndef MARKDOWN_DEFINITIONS
+#define MARKDOWN_DEFINITIONS
+
 /** \file
 * \brief Global definitions for the parser.
 */
@@ -102,4 +105,4 @@ enum markdown_extensions
 	EXT_NOTES			 = 0x02	 /**< A footnote syntax like that of Pandoc or PHP Markdown Extra */
 };
 
-
+#endif
