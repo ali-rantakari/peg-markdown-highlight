@@ -13,7 +13,7 @@ $(GREG):
 	@echo '------- building greg'
 	CC=gcc make -C $(GREGDIR)
 
-styleparser.c : styles_grammar.leg
+styleparser.c : styleparser.leg
 	@echo '------- generating parser code from grammar'
 	$(GREG) -o $@ $<
 
