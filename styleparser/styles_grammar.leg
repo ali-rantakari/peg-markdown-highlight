@@ -1,0 +1,162 @@
+%{
+/* PEG Markdown Highlight
+ * Copyright 2011 Ali Rantakari -- http://hasseg.org
+ * Licensed under the GPL2+ and MIT licenses (see LICENSE for more info).
+ * 
+ * styledef_grammar.leg
+ * 
+ */
+
+#include "styleparser.h"
+
+
+attr_argb_color *new_argb_color(int r, int g, int b, int a) {
+    attr_argb_color *c = (attr_argb_color *)malloc(sizeof(attr_argb_color));
+    c->red = r; c->green = g; c->blue = b; c->alpha = a;
+    return c;
+}
+
+attr_argb_color *new_argb_from_hex(long hex) {
+    // 0xaarrggbb
+    int a = ((hex >> 24) & 0xFF);
+    int r = ((hex >> 16) & 0xFF);
+    int g = ((hex >> 8) & 0xFF);
+    int b = (hex & 0xFF);
+    return new_argb_color(r,g,b,a);
+}
+attr_argb_color *new_argb_from_hex_str(char *str) {
+    // "aarrggbb"
+    long num = strtol(str, NULL, 16);
+    return new_argb_from_hex(num);
+}
+
+attr_value *new_attr_value() {
+    return (attr_value *)malloc(sizeof(attr_value));
+}
+
+
+style_attribute *new_attr(char *name, attr_type type) {
+    style_attribute *attr = (style_attribute *)malloc(sizeof(style_attribute));
+    attr->name = strdup(name);
+    attr->type = type;
+    return attr;
+}
+
+
+// Parsing context data
+typedef struct
+{
+    char *input;
+    int pos;
+    style_attribute **attributes;
+} parser_data;
+
+
+
+# define YYSTYPE style_attribute *
+#ifdef __DEBUG__
+# define YY_DEBUG 1
+#endif
+
+#define YY_INPUT(buf, result, max_size) yy_input_func(buf, &result, max_size, (parser_data *)G->data)
+void yy_input_func(char *buf, int *result, int max_size, parser_data *p_data)
+{
+    int yyc = *(p_data->input + p_data->pos++);
+    (*result) = (EOF == yyc) ? 0 : (*(buf) = yyc, 1);
+    //printf("yyc = %i, result = %i\n", yyc, *result);
+}
+
+
+#define FORE_ATTR(name)   new_attr(name, attr_type_foreground_color)
+#define BACK_ATTR(name)   new_attr(name, attr_type_background_color)
+#define ATTR(name)       new_attr(name, attr_type_other)
+/* ======================================================================== */
+%}
+
+Doc =       ( Block )*
+
+Block =     BlankLine* StyleDef
+
+StyleDef =      StyleLabel (Sp AttrAssignOp)? Sp Newline StyleAttrLine+
+                { printf("styledef.\n"); }
+
+StyleLabel =    < ("EMPH"|"STRONG") > { printf("label: %s\n", yytext); }
+
+StyleAttrLine = Indent a:StyleAttr (Newline|Eof)
+                {
+                    if (a != NULL) {
+                        printf("Got attr: type %i, name %s\n", a->type, a->name);
+                        if (a->type == attr_type_background_color
+                            || a->type == attr_type_foreground_color)
+                            printf("  color: %i %i %i %i\n", a->value->argb_color->alpha,
+                                    a->value->argb_color->red, a->value->argb_color->green,
+                                    a->value->argb_color->blue);
+                    }
+                }
+
+AttrAssignOp =  ':'|'='
+
+StyleAttr =     ARGBColorAttr
+                | ArbitraryAttr
+
+ForeColorAttrName = ("fore"|"fore-color"|"foreground"|"foreground-color")
+BackColorAttrName = ("back"|"back-color"|"background"|"background-color")
+ARGBColorAttr =  (<ForeColorAttrName> { $$ = FORE_ATTR(yytext); }
+                  | <BackColorAttrName> { $$ = BACK_ATTR(yytext); }
+                 )
+                 Sp AttrAssignOp Sp
+                 ('#'|"0x")? < AlphanumericAscii+ >
+                 { $$->value = new_attr_value();
+                   $$->value->argb_color = new_argb_from_hex_str(yytext); }
+
+ArbitraryAttr = < AlphanumericAscii+ >
+                { $$ = ATTR(yytext); }
+                Sp AttrAssignOp Sp
+                < AlphanumericAscii+ >
+                { $$->value = new_attr_value();
+                  $$->value->value = strdup(yytext); }
+
+Indent =        "\t" | "    "
+BlankLine =     Sp Newline
+Eof =           !.
+Spacechar =     ' ' | '\t'
+#Nonspacechar =  !Spacechar !Newline .
+Newline =       '\n' | '\r' '\n'?
+Sp =            Spacechar*
+#Spnl =          Sp (Newline Sp)?
+AlphanumericAscii = [A-Za-z0-9]
+#Digit = [0-9]
+
+%%
+/* ======================================================================== */
+
+void parse(parser_data *p_data)
+{
+    printf("PARSING. (len = %ld)\n", strlen(p_data->input));
+    GREG *g = yyparse_new(p_data);
+    yyparse(g);
+    yyparse_free(g);
+}
+
+parser_data *new_parser_data(char *input)
+{
+    parser_data *p_data = (parser_data*)malloc(sizeof(parser_data));
+    p_data->input = input;
+    p_data->pos = 0;
+    p_data->attributes = (style_attribute**)malloc(sizeof(style_attribute*) * NUM_LANG_TYPES);
+    int i;
+    for (i = 0; i < NUM_LANG_TYPES; i++)
+        p_data->attributes[i] = NULL;
+    return p_data;
+}
+
+
+style_attribute **parse_styles(char *styledef)
+{
+    parser_data *p_data = new_parser_data(styledef);
+    parse(p_data);
+    return p_data->attributes;
+}
+
+
+
