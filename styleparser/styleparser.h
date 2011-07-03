@@ -13,10 +13,15 @@ typedef struct
 typedef enum
 {
     attr_font_style_normal,
-    attr_font_style_bold,
     attr_font_style_condensed,
     attr_font_style_italic
 } attr_font_style;
+
+typedef enum
+{
+    attr_font_weight_normal,
+    attr_font_weight_bold
+} attr_font_weight;
 
 typedef enum
 {
@@ -25,6 +30,7 @@ typedef enum
     attr_type_font_size_pt,
     attr_type_font_family,
     attr_type_font_style,
+    attr_type_font_weight,
     attr_type_other
 } attr_type;
 
@@ -34,7 +40,8 @@ typedef union
     int font_size_pt;
     char *font_family;
     attr_font_style font_style;
-    char *value;
+    attr_font_weight font_weight;
+    char *string;
 } attr_value;
 
 // Style attribute

@@ -25,6 +25,27 @@ char *get_contents(FILE *f)
 int main(int argc, char *argv[])
 {
     char *input = get_contents(stdin);
-    (void)parse_styles(input);
+    style_attribute **attrs = parse_styles(input);
+    
+    printf("------\n");
+    int i;
+    for (i = 0; i < NUM_LANG_TYPES; i++)
+    {
+        if (attrs[i] == NULL)
+            continue;
+        
+        printf("type: %i\n", i);
+        style_attribute *cur = attrs[i];
+        while (cur != NULL)
+        {
+            printf("  attr %i = ", cur->type);
+            if (cur->type == attr_type_background_color || cur->type == attr_type_foreground_color)
+                printf("%i,%i,%i,%i\n", cur->value->argb_color->alpha, cur->value->argb_color->red, cur->value->argb_color->green, cur->value->argb_color->blue);
+            else
+                printf("%s\n", cur->value->string);
+            cur = cur->next;
+        }
+    }
+    
     return 0;
 }

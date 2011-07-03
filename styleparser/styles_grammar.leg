@@ -15,7 +15,6 @@ attr_argb_color *new_argb_color(int r, int g, int b, int a) {
     c->red = r; c->green = g; c->blue = b; c->alpha = a;
     return c;
 }
-
 attr_argb_color *new_argb_from_hex(long hex) {
     // 0xaarrggbb
     int a = ((hex >> 24) & 0xFF);
@@ -34,11 +33,11 @@ attr_value *new_attr_value() {
     return (attr_value *)malloc(sizeof(attr_value));
 }
 
-
 style_attribute *new_attr(char *name, attr_type type) {
     style_attribute *attr = (style_attribute *)malloc(sizeof(style_attribute));
     attr->name = strdup(name);
     attr->type = type;
+    attr->next = NULL;
     return attr;
 }
 
@@ -53,7 +52,156 @@ typedef struct
 
 
 
-# define YYSTYPE style_attribute *
+
+
+typedef struct sem_value
+{
+    char *name;
+    char *value;
+    struct sem_value *next;
+} sem_value;
+
+sem_value *new_sem_value(char *name, char *value)
+{
+    sem_value *v = (sem_value *)malloc(sizeof(sem_value));
+    v->name = name;
+    v->value = value;
+    v->next = NULL;
+    return v;
+}
+
+static sem_value *cons(sem_value *elem, sem_value *list)
+{
+    elem->next = list;
+    return elem;
+}
+
+
+
+element_type element_type_from_name(char *name)
+{
+    static char **elem_type_names = NULL;
+    if (elem_type_names == NULL)
+    {
+        elem_type_names = (char **)malloc(sizeof(char*) * NUM_LANG_TYPES);
+        elem_type_names[LINK] = "LINK";
+        elem_type_names[AUTO_LINK_URL] = "AUTO_LINK_URL";
+        elem_type_names[AUTO_LINK_EMAIL] = "AUTO_LINK_EMAIL";
+        elem_type_names[IMAGE] = "IMAGE";
+        elem_type_names[CODE] = "CODE";
+        elem_type_names[HTML] = "HTML";
+        elem_type_names[HTML_ENTITY] = "HTML_ENTITY";
+        elem_type_names[EMPH] = "EMPH";
+        elem_type_names[STRONG] = "STRONG";
+        elem_type_names[LIST_BULLET] = "LIST_BULLET";
+        elem_type_names[LIST_ENUMERATOR] = "LIST_ENUMERATOR";
+        elem_type_names[COMMENT] = "COMMENT";
+        elem_type_names[H1] = "H1";
+        elem_type_names[H2] = "H2";
+        elem_type_names[H3] = "H3";
+        elem_type_names[H4] = "H4";
+        elem_type_names[H5] = "H5";
+        elem_type_names[H6] = "H6";
+        elem_type_names[BLOCKQUOTE] = "BLOCKQUOTE";
+        elem_type_names[VERBATIM] = "VERBATIM";
+        elem_type_names[HTMLBLOCK] = "HTMLBLOCK";
+        elem_type_names[HRULE] = "HRULE";
+        elem_type_names[REFERENCE] = "REFERENCE";
+        elem_type_names[NOTE] = "NOTE";
+    }
+    
+    int i;
+    for (i = 0; i < NUM_LANG_TYPES; i++)
+    {
+        if (strcmp(elem_type_names[i], name) == 0)
+            return i;
+    }
+    
+    return NO_TYPE;
+}
+
+#define IF_ATTR_NAME(x) if (strcmp(x, name) == 0)
+attr_type attr_type_from_name(char *name)
+{
+    IF_ATTR_NAME("foreground") return attr_type_foreground_color;
+    else IF_ATTR_NAME("foreground-color") return attr_type_foreground_color;
+    else IF_ATTR_NAME("background") return attr_type_background_color;
+    else IF_ATTR_NAME("background-color") return attr_type_background_color;
+    else IF_ATTR_NAME("font-size") return attr_type_font_size_pt;
+    else IF_ATTR_NAME("font-family") return attr_type_font_family;
+    else IF_ATTR_NAME("font-style") return attr_type_font_style;
+    else IF_ATTR_NAME("font-weight") return attr_type_font_weight;
+    return attr_type_other;
+}
+
+style_attribute *interpret_attributes(sem_value *raw_attributes)
+{
+    style_attribute *attrs = NULL;
+    
+    sem_value *cur = raw_attributes;
+    while (cur != NULL)
+    {
+        attr_type atype = attr_type_from_name(cur->name);
+        style_attribute *attr = new_attr(cur->name, atype);
+        attr->value = new_attr_value();
+        
+        if (atype == attr_type_foreground_color || atype == attr_type_background_color)
+        {
+            char *hexstr = cur->value;
+            if (*hexstr == '#')
+                hexstr++;
+            attr->value->argb_color = new_argb_from_hex_str(hexstr);
+        }
+        else if (atype == attr_type_font_size_pt)
+        {
+            // todo: trim non-digits off from value (e.g. "14pt") 
+            attr->value->font_size_pt = atoi(cur->value);
+        }
+        else if (atype == attr_type_font_family)
+        {
+            attr->value->font_family = strdup(cur->value);
+        }
+        else if (atype == attr_type_font_style)
+        {
+            attr_font_style style = attr_font_style_normal;
+            if (strcmp(cur->value, "italic") == 0)
+                style = attr_font_style_italic;
+            else if (strcmp(cur->value, "condensed") == 0)
+                style = attr_font_style_condensed;
+            attr->value->font_style = style;
+        }
+        else if (atype == attr_type_font_weight)
+        {
+            attr_font_weight weight = attr_font_weight_normal;
+            if (strcmp(cur->value, "bold") == 0)
+                weight = attr_font_weight_bold;
+            attr->value->font_weight = weight;
+        }
+        else if (atype == attr_type_other)
+        {
+            attr->value->string = strdup(cur->value);
+        }
+        
+        // add to linked list
+        attr->next = attrs;
+        attrs = attr;
+        
+        cur = cur->next;
+    }
+    
+    return attrs;
+}
+
+void interpret_and_add_style(parser_data *p_data, char *element_type_name, sem_value *raw_attributes)
+{
+    style_attribute *attrs = interpret_attributes(raw_attributes);
+    element_type type = element_type_from_name(element_type_name);
+    p_data->attributes[type] = attrs;
+}
+
+
+
+# define YYSTYPE sem_value *
 #ifdef __DEBUG__
 # define YY_DEBUG 1
 #endif
@@ -63,58 +211,41 @@ void yy_input_func(char *buf, int *result, int max_size, parser_data *p_data)
 {
     int yyc = *(p_data->input + p_data->pos++);
     (*result) = (EOF == yyc) ? 0 : (*(buf) = yyc, 1);
-    //printf("yyc = %i, result = %i\n", yyc, *result);
 }
 
-
-#define FORE_ATTR(name)   new_attr(name, attr_type_foreground_color)
-#define BACK_ATTR(name)   new_attr(name, attr_type_background_color)
-#define ATTR(name)       new_attr(name, attr_type_other)
+#define SEMVAL  new_sem_value(strdup(yytext), NULL);
 /* ======================================================================== */
 %}
 
-Doc =       ( Block )*
+Doc =           ( Block )*
 
-Block =     BlankLine* StyleDef
+StartList =     &. { $$ = NULL; }
 
-StyleDef =      StyleLabel (Sp AttrAssignOp)? Sp Newline StyleAttrLine+
-                { printf("styledef.\n"); }
+Block =         BlankLine* StyleDef
 
-StyleLabel =    < ("EMPH"|"STRONG") > { printf("label: %s\n", yytext); }
+StyleDef =      x:StartList
+                l:StyleLabel
+                Newline
+                ( a:StyleAttrLine { x = cons(a, x); } )+
+                { interpret_and_add_style((parser_data *)G->data, l->name, x); }
+
+StyleLabel =    < StyleLabelChar+ >
+                { $$ = SEMVAL; }
 
 StyleAttrLine = Indent a:StyleAttr (Newline|Eof)
-                {
-                    if (a != NULL) {
-                        printf("Got attr: type %i, name %s\n", a->type, a->name);
-                        if (a->type == attr_type_background_color
-                            || a->type == attr_type_foreground_color)
-                            printf("  color: %i %i %i %i\n", a->value->argb_color->alpha,
-                                    a->value->argb_color->red, a->value->argb_color->green,
-                                    a->value->argb_color->blue);
-                    }
-                }
+                { $$ = a; }
 
-AttrAssignOp =  ':'|'='
+AssignOp =      ':'|'='
 
-StyleAttr =     ARGBColorAttr
-                | ArbitraryAttr
+StyleAttr =     < AttrNameChar+ >
+                { $$ = SEMVAL; }
+                Sp AssignOp Sp
+                < AttrValueChar+ >
+                { $$->value = strdup(yytext); }
 
-ForeColorAttrName = ("fore"|"fore-color"|"foreground"|"foreground-color")
-BackColorAttrName = ("back"|"back-color"|"background"|"background-color")
-ARGBColorAttr =  (<ForeColorAttrName> { $$ = FORE_ATTR(yytext); }
-                  | <BackColorAttrName> { $$ = BACK_ATTR(yytext); }
-                 )
-                 Sp AttrAssignOp Sp
-                 ('#'|"0x")? < AlphanumericAscii+ >
-                 { $$->value = new_attr_value();
-                   $$->value->argb_color = new_argb_from_hex_str(yytext); }
-
-ArbitraryAttr = < AlphanumericAscii+ >
-                { $$ = ATTR(yytext); }
-                Sp AttrAssignOp Sp
-                < AlphanumericAscii+ >
-                { $$->value = new_attr_value();
-                  $$->value->value = strdup(yytext); }
+StyleLabelChar = [A-Z_]
+AttrNameChar =  [A-Za-z0-9]
+AttrValueChar = [A-Za-z0-9#_]
 
 Indent =        "\t" | "    "
 BlankLine =     Sp Newline
@@ -124,7 +255,6 @@ Spacechar =     ' ' | '\t'
 Newline =       '\n' | '\r' '\n'?
 Sp =            Spacechar*
 #Spnl =          Sp (Newline Sp)?
-AlphanumericAscii = [A-Za-z0-9]
 #Digit = [0-9]
 
 %%
