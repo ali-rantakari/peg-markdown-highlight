@@ -10,6 +10,10 @@
 #include "styleparser.h"
 #include <stdbool.h>
 
+// Set custom parser prefix to avoid name collisions with the main
+// PEG Markdown Highlight parser:
+#define YY_NAME(N) style_yy##N
+
 
 attr_argb_color *new_argb_color(int r, int g, int b, int a) {
     attr_argb_color *c = (attr_argb_color *)malloc(sizeof(attr_argb_color));
@@ -49,7 +53,7 @@ typedef struct
     char *input;
     int pos;
     style_attribute **attributes;
-} parser_data;
+} style_parser_data;
 
 
 
@@ -193,7 +197,7 @@ style_attribute *interpret_attributes(sem_value *raw_attributes)
     return attrs;
 }
 
-void interpret_and_add_style(parser_data *p_data, char *element_type_name, sem_value *raw_attributes)
+void interpret_and_add_style(style_parser_data *p_data, char *element_type_name, sem_value *raw_attributes)
 {
     style_attribute *attrs = interpret_attributes(raw_attributes);
     element_type type = element_type_from_name(element_type_name);
@@ -207,8 +211,8 @@ void interpret_and_add_style(parser_data *p_data, char *element_type_name, sem_v
 # define YY_DEBUG 1
 #endif
 
-#define YY_INPUT(buf, result, max_size) yy_input_func(buf, &result, max_size, (parser_data *)G->data)
-void yy_input_func(char *buf, int *result, int max_size, parser_data *p_data)
+#define YY_INPUT(buf, result, max_size) YY_NAME(input_func)(buf, &result, max_size, (style_parser_data *)G->data)
+void YY_NAME(input_func)(char *buf, int *result, int max_size, style_parser_data *p_data)
 {
     int yyc = *(p_data->input + p_data->pos++);
     (*result) = (EOF == yyc) ? 0 : (*(buf) = yyc, 1);
@@ -228,7 +232,7 @@ StyleDef =      x:StartList
                 l:StyleLabel
                 Newline
                 ( a:StyleAttrLine { x = cons(a, x); } )+
-                { interpret_and_add_style((parser_data *)G->data, l->name, x); }
+                { interpret_and_add_style((style_parser_data *)G->data, l->name, x); }
 
 StyleLabel =    < StyleLabelChar+ >
                 { $$ = SEMVAL; }
@@ -261,17 +265,17 @@ Sp =            Spacechar*
 %%
 /* ======================================================================== */
 
-void parse(parser_data *p_data)
+void _sty_parse(style_parser_data *p_data)
 {
     printf("PARSING. (len = %ld)\n", strlen(p_data->input));
-    GREG *g = yyparse_new(p_data);
-    yyparse(g);
-    yyparse_free(g);
+    GREG *g = YY_NAME(parse_new)(p_data);
+    YY_NAME(parse)(g);
+    YY_NAME(parse_free)(g);
 }
 
-parser_data *new_parser_data(char *input)
+style_parser_data *new_style_parser_data(char *input)
 {
-    parser_data *p_data = (parser_data*)malloc(sizeof(parser_data));
+    style_parser_data *p_data = (style_parser_data*)malloc(sizeof(style_parser_data));
     p_data->input = input;
     p_data->pos = 0;
     p_data->attributes = (style_attribute**)malloc(sizeof(style_attribute*) * NUM_LANG_TYPES);
@@ -284,8 +288,8 @@ parser_data *new_parser_data(char *input)
 
 style_attribute **parse_styles(char *styledef)
 {
-    parser_data *p_data = new_parser_data(styledef);
-    parse(p_data);
+    style_parser_data *p_data = new_style_parser_data(styledef);
+    _sty_parse(p_data);
     return p_data->attributes;
 }
 
