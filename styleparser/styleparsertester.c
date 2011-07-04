@@ -35,8 +35,18 @@ void print_styles(style_attribute *list)
                    list->value->argb_color->red,
                    list->value->argb_color->green,
                    list->value->argb_color->blue);
-        else
+        else if (list->type == attr_type_font_weight)
+            printf("%i\n", list->value->font_weight);
+        else if (list->type == attr_type_font_style)
+            printf("%i\n", list->value->font_style);
+        else if (list->type == attr_type_font_size_pt)
+            printf("%i pt\n", list->value->font_size_pt);
+        else if (list->type == attr_type_font_family)
+            printf("%s\n", list->value->font_family);
+        else if (list->type == attr_type_other)
             printf("%s\n", list->value->string);
+        else
+            printf("???\n");
         list = list->next;
     }
 }
