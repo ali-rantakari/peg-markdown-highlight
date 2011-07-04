@@ -13,6 +13,30 @@
 #include <ctype.h>
 
 
+// vasprintf is not in the C standard nor in POSIX so we provide our own
+int our_vasprintf(char **strptr, const char *fmt, va_list argptr)
+{
+    int ret;
+    va_list argptr2;
+    *strptr = NULL;
+    
+    va_copy(argptr2, argptr);
+    ret = vsnprintf(NULL, 0, fmt, argptr2);
+    if (ret <= 0)
+        return ret;
+    
+    *strptr = (char *)malloc(ret+1);
+    if (*strptr == NULL)
+        return -1;
+    
+    va_copy(argptr2, argptr);
+    ret = vsnprintf(*strptr, ret+1, fmt, argptr2);
+    
+    return ret;
+}
+
+
+
 // Set custom symbol name prefix to avoid name collisions with the main
 // PEG Markdown Highlight parser:
 #define YY_NAME(N) style_yy##N
@@ -186,7 +210,7 @@ void report_error(style_parser_data *p_data, char *str, ...)
     va_list argptr;
     va_start(argptr, str);
     char *errmsg;
-    vasprintf(&errmsg, str, argptr);
+    our_vasprintf(&errmsg, str, argptr);
     va_end(argptr);
     p_data->error_callback(errmsg);
     free(errmsg);
