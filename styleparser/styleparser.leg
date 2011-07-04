@@ -55,6 +55,7 @@ typedef struct
     char *input;
     int pos;
     void (*error_callback)(char *);
+    int styles_pos;
     style_collection *styles;
 } style_parser_data;
 
@@ -193,6 +194,7 @@ void report_error(style_parser_data *p_data, char *str, ...)
 
 #define EQUALS(a,b) (strcmp(a, b) == 0)
 style_attribute *interpret_attributes(style_parser_data *p_data,
+                                      element_type lang_element_type,
                                       sem_value *raw_attributes)
 {
     style_attribute *attrs = NULL;
@@ -202,6 +204,7 @@ style_attribute *interpret_attributes(style_parser_data *p_data,
     {
         attr_type atype = attr_type_from_name(cur->name);
         style_attribute *attr = new_attr(cur->name, atype);
+        attr->lang_element_type = lang_element_type;
         attr->value = new_attr_value();
         
         if (atype == attr_type_foreground_color
@@ -271,12 +274,12 @@ void interpret_and_add_style(style_parser_data *p_data,
                              char *element_type_name,
                              sem_value *raw_attributes)
 {
-    style_attribute *attrs = interpret_attributes(p_data, raw_attributes);
     element_type type = element_type_from_name(element_type_name);
+    style_attribute *attrs = interpret_attributes(p_data, type, raw_attributes);
     if (type == EDITOR_STYLE_TYPE)
         p_data->styles->editor_styles = attrs;
     else
-        p_data->styles->element_styles[type] = attrs;
+        p_data->styles->element_styles[(p_data->styles_pos)++] = attrs;
 }
 
 
@@ -373,6 +376,7 @@ style_parser_data *new_style_parser_data(char *input)
                                 malloc(sizeof(style_parser_data));
     p_data->input = input;
     p_data->pos = 0;
+    p_data->styles_pos = 0;
     p_data->styles = new_style_collection();
     return p_data;
 }

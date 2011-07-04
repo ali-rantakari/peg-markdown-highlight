@@ -77,9 +77,12 @@ int main(int argc, char *argv[])
         
         if (cur == NULL)
             continue;
-        printf("%s:\n", element_name_from_type(i));
+        printf("%s:\n", element_name_from_type(cur->lang_element_type));
         print_styles(cur);
     }
     
     return 0;
 }
+
+
+

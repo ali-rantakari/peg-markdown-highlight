@@ -49,6 +49,7 @@ typedef union
 // Style attribute
 typedef struct style_attribute
 {
+    element_type lang_element_type;
     attr_type type;
     char *name;
     attr_value *value;
