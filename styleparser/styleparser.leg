@@ -268,13 +268,21 @@ style_attribute *interpret_attributes(style_parser_data *p_data,
 
 // The element_type value that stands in as an indicator of "editor-wide"
 // style definitions:
-#define EDITOR_STYLE_TYPE  NO_TYPE
+#define EDITOR_STYLE_TYPE  SEPARATOR
 
 void interpret_and_add_style(style_parser_data *p_data,
                              char *element_type_name,
                              sem_value *raw_attributes)
 {
     element_type type = element_type_from_name(element_type_name);
+    if (EQUALS(element_type_name, "editor"))
+        type = EDITOR_STYLE_TYPE;
+    if (type == NO_TYPE) {
+        report_error(p_data,
+            "Style rule '%s' is not a language element type name or 'editor'",
+            element_type_name);
+        return;
+    }
     style_attribute *attrs = interpret_attributes(p_data, type, raw_attributes);
     if (type == EDITOR_STYLE_TYPE)
         p_data->styles->editor_styles = attrs;
