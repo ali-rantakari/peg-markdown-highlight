@@ -337,7 +337,7 @@ StyleAttr =     < AttrNameChar+ >
 
 StyleLabelChar = [A-Z0-9_]
 AttrNameChar =  [A-Za-z0-9-]
-AttrValueChar = (!Newline !Eof .)
+AttrValueChar = (!Newline !Eof !BeginLineComment .)
 
 Indent =        "\t" | "    "
 BlankLine =     Sp Newline
@@ -349,7 +349,8 @@ Sp =            Spacechar*
 #Spnl =          Sp (Newline Sp)?
 #Digit = [0-9]
 
-LineComment =   '#' (!Newline !Eof .)* (Newline|Eof)
+BeginLineComment = '#'
+LineComment =   BeginLineComment (!Newline !Eof .)* (Newline|Eof)
 
 %%
 /* ======================================================================== */
