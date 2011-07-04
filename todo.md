@@ -1,5 +1,6 @@
 Parser
 ------
+- Fix bug: image highlight when image label does not exist
 - More granular matching of elements:
     - Match whole blockquote area separately from blockquote indicator
     - Match actual content separately from syntax characters (e.g. provide
@@ -8,7 +9,9 @@ Parser
 - Highlight footnote syntax
 - Use same type for offsets in greg-generated parser code and additional
   parser code (now they're `int` and `unsigned long`).
-- Highlight HTML?
+- Highlight more HTML
+    - Elements corresponding to Markdown elements
+    - Other elements? (we have the HTML element type for that -- need more?)
 - Reduce memory usage (profile with valgrind, Instruments or somesuch)
 
 
