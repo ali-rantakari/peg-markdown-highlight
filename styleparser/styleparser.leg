@@ -326,7 +326,7 @@ StyleAttr =     < AttrNameChar+ >
 
 StyleLabelChar = [A-Z0-9_]
 AttrNameChar =  [A-Za-z0-9-]
-AttrValueChar = [A-Za-z0-9#_]
+AttrValueChar = (!Newline !Eof .)
 
 Indent =        "\t" | "    "
 BlankLine =     Sp Newline
