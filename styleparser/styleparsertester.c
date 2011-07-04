@@ -22,29 +22,53 @@ char *get_contents(FILE *f)
     return content;
 }
 
+void print_styles(style_attribute *list)
+{
+    while (list != NULL)
+    {
+        printf("  %s = ", attr_name_from_type(list->type));
+        if (list->type == attr_type_background_color
+            || list->type == attr_type_foreground_color
+            )
+            printf("%i,%i,%i,%i\n",
+                   list->value->argb_color->alpha,
+                   list->value->argb_color->red,
+                   list->value->argb_color->green,
+                   list->value->argb_color->blue);
+        else
+            printf("%s\n", list->value->string);
+        list = list->next;
+    }
+}
+
+void parsing_error_callback(char *error_message)
+{
+    fprintf(stderr, "ERROR: %s\n", error_message);
+}
+
 int main(int argc, char *argv[])
 {
     char *input = get_contents(stdin);
-    style_attribute **attrs = parse_styles(input);
+    style_collection *styles = parse_styles(input, &parsing_error_callback);
     
     printf("------\n");
+    
+    if (styles->editor_styles != NULL)
+    {
+        printf("Editor styles:\n");
+        print_styles(styles->editor_styles);
+        printf("\n");
+    }
+    
     int i;
     for (i = 0; i < NUM_LANG_TYPES; i++)
     {
-        if (attrs[i] == NULL)
-            continue;
+        style_attribute *cur = styles->element_styles[i];
         
-        printf("type: %i\n", i);
-        style_attribute *cur = attrs[i];
-        while (cur != NULL)
-        {
-            printf("  attr %i = ", cur->type);
-            if (cur->type == attr_type_background_color || cur->type == attr_type_foreground_color)
-                printf("%i,%i,%i,%i\n", cur->value->argb_color->alpha, cur->value->argb_color->red, cur->value->argb_color->green, cur->value->argb_color->blue);
-            else
-                printf("%s\n", cur->value->string);
-            cur = cur->next;
-        }
+        if (cur == NULL)
+            continue;
+        printf("%s:\n", element_name_from_type(i));
+        print_styles(cur);
     }
     
     return 0;

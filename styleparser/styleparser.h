@@ -23,6 +23,7 @@ typedef enum
     attr_font_weight_bold
 } attr_font_weight;
 
+// Style attribute types
 typedef enum
 {
     attr_type_foreground_color,
@@ -34,6 +35,7 @@ typedef enum
     attr_type_other
 } attr_type;
 
+// Style attribute value
 typedef union
 {
     attr_argb_color *argb_color;
@@ -53,5 +55,17 @@ typedef struct style_attribute
     struct style_attribute *next;
 } style_attribute;
 
-style_attribute **parse_styles(char *styledef);
+// Collection of styles
+typedef struct
+{
+    style_attribute *editor_styles;
+    style_attribute **element_styles;
+} style_collection;
+
+style_collection *parse_styles(char *input, void(*error_callback)(char*));
+
+element_type element_type_from_name(char *name);
+char *element_name_from_type(element_type type);
+attr_type attr_type_from_name(char *name);
+char *attr_name_from_type(attr_type type);
 
