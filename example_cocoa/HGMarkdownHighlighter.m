@@ -68,7 +68,6 @@
 	if (!(self = [self init]))
 		return nil;
 	self.targetTextView = textView;
-	[self readClearTextStylesFromTextView];
 	return self;
 }
 
@@ -427,6 +426,20 @@
 	else
 		styleDependenciesPending = YES;
 }
+
+
+- (void) setTargetTextView:(NSTextView *)newTextView
+{
+	if (targetTextView == newTextView)
+		return;
+	
+	[targetTextView release];
+	targetTextView = [newTextView retain];
+	
+	if (targetTextView != nil)
+		[self readClearTextStylesFromTextView];
+}
+
 
 - (void) parseAndHighlightNow
 {
