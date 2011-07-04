@@ -348,7 +348,6 @@ LineComment =   '#' (!Newline !Eof .)* (Newline|Eof)
 
 void _sty_parse(style_parser_data *p_data)
 {
-    printf("PARSING. (len = %ld)\n", strlen(p_data->input));
     GREG *g = YY_NAME(parse_new)(p_data);
     YY_NAME(parse)(g);
     YY_NAME(parse_free)(g);
