@@ -218,12 +218,20 @@
 	clearFontTraitMask = [self getClearFontTraitMask:
 						  [[NSFontManager sharedFontManager]
 						   traitsOfFont:[self.targetTextView font]]];
+	
 	self.defaultTextColor = [self.targetTextView textColor];
-	self.defaultTypingAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
-									[self.targetTextView backgroundColor], NSBackgroundColorAttributeName,
-									[self.targetTextView textColor], NSForegroundColorAttributeName,
-									[self.targetTextView font], NSFontAttributeName,
-									nil];
+	
+	NSMutableDictionary *typingAttrs = [NSMutableDictionary dictionary];
+	if ([self.targetTextView backgroundColor] != nil)
+		[typingAttrs setObject:[self.targetTextView backgroundColor]
+						forKey:NSBackgroundColorAttributeName];
+	if ([self.targetTextView textColor] != nil)
+		[typingAttrs setObject:[self.targetTextView textColor]
+						forKey:NSForegroundColorAttributeName];
+	if ([self.targetTextView font] != nil)
+		[typingAttrs setObject:[self.targetTextView font]
+						forKey:NSFontAttributeName];
+	self.defaultTypingAttributes = typingAttrs;
 }
 
 - (void) applyHighlighting:(element **)elements withRange:(NSRange)range
