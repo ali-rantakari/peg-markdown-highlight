@@ -1,8 +1,0 @@
-EMPH
-    foreground: #00ff00
-    background: #AB0000ff
-
-STRONG
-    dog: 1
-    cat: 4
-

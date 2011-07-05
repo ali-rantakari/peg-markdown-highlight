@@ -1,0 +1,18 @@
+editor
+foreground: 13ff13
+background: 000000
+
+EMPH
+foreground: 00ff00
+background: AB0000ff
+
+STRONG
+dog: 1
+cat: 4
+font-style: italic
+font-weight: bold
+font-size: 16
+font-family: Courier
+
+BOO
+x: 3
