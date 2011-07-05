@@ -34,5 +34,5 @@ distclean: clean
 	make -C $(GREGDIR) spotless
 
 leak-check: $(TESTER)
-	valgrind --leak-check=full ./styleparsertester < ../todo.md
+	valgrind --leak-check=full ./styleparsertester < styles/teststyle.style
 
