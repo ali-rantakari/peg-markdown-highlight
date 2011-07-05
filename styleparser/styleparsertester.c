@@ -81,6 +81,9 @@ int main(int argc, char *argv[])
         print_styles(cur);
     }
     
+    free_style_collection(styles);
+    free(input);
+    
     return 0;
 }
 
