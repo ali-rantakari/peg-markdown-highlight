@@ -11,17 +11,10 @@
 #import "styleparser.h"
 
 
-typedef struct
-{
-	id delegate;
-	SEL selector;
-} StyleparsingErrorContext;
-
 void styleparsing_error_callback(char *error_message, void *context_data)
 {
-	StyleparsingErrorContext *context = (StyleparsingErrorContext *)context_data;
-	[context->delegate performSelector:context->selector
-							withObject:[NSString stringWithUTF8String:error_message]];
+	[((HGMarkdownHighlighter *)context_data) performSelector:@selector(handleStyleParsingError:)
+												  withObject:[NSString stringWithUTF8String:error_message]];
 }
 
 
@@ -62,6 +55,7 @@ void styleparsing_error_callback(char *error_message, void *context_data)
 	cachedElements = NULL;
 	currentHighlightText = NULL;
 	styleDependenciesPending = NO;
+	styleParsingErrors = [[NSMutableArray array] retain];
 	
 	self.defaultTypingAttributes = nil;
 	self.workerThread = nil;
@@ -114,6 +108,7 @@ void styleparsing_error_callback(char *error_message, void *context_data)
 	self.targetTextView = nil;
 	self.updateTimer = nil;
 	self.styles = nil;
+	[styleParsingErrors release], styleParsingErrors = nil;
 	[super dealloc];
 }
 
@@ -454,23 +449,27 @@ void styleparsing_error_callback(char *error_message, void *context_data)
 		styleDependenciesPending = YES;
 }
 
+- (void) handleStyleParsingError:(NSString *)errorMessage
+{
+	[styleParsingErrors addObject:errorMessage];
+}
 
 - (void) applyStylesFromStylesheet:(NSString *)stylesheet
-				 withErrorDelegate:(id)delegate
-					 errorSelector:(SEL)selector
+				 withErrorDelegate:(id)errorDelegate
+					 errorSelector:(SEL)errorSelector
 {
 	char *c_stylesheet = (char *)[stylesheet UTF8String];
 	style_collection *style_coll = NULL;
 	
-	if (delegate == nil)
+	if (errorDelegate == nil)
 		style_coll = parse_styles(c_stylesheet, NULL, NULL);
 	else
 	{
-		StyleparsingErrorContext *error_context = (StyleparsingErrorContext *)malloc(sizeof(StyleparsingErrorContext));
-		error_context->delegate = delegate;
-		error_context->selector = selector;
-		style_coll = parse_styles(c_stylesheet, &styleparsing_error_callback, error_context);
-		free(error_context);
+		[styleParsingErrors removeAllObjects];
+		style_coll = parse_styles(c_stylesheet, &styleparsing_error_callback, self);
+		if ([styleParsingErrors count] > 0)
+			[errorDelegate performSelector:errorSelector
+							    withObject:styleParsingErrors];
 	}
 	
 	NSMutableArray *stylesArr = [NSMutableArray array];

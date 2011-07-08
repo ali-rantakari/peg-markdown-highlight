@@ -35,6 +35,7 @@
 	char *currentHighlightText;
 	BOOL workerThreadResultsInvalid;
 	BOOL styleDependenciesPending;
+	NSMutableArray *styleParsingErrors;
 }
 
 /** \brief The order and styles for higlighting different elements.

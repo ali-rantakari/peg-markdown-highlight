@@ -24,15 +24,11 @@
 	if (!(self = [super init]))
 		return nil;
 	
-	styleParsingErrors = [[NSMutableArray array] retain];
-	
 	return self;
 }
 
 - (void) dealloc
 {
-	if (styleParsingErrors != nil)
-		[styleParsingErrors release], styleParsingErrors = nil;
 	[super dealloc];
 }
 
@@ -43,18 +39,10 @@
 }
 
 
-- (void) handleStyleParsingError:(NSString *)errorMessage
+- (void) handleStyleParsingErrors:(NSArray *)errorMessages
 {
-	[styleParsingErrors addObject:errorMessage];
-}
-
-- (void) reportStyleParsingErrors
-{
-	if ([styleParsingErrors count] == 0)
-		return;
-	
 	NSMutableString *errorsInfo = [NSMutableString string];
-	for (NSString *str in styleParsingErrors)
+	for (NSString *str in errorMessages)
 	{
 		[errorsInfo appendString:@"• "];
 		[errorsInfo appendString:str];
@@ -86,11 +74,9 @@
 		NSString *styleContents = [NSString stringWithContentsOfFile:styleFilePath
 															encoding:NSUTF8StringEncoding
 															   error:NULL];
-		[styleParsingErrors removeAllObjects];
 		[hl1 applyStylesFromStylesheet:styleContents
 					 withErrorDelegate:self
-						 errorSelector:@selector(handleStyleParsingError:)];
-		[self reportStyleParsingErrors];
+						 errorSelector:@selector(handleStyleParsingErrors:)];
 	}
 
 	[hl1 highlightNow];
