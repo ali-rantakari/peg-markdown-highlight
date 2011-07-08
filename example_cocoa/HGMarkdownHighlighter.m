@@ -10,6 +10,21 @@
 #import "markdown_parser.h"
 #import "styleparser.h"
 
+
+typedef struct
+{
+	id delegate;
+	SEL selector;
+} StyleparsingErrorContext;
+
+void styleparsing_error_callback(char *error_message, void *context_data)
+{
+	StyleparsingErrorContext *context = (StyleparsingErrorContext *)context_data;
+	[context->delegate performSelector:context->selector
+							withObject:[NSString stringWithUTF8String:error_message]];
+}
+
+
 // 'private members' category
 @interface HGMarkdownHighlighter()
 
@@ -438,11 +453,22 @@
 
 
 - (void) applyStylesFromStylesheet:(NSString *)stylesheet
+				 withErrorDelegate:(id)delegate
+					 errorSelector:(SEL)selector
 {
-	// Todo: support error reporting somehow
-	
 	char *c_stylesheet = (char *)[stylesheet UTF8String];
-	style_collection *style_coll = parse_styles(c_stylesheet, NULL);
+	style_collection *style_coll = NULL;
+	
+	if (delegate == nil)
+		style_coll = parse_styles(c_stylesheet, NULL, NULL);
+	else
+	{
+		StyleparsingErrorContext *error_context = (StyleparsingErrorContext *)malloc(sizeof(StyleparsingErrorContext));
+		error_context->delegate = delegate;
+		error_context->selector = selector;
+		style_coll = parse_styles(c_stylesheet, &styleparsing_error_callback, error_context);
+		free(error_context);
+	}
 	
 	NSMutableArray *stylesArr = [NSMutableArray array];
 	

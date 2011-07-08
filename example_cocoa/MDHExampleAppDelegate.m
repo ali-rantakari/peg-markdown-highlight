@@ -24,11 +24,15 @@
 	if (!(self = [super init]))
 		return nil;
 	
+	styleParsingErrors = [[NSMutableArray array] retain];
+	
 	return self;
 }
 
 - (void) dealloc
 {
+	if (styleParsingErrors != nil)
+		[styleParsingErrors release], styleParsingErrors = nil;
 	[super dealloc];
 }
 
@@ -38,6 +42,32 @@
 	[delayLabel setFloatValue:ROUND_QUARTER([delaySlider floatValue])];
 }
 
+
+- (void) handleStyleParsingError:(NSString *)errorMessage
+{
+	[styleParsingErrors addObject:errorMessage];
+}
+
+- (void) reportStyleParsingErrors
+{
+	if ([styleParsingErrors count] == 0)
+		return;
+	
+	NSMutableString *errorsInfo = [NSMutableString string];
+	for (NSString *str in styleParsingErrors)
+	{
+		[errorsInfo appendString:@"• "];
+		[errorsInfo appendString:str];
+		[errorsInfo appendString:@"\n"];
+	}
+	
+	NSAlert *alert = [NSAlert alertWithMessageText:@"There were some errors when parsing the stylesheet:"
+									 defaultButton:@"Ok"
+								   alternateButton:nil
+									   otherButton:nil
+						 informativeTextWithFormat:errorsInfo];
+	[alert runModal];
+}
 
 - (void) setTextView1Styles:(NSString *)styleName
 {
@@ -56,7 +86,11 @@
 		NSString *styleContents = [NSString stringWithContentsOfFile:styleFilePath
 															encoding:NSUTF8StringEncoding
 															   error:NULL];
-		[hl1 applyStylesFromStylesheet:styleContents];
+		[styleParsingErrors removeAllObjects];
+		[hl1 applyStylesFromStylesheet:styleContents
+					 withErrorDelegate:self
+						 errorSelector:@selector(handleStyleParsingError:)];
+		[self reportStyleParsingErrors];
 	}
 
 	[hl1 highlightNow];

@@ -22,6 +22,8 @@
 	
 	HGMarkdownHighlighter *hl1;
 	HGMarkdownHighlighter *hl2;
+	
+	NSMutableArray *styleParsingErrors;
 }
 
 @property (assign) IBOutlet NSWindow *window;

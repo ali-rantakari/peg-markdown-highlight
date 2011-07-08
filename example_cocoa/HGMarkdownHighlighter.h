@@ -119,7 +119,9 @@
 
 /** \brief todo
  */
-- (void) applyStylesFromStylesheet:(NSString *)stylesheet;
+- (void) applyStylesFromStylesheet:(NSString *)stylesheet
+				 withErrorDelegate:(id)delegate
+					 errorSelector:(SEL)selector;
 
 /** \brief Manually invoke parsing and highlighting of the NSTextView contents. */
 - (void) parseAndHighlightNow;
