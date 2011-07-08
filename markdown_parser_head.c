@@ -237,12 +237,15 @@ void free_elements(element **elems)
 #define HAS_UTF8_BOM(x)         (((*x & 0xFF) == 0xEF) && ((*(x+1) & 0xFF) == 0xBB) && ((*(x+2) & 0xFF) == 0xBF))
 
 /*
-Copy `str` to `out`, removing UTF-8 continuation bytes
-and a possible UTF-8 BOM (byte order mark).
+Copy `str` to `out`, while doing the following:
+  - remove UTF-8 continuation bytes
+  - remove possible UTF-8 BOM (byte order mark)
+  - append two newlines to the end (like peg-markdown does)
 */
-int strcpy_sanitize(char *str, char **out)
+int strcpy_preformat(char *str, char **out)
 {
-    char *new_str = (char *)malloc(sizeof(char) * strlen(str) + 1);
+    // +2 in the following is due to the "\n\n" suffix:
+    char *new_str = (char *)malloc(sizeof(char) * strlen(str) + 1 + 2);
     char *c = str;
     int i = 0;
     
@@ -255,6 +258,8 @@ int strcpy_sanitize(char *str, char **out)
             *(new_str+i) = *c, i++;
         c++;
     }
+    *(new_str+(i++)) = '\n';
+    *(new_str+(i++)) = '\n';
     *(new_str+i) = '\0';
     
     *out = new_str;
@@ -266,7 +271,7 @@ int strcpy_sanitize(char *str, char **out)
 void markdown_to_elements(char *text, int extensions, element **out_result[])
 {
     char *text_copy = NULL;
-    int text_copy_len = strcpy_sanitize(text, &text_copy);
+    int text_copy_len = strcpy_preformat(text, &text_copy);
     
     element *parsing_elem = (element *)malloc(sizeof(element));
     parsing_elem->type = RAW;
