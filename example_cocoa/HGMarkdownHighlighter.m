@@ -247,6 +247,9 @@ void styleparsing_error_callback(char *error_message, void *context_data)
 	if ([self.targetTextView font] != nil)
 		[typingAttrs setObject:[self.targetTextView font]
 						forKey:NSFontAttributeName];
+	if ([self.targetTextView defaultParagraphStyle] != nil)
+		[typingAttrs setObject:[self.targetTextView defaultParagraphStyle]
+						forKey:NSParagraphStyleAttributeName];
 	self.defaultTypingAttributes = typingAttrs;
 }
 
