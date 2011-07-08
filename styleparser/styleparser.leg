@@ -79,7 +79,8 @@ typedef struct
 {
     char *input;
     int pos;
-    void (*error_callback)(char *);
+    void (*error_callback)(char*,void*);
+    void *error_callback_context;
     int styles_pos;
     style_collection *styles;
 } style_parser_data;
@@ -225,7 +226,7 @@ void report_error(style_parser_data *p_data, char *str, ...)
     char *errmsg;
     our_vasprintf(&errmsg, str, argptr);
     va_end(argptr);
-    p_data->error_callback(errmsg);
+    p_data->error_callback(errmsg, p_data->error_callback_context);
     free(errmsg);
 }
 
@@ -441,10 +442,12 @@ style_parser_data *new_style_parser_data(char *input)
     return p_data;
 }
 
-style_collection *parse_styles(char *input, void(*error_callback)(char*))
+style_collection *parse_styles(char *input, void(*error_callback)(char*,void*),
+                               void *error_callback_context)
 {
     style_parser_data *p_data = new_style_parser_data(input);
     p_data->error_callback = error_callback;
+    p_data->error_callback_context = error_callback_context;
     
     _sty_parse(p_data);
     

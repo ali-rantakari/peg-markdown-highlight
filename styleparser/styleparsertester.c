@@ -54,7 +54,7 @@ void print_styles(style_attribute *list)
     }
 }
 
-void parsing_error_callback(char *error_message)
+void parsing_error_callback(char *error_message, void *context_data)
 {
     fprintf(stderr, "ERROR: %s\n", error_message);
 }
@@ -62,7 +62,7 @@ void parsing_error_callback(char *error_message)
 int main(int argc, char *argv[])
 {
     char *input = get_contents(stdin);
-    style_collection *styles = parse_styles(input, &parsing_error_callback);
+    style_collection *styles = parse_styles(input, &parsing_error_callback, NULL);
     
     printf("------\n");
     
