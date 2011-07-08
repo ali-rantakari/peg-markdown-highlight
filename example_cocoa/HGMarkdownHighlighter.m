@@ -8,6 +8,7 @@
 #import "HGMarkdownHighlighter.h"
 #import "HGMarkdownHighlightingStyle.h"
 #import "markdown_parser.h"
+#import "styleparser.h"
 
 // 'private members' category
 @interface HGMarkdownHighlighter()
@@ -433,6 +434,53 @@
 		[self applyStyleDependenciesToTargetTextView];
 	else
 		styleDependenciesPending = YES;
+}
+
+
+- (void) applyStylesFromStylesheet:(NSString *)stylesheet
+{
+	// Todo: support error reporting somehow
+	
+	char *c_stylesheet = (char *)[stylesheet UTF8String];
+	style_collection *style_coll = parse_styles(c_stylesheet, NULL);
+	
+	NSMutableArray *stylesArr = [NSMutableArray array];
+	
+	// Set language element styles
+	for (int i = 0; i < NUM_LANG_TYPES; i++)
+	{
+		style_attribute *cur = style_coll->element_styles[i];
+		if (cur == NULL)
+			continue;
+		HGMarkdownHighlightingStyle *style = [[[HGMarkdownHighlightingStyle alloc]
+											   initWithStyleAttributes:cur] autorelease];
+		[stylesArr addObject:style];
+	}
+	
+	self.styles = stylesArr;
+	
+	// Set editor styles
+	if (self.targetTextView != nil && style_coll->editor_styles != NULL)
+	{
+		[self clearHighlighting];
+		
+		style_attribute *cur = style_coll->editor_styles;
+		while (cur != NULL)
+		{
+			if (cur->type == attr_type_background_color)
+				[self.targetTextView setBackgroundColor:[HGMarkdownHighlightingStyle
+														 colorFromARGBColor:cur->value->argb_color]];
+			else if (cur->type == attr_type_foreground_color)
+				[self.targetTextView setTextColor:[HGMarkdownHighlightingStyle
+												   colorFromARGBColor:cur->value->argb_color]];
+			cur = cur->next;
+		}
+		
+		[self readClearTextStylesFromTextView];
+	}
+	
+	free_style_collection(style_coll);
+	[self highlightNow];
 }
 
 

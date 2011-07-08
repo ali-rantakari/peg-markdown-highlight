@@ -7,6 +7,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "markdown_definitions.h"
+#import "styleparser.h"
 
 
 #define HG_MKSTYLE(elem, add, remove, traits)	[[[HGMarkdownHighlightingStyle alloc] initWithType:(elem) attributesToAdd:(add) toRemove:(remove) fontTraitsToAdd:(traits)] autorelease]
@@ -59,11 +60,16 @@
 	element_type elementType;
 }
 
++ (NSColor *) colorFromARGBColor:(attr_argb_color *)argb_color;
+
 /** \brief Init a new instance. */
 - (id) initWithType:(element_type)elemType
 	attributesToAdd:(NSDictionary *)toAdd
 		   toRemove:(NSArray *)toRemove
 	fontTraitsToAdd:(NSFontTraitMask)traits;
+
+/** \brief Init a new instance based on styles from the stylesheet parser. */
+- (id) initWithStyleAttributes:(style_attribute *)attributes;
 
 /** \brief The Markdown language element type these styles pertain to. */
 @property element_type elementType;

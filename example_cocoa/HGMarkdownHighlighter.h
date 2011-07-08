@@ -117,6 +117,10 @@
  */
 - (void) readClearTextStylesFromTextView;
 
+/** \brief todo
+ */
+- (void) applyStylesFromStylesheet:(NSString *)stylesheet;
+
 /** \brief Manually invoke parsing and highlighting of the NSTextView contents. */
 - (void) parseAndHighlightNow;
 
