@@ -45,9 +45,9 @@ void print_styles(style_attribute *list)
         else if (list->type == attr_type_font_size_pt)
             printf("%i pt\n", list->value->font_size_pt);
         else if (list->type == attr_type_font_family)
-            printf("%s\n", list->value->font_family);
+            printf("\"%s\"\n", list->value->font_family);
         else if (list->type == attr_type_other)
-            printf("%s\n", list->value->string);
+            printf("\"%s\"\n", list->value->string);
         else
             printf("???\n");
         list = list->next;
