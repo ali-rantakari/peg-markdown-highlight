@@ -458,6 +458,9 @@ void styleparsing_error_callback(char *error_message, void *context_data)
 				 withErrorDelegate:(id)errorDelegate
 					 errorSelector:(SEL)errorSelector
 {
+	if (stylesheet == nil)
+		return;
+	
 	char *c_stylesheet = (char *)[stylesheet UTF8String];
 	style_collection *style_coll = NULL;
 	
