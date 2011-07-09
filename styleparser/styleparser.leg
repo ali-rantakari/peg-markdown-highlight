@@ -375,6 +375,7 @@ StyleDef =      x:StartList
 
 StyleLabel =    Indent < ("editor"|StyleLabelChar+) >
                 { $$ = SEMVAL; }
+                Sp AssignOp?
                 
 
 StyleAttrLine = Indent a:StyleAttr Sp (LineComment|Newline|Eof)
