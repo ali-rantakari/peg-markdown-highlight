@@ -158,7 +158,7 @@ attr_argb_color *new_argb_from_hex_str(style_parser_data *p_data, char *str)
                      "Value '%s' is not a valid color value: it should be a "
                      "hexadecimal number, 6 or 8 characters long.",
                      str);
-        return new_argb_from_hex(0, false);
+        return NULL;
     }
     char *endptr = NULL;
     long num = strtol(str, &endptr, 16);
@@ -168,7 +168,7 @@ attr_argb_color *new_argb_from_hex_str(style_parser_data *p_data, char *str)
                      "'%c' is invalid. The color value should be a hexadecimal "
                      "number, 6 or 8 characters long.",
                      str, *endptr);
-        return new_argb_from_hex(0, false);
+        return NULL;
     }
     return new_argb_from_hex(num, (len == 8));
 }
@@ -185,6 +185,30 @@ style_attribute *new_attr(char *name, attr_type type)
     attr->type = type;
     attr->next = NULL;
     return attr;
+}
+
+void free_style_attributes(style_attribute *list)
+{
+    style_attribute *cur = list;
+    while (cur != NULL)
+    {
+        if (cur->name != NULL)
+            free(cur->name);
+        if (cur->value != NULL)
+        {
+            if (cur->type == attr_type_foreground_color
+                || cur->type == attr_type_background_color)
+                free(cur->value->argb_color);
+            if (cur->type == attr_type_font_family)
+                free(cur->value->font_family);
+            if (cur->type == attr_type_other)
+                free(cur->value->string);
+            free(cur->value);
+        }
+        style_attribute *this = cur;
+        cur = cur->next;
+        free(this);
+    }
 }
 
 
@@ -308,14 +332,21 @@ style_attribute *interpret_attributes(style_parser_data *p_data,
             char *hexstr = trim_str(cur->value);
             // new_argb_from_hex_str() reports conversion errors
             attr->value->argb_color = new_argb_from_hex_str(p_data, hexstr);
+            if (attr->value->argb_color == NULL) {
+                free_style_attributes(attr);
+                attr = NULL;
+            }
         }
         else if (atype == attr_type_font_size_pt)
         {
             char *endptr = NULL;
             attr->value->font_size_pt = (int)strtol(cur->value, &endptr, 10);
-            if (endptr == cur->value)
+            if (endptr == cur->value) {
                 report_error(p_data, "Value '%s' is invalid for attribute '%s'",
                              cur->value, cur->name);
+                free_style_attributes(attr);
+                attr = NULL;
+            }
         }
         else if (atype == attr_type_font_family)
         {
@@ -330,10 +361,15 @@ style_attribute *interpret_attributes(style_parser_data *p_data,
                 style = attr_font_style_italic;
             else if (EQUALS(standardized_style_value, "condensed"))
                 style = attr_font_style_condensed;
-            else
+            else {
                 report_error(p_data, "Value '%s' is invalid for attribute '%s'",
                              cur->value, cur->name);
-            attr->value->font_style = style;
+                free_style_attributes(attr);
+                attr = NULL;
+            }
+            
+            if (attr != NULL)
+                attr->value->font_style = style;
             free(standardized_style_value);
         }
         else if (atype == attr_type_font_weight)
@@ -343,10 +379,15 @@ style_attribute *interpret_attributes(style_parser_data *p_data,
             
             if (EQUALS(standardized_weight_value, "bold"))
                 weight = attr_font_weight_bold;
-            else
+            else {
                 report_error(p_data, "Value '%s' is invalid for attribute '%s'",
                              cur->value, cur->name);
-            attr->value->font_weight = weight;
+                free_style_attributes(attr);
+                attr = NULL;
+            }
+            
+            if (attr != NULL)
+                attr->value->font_weight = weight;
             free(standardized_weight_value);
         }
         else if (atype == attr_type_other)
@@ -354,9 +395,11 @@ style_attribute *interpret_attributes(style_parser_data *p_data,
             attr->value->string = strdup(cur->value);
         }
         
-        // add to linked list
-        attr->next = attrs;
-        attrs = attr;
+        if (attr != NULL) {
+            // add to linked list
+            attr->next = attrs;
+            attrs = attr;
+        }
         
         cur = cur->next;
     }
@@ -480,6 +523,16 @@ style_collection *new_style_collection()
     return sc;
 }
 
+void free_style_collection(style_collection *coll)
+{
+    free_style_attributes(coll->editor_styles);
+    int i;
+    for (i = 0; i < NUM_LANG_TYPES; i++)
+        free_style_attributes(coll->element_styles[i]);
+    free(coll->element_styles);
+    free(coll);
+}
+
 style_parser_data *new_style_parser_data(char *input)
 {
     style_parser_data *p_data = (style_parser_data*)
@@ -503,40 +556,6 @@ style_collection *parse_styles(char *input, void(*error_callback)(char*,void*),
     style_collection *ret = p_data->styles;
     free(p_data);
     return ret;
-}
-
-void free_style_attributes(style_attribute *list)
-{
-    style_attribute *cur = list;
-    while (cur != NULL)
-    {
-        if (cur->name != NULL)
-            free(cur->name);
-        if (cur->value != NULL)
-        {
-            if (cur->type == attr_type_foreground_color
-                || cur->type == attr_type_background_color)
-                free(cur->value->argb_color);
-            if (cur->type == attr_type_font_family)
-                free(cur->value->font_family);
-            if (cur->type == attr_type_other)
-                free(cur->value->string);
-            free(cur->value);
-        }
-        style_attribute *this = cur;
-        cur = cur->next;
-        free(this);
-    }
-}
-
-void free_style_collection(style_collection *coll)
-{
-    free_style_attributes(coll->editor_styles);
-    int i;
-    for (i = 0; i < NUM_LANG_TYPES; i++)
-        free_style_attributes(coll->element_styles[i]);
-    free(coll->element_styles);
-    free(coll);
 }
 
 
