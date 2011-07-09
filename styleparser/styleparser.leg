@@ -225,6 +225,9 @@ char **get_element_type_names()
     if (elem_type_names == NULL)
     {
         elem_type_names = (char **)malloc(sizeof(char*) * NUM_LANG_TYPES);
+        int i;
+        for (i = 0; i < NUM_LANG_TYPES; i++)
+            elem_type_names[i] = NULL;
         elem_type_names[LINK] = "LINK";
         elem_type_names[AUTO_LINK_URL] = "AUTO_LINK_URL";
         elem_type_names[AUTO_LINK_EMAIL] = "AUTO_LINK_EMAIL";
@@ -260,7 +263,10 @@ element_type element_type_from_name(char *name)
     int i;
     for (i = 0; i < NUM_LANG_TYPES; i++)
     {
-        if (strcmp(elem_type_names[i], name) == 0)
+        char *i_name = elem_type_names[i];
+        if (i_name == NULL)
+            continue;
+        if (strcmp(i_name, name) == 0)
             return i;
     }
     
@@ -270,7 +276,10 @@ element_type element_type_from_name(char *name)
 char *element_name_from_type(element_type type)
 {
     char **elem_type_names = get_element_type_names();
-    return elem_type_names[type];
+    char* ret = elem_type_names[type];
+    if (ret == NULL)
+        return "unknown type";
+    return ret;
 }
 
 
