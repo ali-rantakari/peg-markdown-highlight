@@ -462,7 +462,13 @@ StrongUl =  s:TwoUlOpen
             { ADD(elem_s(STRONG)); }
 
 Image = '!' ( ExplicitLink | ReferenceLink )
-        { $$->type = IMAGE; $$->pos -= 1; ADD($$); }
+        {
+            if ($$ != NULL) {
+                $$->type = IMAGE;
+                $$->pos -= 1;
+                ADD($$);
+            }
+        }
 
 Link =  ( ExplicitLink | ReferenceLink | AutoLink )
         { if ($$) ADD($$); } # AutoLink does not return $$
@@ -476,7 +482,8 @@ ReferenceLinkDouble =  < s:Label Spnl !"[]" l:Label >
                                 $$ = elem_s(LINK);
                                 $$->label = strdup(l->label);
                                 $$->address = reference->address;
-                            }
+                            } else
+                                $$ = NULL;
                             FREE_LABEL(s);
                             FREE_LABEL(l);
                         }
@@ -488,7 +495,8 @@ ReferenceLinkSingle =  < s:Label (Spnl "[]")? >
                                 $$ = elem_s(LINK);
                                 $$->label = strdup(s->label);
                                 $$->address = reference->address;
-                            }
+                            } else
+                                $$ = NULL;
                             FREE_LABEL(s);
                         }
 
