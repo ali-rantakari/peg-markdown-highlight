@@ -501,6 +501,9 @@ void styleparsing_error_callback(char *error_message, void *context_data)
 			else if (cur->type == attr_type_foreground_color)
 				[self.targetTextView setTextColor:[HGMarkdownHighlightingStyle
 												   colorFromARGBColor:cur->value->argb_color]];
+			else if (cur->type == attr_type_caret_color)
+				[self.targetTextView setInsertionPointColor:[HGMarkdownHighlightingStyle
+															 colorFromARGBColor:cur->value->argb_color]];
 			cur = cur->next;
 		}
 		

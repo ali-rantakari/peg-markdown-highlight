@@ -6,6 +6,7 @@
 editor
 foreground: 93a1a1 # base1
 background: 002b36 # base03
+caret: ffffff
 
 H1
 foreground: 6c71c4 # violet

@@ -28,6 +28,7 @@ typedef enum
 {
     attr_type_foreground_color,
     attr_type_background_color,
+    attr_type_caret_color,
     attr_type_font_size_pt,
     attr_type_font_family,
     attr_type_font_style,
