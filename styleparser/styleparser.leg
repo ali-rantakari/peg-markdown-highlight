@@ -269,9 +269,11 @@ style_attribute *interpret_attributes(style_parser_data *p_data,
         }
         else if (atype == attr_type_font_size_pt)
         {
-            // todo: trim non-digits off from value (e.g. "14pt")
-            // todo: handle conversion errors somehow
-            attr->value->font_size_pt = atoi(cur->value);
+            char *endptr = NULL;
+            attr->value->font_size_pt = (int)strtol(cur->value, &endptr, 10);
+            if (endptr == cur->value)
+                report_error(p_data, "Value '%s' is invalid for attribute '%s'",
+                             cur->value, cur->name);
         }
         else if (atype == attr_type_font_family)
         {
