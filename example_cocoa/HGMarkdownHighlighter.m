@@ -218,6 +218,7 @@ void styleparsing_error_callback(char *error_message, void *context_data)
 	
 	[textStorage applyFontTraits:clearFontTraitMask range:range];
 	[textStorage removeAttribute:NSBackgroundColorAttributeName range:range];
+	[textStorage removeAttribute:NSLinkAttributeName range:range];
 	if (self.defaultTextColor != nil)
 		[textStorage addAttribute:NSForegroundColorAttributeName value:self.defaultTextColor range:range];
 	else
