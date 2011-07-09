@@ -244,6 +244,21 @@ char *trim_str(char *str)
     return str;
 }
 
+char *strcpy_lower(char *str)
+{
+    char *low = strdup(str);
+    int i;
+    int len = strlen(str);
+    for (i = 0; i < len; i++)
+        *(low+i) = tolower(*(low+i));
+    return low;
+}
+
+char *standardize_str(char *str)
+{
+    return strcpy_lower(trim_str(str));
+}
+
 
 #define EQUALS(a,b) (strcmp(a, b) == 0)
 style_attribute *interpret_attributes(style_parser_data *p_data,
@@ -281,27 +296,31 @@ style_attribute *interpret_attributes(style_parser_data *p_data,
         }
         else if (atype == attr_type_font_style)
         {
-            // todo: standardize input (trim; lowercase)
+            char *standardized_style_value = standardize_str(cur->value);
             attr_font_style style = attr_font_style_normal;
-            if (EQUALS(cur->value, "italic"))
+            
+            if (EQUALS(standardized_style_value, "italic"))
                 style = attr_font_style_italic;
-            else if (EQUALS(cur->value, "condensed"))
+            else if (EQUALS(standardized_style_value, "condensed"))
                 style = attr_font_style_condensed;
             else
                 report_error(p_data, "Value '%s' is invalid for attribute '%s'",
                              cur->value, cur->name);
             attr->value->font_style = style;
+            free(standardized_style_value);
         }
         else if (atype == attr_type_font_weight)
         {
-            // todo: standardize input (trim; lowercase)
+            char *standardized_weight_value = standardize_str(cur->value);
             attr_font_weight weight = attr_font_weight_normal;
-            if (EQUALS(cur->value, "bold"))
+            
+            if (EQUALS(standardized_weight_value, "bold"))
                 weight = attr_font_weight_bold;
             else
                 report_error(p_data, "Value '%s' is invalid for attribute '%s'",
                              cur->value, cur->name);
             attr->value->font_weight = weight;
+            free(standardized_weight_value);
         }
         else if (atype == attr_type_other)
         {
