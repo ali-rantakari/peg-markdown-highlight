@@ -373,11 +373,11 @@ StyleDef =      x:StartList
                   free_sem_values(l);
                 }
 
-StyleLabel =    < ("editor"|StyleLabelChar+) >
+StyleLabel =    Indent < ("editor"|StyleLabelChar+) >
                 { $$ = SEMVAL; }
                 
 
-StyleAttrLine = Indent? a:StyleAttr Sp (LineComment|Newline|Eof)
+StyleAttrLine = Indent a:StyleAttr Sp (LineComment|Newline|Eof)
                 { $$ = a; }
 
 AssignOp =      ':'|'='
@@ -392,7 +392,7 @@ StyleLabelChar = [A-Z0-9_]
 AttrNameChar =  [A-Za-z0-9-]
 AttrValueChar = (!Newline !Eof !BeginLineComment .)
 
-Indent =        "\t" | "    "
+Indent =        ("\t" | " ")*
 BlankLine =     Sp Newline
 Eof =           !.
 Spacechar =     ' ' | '\t'
