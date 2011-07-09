@@ -42,38 +42,6 @@ int our_vasprintf(char **strptr, const char *fmt, va_list argptr)
 #define YY_NAME(N) style_yy##N
 
 
-attr_argb_color *new_argb_color(int r, int g, int b, int a) {
-    attr_argb_color *c = (attr_argb_color *)malloc(sizeof(attr_argb_color));
-    c->red = r; c->green = g; c->blue = b; c->alpha = a;
-    return c;
-}
-attr_argb_color *new_argb_from_hex(long hex, bool has_alpha) {
-    // 0xaarrggbb
-    int a = has_alpha ? ((hex >> 24) & 0xFF) : 255;
-    int r = ((hex >> 16) & 0xFF);
-    int g = ((hex >> 8) & 0xFF);
-    int b = (hex & 0xFF);
-    return new_argb_color(r,g,b,a);
-}
-attr_argb_color *new_argb_from_hex_str(char *str) {
-    // "aarrggbb"
-    long num = strtol(str, NULL, 16);
-    return new_argb_from_hex(num, (strlen(str) == 8));
-}
-
-attr_value *new_attr_value() {
-    return (attr_value *)malloc(sizeof(attr_value));
-}
-
-style_attribute *new_attr(char *name, attr_type type) {
-    style_attribute *attr = (style_attribute *)malloc(sizeof(style_attribute));
-    attr->name = strdup(name);
-    attr->type = type;
-    attr->next = NULL;
-    return attr;
-}
-
-
 // Parsing context data
 typedef struct
 {
@@ -84,10 +52,6 @@ typedef struct
     int styles_pos;
     style_collection *styles;
 } style_parser_data;
-
-
-
-
 
 typedef struct sem_value
 {
@@ -123,6 +87,109 @@ static sem_value *cons(sem_value *elem, sem_value *list)
     elem->next = list;
     return elem;
 }
+
+void report_error(style_parser_data *p_data, char *str, ...)
+{
+    if (p_data->error_callback == NULL)
+        return;
+    va_list argptr;
+    va_start(argptr, str);
+    char *errmsg;
+    our_vasprintf(&errmsg, str, argptr);
+    va_end(argptr);
+    p_data->error_callback(errmsg, p_data->error_callback_context);
+    free(errmsg);
+}
+
+
+
+char *trim_str(char *str)
+{
+    while (isspace(*str))
+        str++;
+    if (*str == '\0')
+        return str;
+    char *end = str + strlen(str) - 1;
+    while (end > str && isspace(*end))
+        end--;
+    *(end+1) = '\0';
+    return str;
+}
+
+char *strcpy_lower(char *str)
+{
+    char *low = strdup(str);
+    int i;
+    int len = strlen(str);
+    for (i = 0; i < len; i++)
+        *(low+i) = tolower(*(low+i));
+    return low;
+}
+
+char *standardize_str(char *str)
+{
+    return strcpy_lower(trim_str(str));
+}
+
+
+
+
+attr_argb_color *new_argb_color(int r, int g, int b, int a)
+{
+    attr_argb_color *c = (attr_argb_color *)malloc(sizeof(attr_argb_color));
+    c->red = r; c->green = g; c->blue = b; c->alpha = a;
+    return c;
+}
+attr_argb_color *new_argb_from_hex(long hex, bool has_alpha)
+{
+    // 0xaarrggbb
+    int a = has_alpha ? ((hex >> 24) & 0xFF) : 255;
+    int r = ((hex >> 16) & 0xFF);
+    int g = ((hex >> 8) & 0xFF);
+    int b = (hex & 0xFF);
+    return new_argb_color(r,g,b,a);
+}
+attr_argb_color *new_argb_from_hex_str(style_parser_data *p_data, char *str)
+{
+    // "aarrggbb"
+    int len = strlen(str);
+    if (len != 6 && len != 8) {
+        report_error(p_data,
+                     "Value '%s' is not a valid color value: it should be a "
+                     "hexadecimal number, 6 or 8 characters long.",
+                     str);
+        return new_argb_from_hex(0, false);
+    }
+    char *endptr = NULL;
+    long num = strtol(str, &endptr, 16);
+    if (*endptr != '\0') {
+        report_error(p_data,
+                     "Value '%s' is not a valid color value: the character "
+                     "'%c' is invalid. The color value should be a hexadecimal "
+                     "number, 6 or 8 characters long.",
+                     str, *endptr);
+        return new_argb_from_hex(0, false);
+    }
+    return new_argb_from_hex(num, (len == 8));
+}
+
+attr_value *new_attr_value()
+{
+    return (attr_value *)malloc(sizeof(attr_value));
+}
+
+style_attribute *new_attr(char *name, attr_type type)
+{
+    style_attribute *attr = (style_attribute *)malloc(sizeof(style_attribute));
+    attr->name = strdup(name);
+    attr->type = type;
+    attr->next = NULL;
+    return attr;
+}
+
+
+
+
 
 
 char **get_element_type_names()
@@ -217,47 +284,7 @@ char *attr_name_from_type(attr_type type)
 }
 
 
-void report_error(style_parser_data *p_data, char *str, ...)
-{
-    if (p_data->error_callback == NULL)
-        return;
-    va_list argptr;
-    va_start(argptr, str);
-    char *errmsg;
-    our_vasprintf(&errmsg, str, argptr);
-    va_end(argptr);
-    p_data->error_callback(errmsg, p_data->error_callback_context);
-    free(errmsg);
-}
 
-
-char *trim_str(char *str)
-{
-    while (isspace(*str))
-        str++;
-    if (*str == '\0')
-        return str;
-    char *end = str + strlen(str) - 1;
-    while (end > str && isspace(*end))
-        end--;
-    *(end+1) = '\0';
-    return str;
-}
-
-char *strcpy_lower(char *str)
-{
-    char *low = strdup(str);
-    int i;
-    int len = strlen(str);
-    for (i = 0; i < len; i++)
-        *(low+i) = tolower(*(low+i));
-    return low;
-}
-
-char *standardize_str(char *str)
-{
-    return strcpy_lower(trim_str(str));
-}
 
 
 #define EQUALS(a,b) (strcmp(a, b) == 0)
@@ -278,9 +305,9 @@ style_attribute *interpret_attributes(style_parser_data *p_data,
         if (atype == attr_type_foreground_color
             || atype == attr_type_background_color)
         {
-            // todo: handle conversion errors somehow
             char *hexstr = trim_str(cur->value);
-            attr->value->argb_color = new_argb_from_hex_str(hexstr);
+            // new_argb_from_hex_str() reports conversion errors
+            attr->value->argb_color = new_argb_from_hex_str(p_data, hexstr);
         }
         else if (atype == attr_type_font_size_pt)
         {
