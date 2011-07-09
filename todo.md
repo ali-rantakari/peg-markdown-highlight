@@ -1,6 +1,9 @@
 Parser
 ------
-- Fix bug: image highlight when image label does not exist
+- Add more style attribute types
+    - (what else does Cocoa support?)
+- Document the stylesheet parser syntax
+    - Need to first "stabilize" the syntax
 - More granular matching of elements:
     - Match whole blockquote area separately from blockquote indicator
     - Match actual content separately from syntax characters (e.g. provide
@@ -17,6 +20,7 @@ Parser
 
 Cocoa
 -----
+- Fix bug: Correctly clear link attributes
 - Investigate using temporary attributes
     - In which way are they temporary? When are they removed?
 - When copying to clipboard, remove highlights if possible (make this an option?)
