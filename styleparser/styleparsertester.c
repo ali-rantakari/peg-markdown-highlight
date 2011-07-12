@@ -72,6 +72,18 @@ int main(int argc, char *argv[])
         print_styles(styles->editor_styles);
         printf("\n");
     }
+    if (styles->editor_current_line_styles != NULL)
+    {
+        printf("Current line styles:\n");
+        print_styles(styles->editor_current_line_styles);
+        printf("\n");
+    }
+    if (styles->editor_selection_styles != NULL)
+    {
+        printf("Selection styles:\n");
+        print_styles(styles->editor_selection_styles);
+        printf("\n");
+    }
     
     int i;
     for (i = 0; i < NUM_LANG_TYPES; i++)

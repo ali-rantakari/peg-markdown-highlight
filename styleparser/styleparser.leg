@@ -423,26 +423,38 @@ style_attribute *interpret_attributes(style_parser_data *p_data,
 }
 
 
-// The element_type value that stands in as an indicator of "editor-wide"
-// style definitions:
-#define EDITOR_STYLE_TYPE  SEPARATOR
-
 void interpret_and_add_style(style_parser_data *p_data,
                              char *element_type_name,
                              sem_value *raw_attributes)
 {
+    bool isEditorType = false;
+    bool isCurrentLineType = false;
+    bool isSelectionType = false;
     element_type type = element_type_from_name(element_type_name);
-    if (EQUALS(element_type_name, "editor"))
-        type = EDITOR_STYLE_TYPE;
-    if (type == NO_TYPE) {
-        report_error(p_data,
-            "Style rule '%s' is not a language element type name or 'editor'",
-            element_type_name);
-        return;
+    if (type == NO_TYPE)
+    {
+        if (EQUALS(element_type_name, "editor"))
+            isEditorType = true, type = NO_TYPE;
+        else if (EQUALS(element_type_name, "editor-current-line"))
+            isCurrentLineType = true, type = NO_TYPE;
+        else if (EQUALS(element_type_name, "editor-selection"))
+            isSelectionType = true, type = NO_TYPE;
+        else {
+            report_error(p_data,
+                "Style rule '%s' is not a language element type name or "
+                "one of the following: 'editor', 'editor-current-line', "
+                "'editor-selection'",
+                element_type_name);
+            return;
+        }
     }
     style_attribute *attrs = interpret_attributes(p_data, type, raw_attributes);
-    if (type == EDITOR_STYLE_TYPE)
+    if (isEditorType)
         p_data->styles->editor_styles = attrs;
+    else if (isCurrentLineType)
+        p_data->styles->editor_current_line_styles = attrs;
+    else if (isSelectionType)
+        p_data->styles->editor_selection_styles = attrs;
     else
         p_data->styles->element_styles[(p_data->styles_pos)++] = attrs;
 }
@@ -479,7 +491,7 @@ StyleDef =      x:StartList
                   free_sem_values(l);
                 }
 
-StyleLabel =    Indent < ("editor"|StyleLabelChar+) >
+StyleLabel =    Indent < StyleLabelChar+ >
                 { $$ = SEMVAL; }
                 Sp AssignOp?
                 
@@ -495,7 +507,7 @@ StyleAttr =     < AttrNameChar+ >
                 < AttrValueChar+ >
                 { $$->value = strdup(yytext); }
 
-StyleLabelChar = [A-Z0-9_]
+StyleLabelChar = [A-Za-z0-9-_]
 AttrNameChar =  [A-Za-z0-9-]
 AttrValueChar = (!Newline !Eof !BeginLineComment .)
 
@@ -534,6 +546,8 @@ style_collection *new_style_collection()
         sc->element_styles[i] = NULL;
     
     sc->editor_styles = NULL;
+    sc->editor_current_line_styles = NULL;
+    sc->editor_selection_styles = NULL;
     
     return sc;
 }
@@ -541,6 +555,8 @@ style_collection *new_style_collection()
 void free_style_collection(style_collection *coll)
 {
     free_style_attributes(coll->editor_styles);
+    free_style_attributes(coll->editor_current_line_styles);
+    free_style_attributes(coll->editor_selection_styles);
     int i;
     for (i = 0; i < NUM_LANG_TYPES; i++)
         free_style_attributes(coll->element_styles[i]);

@@ -61,6 +61,8 @@ typedef struct style_attribute
 typedef struct
 {
     style_attribute *editor_styles;
+    style_attribute *editor_current_line_styles;
+    style_attribute *editor_selection_styles;
     style_attribute **element_styles;
 } style_collection;
 
