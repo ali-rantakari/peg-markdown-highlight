@@ -198,9 +198,7 @@ void free_style_attributes(style_attribute *list)
         {
             if (cur->type == attr_type_foreground_color
                 || cur->type == attr_type_background_color
-                || cur->type == attr_type_caret_color
-                || cur->type == attr_type_selection_foreground_color
-                || cur->type == attr_type_selection_background_color)
+                || cur->type == attr_type_caret_color)
                 free(cur->value->argb_color);
             if (cur->type == attr_type_font_family)
                 free(cur->value->font_family);
@@ -293,10 +291,6 @@ attr_type attr_type_from_name(char *name)
     else IF_ATTR_NAME("background-color") return attr_type_background_color;
     else IF_ATTR_NAME("caret") return attr_type_caret_color;
     else IF_ATTR_NAME("caret-color") return attr_type_caret_color;
-    else IF_ATTR_NAME("selection-foreground") return attr_type_selection_foreground_color;
-    else IF_ATTR_NAME("selection-foreground-color") return attr_type_selection_foreground_color;
-    else IF_ATTR_NAME("selection-background") return attr_type_selection_background_color;
-    else IF_ATTR_NAME("selection-background-color") return attr_type_selection_background_color;
     else IF_ATTR_NAME("font-size") return attr_type_font_size_pt;
     else IF_ATTR_NAME("font-family") return attr_type_font_family;
     else IF_ATTR_NAME("font-style") return attr_type_font_style;
@@ -314,10 +308,6 @@ char *attr_name_from_type(attr_type type)
             return "background-color"; break;
         case attr_type_caret_color:
             return "caret-color"; break;
-        case attr_type_selection_foreground_color:
-            return "selection-foreground-color"; break;
-        case attr_type_selection_background_color:
-            return "selection-background-color"; break;
         case attr_type_font_size_pt:
             return "font-size"; break;
         case attr_type_font_family:
@@ -352,9 +342,7 @@ style_attribute *interpret_attributes(style_parser_data *p_data,
         
         if (atype == attr_type_foreground_color
             || atype == attr_type_background_color
-            || atype == attr_type_caret_color
-            || atype == attr_type_selection_foreground_color
-            || atype == attr_type_selection_background_color)
+            || atype == attr_type_caret_color)
         {
             char *hexstr = trim_str(cur->value);
             // new_argb_from_hex_str() reports conversion errors
