@@ -347,7 +347,8 @@ multi_value *split_multi_value(char *input)
         for (i = 0; (*(c+i) != '\0' && *(c+i) != ','); i++);
         multi_value *mv = (multi_value *)malloc(sizeof(multi_value));
         mv->value = (char *)malloc(sizeof(char)*i + 1);
-        strncpy(mv->value, c, i);
+        *mv->value = '\0';
+        strncat(mv->value, c, i);
         mv->next = head;
         head = mv;
         if (*(c+i) == ',')
