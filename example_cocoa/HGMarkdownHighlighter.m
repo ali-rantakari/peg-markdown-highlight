@@ -479,7 +479,8 @@ void styleparsing_error_callback(char *error_message, void *context_data)
 	NSMutableArray *stylesArr = [NSMutableArray array];
 	
 	// Set language element styles
-	for (int i = 0; i < NUM_LANG_TYPES; i++)
+	int i;
+	for (i = 0; i < NUM_LANG_TYPES; i++)
 	{
 		style_attribute *cur = style_coll->element_styles[i];
 		if (cur == NULL)
