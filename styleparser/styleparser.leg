@@ -433,7 +433,7 @@ style_attribute *interpret_attributes(style_parser_data *p_data,
                     attr->value->font_styles->underlined = true;
                 else {
                     report_error(p_data, "Value '%s' is invalid for attribute '%s'",
-                                 value_cur->value, cur->name);
+                                 standardized_value, cur->name);
                 }
                 
                 free(standardized_value);
