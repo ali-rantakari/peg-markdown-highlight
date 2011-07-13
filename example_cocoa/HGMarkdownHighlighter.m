@@ -12,8 +12,11 @@
 
 void styleparsing_error_callback(char *error_message, void *context_data)
 {
+	NSString *errMsg = [NSString stringWithUTF8String:error_message];
+	if (errMsg == nil)
+		NSLog(@"Cannot interpret error message as UTF-8: '%s'", error_message);
 	[((HGMarkdownHighlighter *)context_data) performSelector:@selector(handleStyleParsingError:)
-												  withObject:[NSString stringWithUTF8String:error_message]];
+												  withObject:errMsg];
 }
 
 
@@ -454,7 +457,10 @@ void styleparsing_error_callback(char *error_message, void *context_data)
 
 - (void) handleStyleParsingError:(NSString *)errorMessage
 {
-	[styleParsingErrors addObject:errorMessage];
+	NSString *messageToAdd = errorMessage;
+	if (errorMessage == nil)
+		messageToAdd = @"<broken error message>";
+	[styleParsingErrors addObject:messageToAdd];
 }
 
 - (void) applyStylesFromStylesheet:(NSString *)stylesheet
