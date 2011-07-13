@@ -493,23 +493,57 @@ void styleparsing_error_callback(char *error_message, void *context_data)
 	self.styles = stylesArr;
 	
 	// Set editor styles
-	if (self.targetTextView != nil && style_coll->editor_styles != NULL)
+	if (self.targetTextView != nil)
 	{
 		[self clearHighlighting];
 		
-		style_attribute *cur = style_coll->editor_styles;
-		while (cur != NULL)
+		// General editor styles
+		if (style_coll->editor_styles != NULL)
 		{
-			if (cur->type == attr_type_background_color)
-				[self.targetTextView setBackgroundColor:[HGMarkdownHighlightingStyle
-														 colorFromARGBColor:cur->value->argb_color]];
-			else if (cur->type == attr_type_foreground_color)
-				[self.targetTextView setTextColor:[HGMarkdownHighlightingStyle
-												   colorFromARGBColor:cur->value->argb_color]];
-			else if (cur->type == attr_type_caret_color)
-				[self.targetTextView setInsertionPointColor:[HGMarkdownHighlightingStyle
+			style_attribute *cur = style_coll->editor_styles;
+			while (cur != NULL)
+			{
+				if (cur->type == attr_type_background_color)
+					[self.targetTextView setBackgroundColor:[HGMarkdownHighlightingStyle
 															 colorFromARGBColor:cur->value->argb_color]];
-			cur = cur->next;
+				else if (cur->type == attr_type_foreground_color)
+					[self.targetTextView setTextColor:[HGMarkdownHighlightingStyle
+													   colorFromARGBColor:cur->value->argb_color]];
+				else if (cur->type == attr_type_caret_color)
+					[self.targetTextView setInsertionPointColor:[HGMarkdownHighlightingStyle
+																 colorFromARGBColor:cur->value->argb_color]];
+				cur = cur->next;
+			}
+		}
+		
+		// Selection styles
+		if (style_coll->editor_selection_styles != NULL)
+		{
+			NSMutableDictionary *selAttrs = [[self.targetTextView selectedTextAttributes] mutableCopy];
+			
+			style_attribute *cur = style_coll->editor_selection_styles;
+			while (cur != NULL)
+			{
+				// Cocoa (as of Mac OS 10.6.6) supports only foreground color,
+				// background color and underlining attributes for selections:
+				if (cur->type == attr_type_background_color)
+					[selAttrs setObject:[HGMarkdownHighlightingStyle
+										 colorFromARGBColor:cur->value->argb_color]
+								 forKey:NSBackgroundColorAttributeName];
+				else if (cur->type == attr_type_foreground_color)
+					[selAttrs setObject:[HGMarkdownHighlightingStyle
+										 colorFromARGBColor:cur->value->argb_color]
+								 forKey:NSForegroundColorAttributeName];
+				else if (cur->type == attr_type_font_style)
+				{
+					if (cur->value->font_styles->underlined)
+						[selAttrs setObject:[NSNumber numberWithInt:NSUnderlineStyleSingle]
+									 forKey:NSUnderlineStyleAttributeName];
+				}
+				cur = cur->next;
+			}
+			
+			[self.targetTextView setSelectedTextAttributes:selAttrs];
 		}
 		
 		[self readClearTextStylesFromTextView];
