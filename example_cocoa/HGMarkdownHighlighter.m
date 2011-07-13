@@ -6,7 +6,6 @@
  */
 
 #import "HGMarkdownHighlighter.h"
-#import "HGMarkdownHighlightingStyle.h"
 #import "markdown_parser.h"
 #import "styleparser.h"
 
@@ -45,6 +44,7 @@ void styleparsing_error_callback(char *error_message, void *context_data)
 @synthesize defaultTypingAttributes;
 @synthesize resetTypingAttributes;
 @synthesize makeLinksClickable;
+@synthesize currentLineStyle;
 
 
 - (id) init
@@ -61,6 +61,7 @@ void styleparsing_error_callback(char *error_message, void *context_data)
 	self.workerThread = nil;
 	self.defaultTextColor = nil;
 	self.styles = nil;
+	self.currentLineStyle = nil;
 	self.isActive = NO;
 	self.resetTypingAttributes = YES;
 	self.makeLinksClickable = NO;
@@ -108,6 +109,7 @@ void styleparsing_error_callback(char *error_message, void *context_data)
 	self.targetTextView = nil;
 	self.updateTimer = nil;
 	self.styles = nil;
+	self.currentLineStyle = nil;
 	[styleParsingErrors release], styleParsingErrors = nil;
 	[super dealloc];
 }
@@ -546,6 +548,14 @@ void styleparsing_error_callback(char *error_message, void *context_data)
 			[self.targetTextView setSelectedTextAttributes:selAttrs];
 		}
 		
+		// Current line styles
+		if (style_coll->editor_current_line_styles != NULL)
+		{
+			self.currentLineStyle = [[[HGMarkdownHighlightingStyle alloc]
+									  initWithStyleAttributes:style_coll->editor_current_line_styles]
+									 autorelease];
+		}
+			
 		[self readClearTextStylesFromTextView];
 	}
 	

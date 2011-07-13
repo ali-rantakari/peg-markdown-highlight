@@ -7,6 +7,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "markdown_definitions.h"
+#import "HGMarkdownHighlightingStyle.h"
 
 /**
  * \brief Highlighter for an NSTextView.
@@ -24,6 +25,7 @@
 	BOOL resetTypingAttributes;
 	BOOL makeLinksClickable;
 	NSArray *styles;
+	HGMarkdownHighlightingStyle *currentLineStyle;
 
 @private
 	NSFontTraitMask clearFontTraitMask;
@@ -51,6 +53,15 @@
  * \sa element_type
  */
 @property(copy) NSArray *styles;
+
+/** \brief The style for highlighting the current line.
+  * 
+  * The value of this property, if set, comes from stylesheets
+  * read by calling -applyStylesFromStylesheet:withErrorDelegate:selector:.
+  * 
+  * \sa applyStylesFromStylesheet:withErrorDelegate:selector:
+  */
+@property(retain) HGMarkdownHighlightingStyle *currentLineStyle;
 
 /** \brief The delay between editing text and it getting highlighted. */
 @property NSTimeInterval waitInterval;
