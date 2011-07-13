@@ -572,6 +572,8 @@ void styleparsing_error_callback(char *error_message, void *context_data)
 									  initWithStyleAttributes:style_coll->editor_current_line_styles]
 									 autorelease];
 		}
+		else
+			self.currentLineStyle = nil;
 			
 		[self readClearTextStylesFromTextView];
 	}
