@@ -38,10 +38,16 @@ void print_styles(style_attribute *list)
                    list->value->argb_color->red,
                    list->value->argb_color->green,
                    list->value->argb_color->blue);
-        else if (list->type == attr_type_font_weight)
-            printf("%i\n", list->value->font_weight);
         else if (list->type == attr_type_font_style)
-            printf("%i\n", list->value->font_style);
+        {
+            if (list->value->font_styles->bold == true)
+                printf("bold ");
+            if (list->value->font_styles->italic == true)
+                printf("italic ");
+            if (list->value->font_styles->underlined == true)
+                printf("underlined ");
+            printf("\n");
+        }
         else if (list->type == attr_type_font_size_pt)
             printf("%i pt\n", list->value->font_size_pt);
         else if (list->type == attr_type_font_family)

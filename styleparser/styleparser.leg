@@ -8,7 +8,6 @@
  */
 
 #include "styleparser.h"
-#include <stdbool.h>
 #include <stdarg.h>
 #include <ctype.h>
 
@@ -178,6 +177,16 @@ attr_value *new_attr_value()
     return (attr_value *)malloc(sizeof(attr_value));
 }
 
+attr_font_styles *new_font_styles()
+{
+    attr_font_styles *ret = (attr_font_styles *)
+                            malloc(sizeof(attr_font_styles));
+    ret->italic = false;
+    ret->bold = false;
+    ret->underlined = false;
+    return ret;
+}
+
 style_attribute *new_attr(char *name, attr_type type)
 {
     style_attribute *attr = (style_attribute *)malloc(sizeof(style_attribute));
@@ -200,9 +209,11 @@ void free_style_attributes(style_attribute *list)
                 || cur->type == attr_type_background_color
                 || cur->type == attr_type_caret_color)
                 free(cur->value->argb_color);
-            if (cur->type == attr_type_font_family)
+            else if (cur->type == attr_type_font_family)
                 free(cur->value->font_family);
-            if (cur->type == attr_type_other)
+            else if (cur->type == attr_type_font_style)
+                free(cur->value->font_styles);
+            else if (cur->type == attr_type_other)
                 free(cur->value->string);
             free(cur->value);
         }
@@ -294,7 +305,6 @@ attr_type attr_type_from_name(char *name)
     else IF_ATTR_NAME("font-size") return attr_type_font_size_pt;
     else IF_ATTR_NAME("font-family") return attr_type_font_family;
     else IF_ATTR_NAME("font-style") return attr_type_font_style;
-    else IF_ATTR_NAME("font-weight") return attr_type_font_weight;
     return attr_type_other;
 }
 
@@ -314,13 +324,51 @@ char *attr_name_from_type(attr_type type)
             return "font-family"; break;
         case attr_type_font_style:
             return "font-style"; break;
-        case attr_type_font_weight:
-            return "font-weight"; break;
         default:
             return "unknown";
     }
 }
 
+
+typedef struct multi_value
+{
+    char *value;
+    struct multi_value *next;
+} multi_value;
+
+multi_value *split_multi_value(char *input)
+{
+    multi_value *head = NULL;
+    
+    char *c = input;
+    while (*c != '\0')
+    {
+        size_t i;
+        for (i = 0; (*(c+i) != '\0' && *(c+i) != ','); i++);
+        multi_value *mv = (multi_value *)malloc(sizeof(multi_value));
+        mv->value = (char *)malloc(sizeof(char)*i + 1);
+        strncpy(mv->value, c, i);
+        mv->next = head;
+        head = mv;
+        if (*(c+i) == ',')
+            i++;
+        c += i;
+    }
+    
+    return head;
+}
+
+void free_multi_value(multi_value *val)
+{
+    multi_value *cur = val;
+    while (cur != NULL)
+    {
+        multi_value *this = cur;
+        free(this->value);
+        free(this);
+        cur = cur->next;
+    }
+}
 
 
 
@@ -369,41 +417,28 @@ style_attribute *interpret_attributes(style_parser_data *p_data,
         }
         else if (atype == attr_type_font_style)
         {
-            char *standardized_style_value = standardize_str(cur->value);
-            attr_font_style style = attr_font_style_normal;
-            
-            if (EQUALS(standardized_style_value, "italic"))
-                style = attr_font_style_italic;
-            else if (EQUALS(standardized_style_value, "condensed"))
-                style = attr_font_style_condensed;
-            else {
-                report_error(p_data, "Value '%s' is invalid for attribute '%s'",
-                             cur->value, cur->name);
-                free_style_attributes(attr);
-                attr = NULL;
+            attr->value->font_styles = new_font_styles();
+            multi_value *values = split_multi_value(cur->value);
+            multi_value *value_cur = values;
+            while (value_cur != NULL)
+            {
+                char *standardized_value = standardize_str(value_cur->value);
+                
+                if (EQUALS(standardized_value, "italic"))
+                    attr->value->font_styles->italic = true;
+                else if (EQUALS(standardized_value, "bold"))
+                    attr->value->font_styles->bold = true;
+                else if (EQUALS(standardized_value, "underlined"))
+                    attr->value->font_styles->underlined = true;
+                else {
+                    report_error(p_data, "Value '%s' is invalid for attribute '%s'",
+                                 value_cur->value, cur->name);
+                }
+                
+                free(standardized_value);
+                value_cur = value_cur->next;
             }
-            
-            if (attr != NULL)
-                attr->value->font_style = style;
-            free(standardized_style_value);
-        }
-        else if (atype == attr_type_font_weight)
-        {
-            char *standardized_weight_value = standardize_str(cur->value);
-            attr_font_weight weight = attr_font_weight_normal;
-            
-            if (EQUALS(standardized_weight_value, "bold"))
-                weight = attr_font_weight_bold;
-            else {
-                report_error(p_data, "Value '%s' is invalid for attribute '%s'",
-                             cur->value, cur->name);
-                free_style_attributes(attr);
-                attr = NULL;
-            }
-            
-            if (attr != NULL)
-                attr->value->font_weight = weight;
-            free(standardized_weight_value);
+            free_multi_value(values);
         }
         else if (atype == attr_type_other)
         {
