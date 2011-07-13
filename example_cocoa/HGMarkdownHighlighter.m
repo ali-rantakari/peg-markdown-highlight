@@ -455,6 +455,15 @@ void styleparsing_error_callback(char *error_message, void *context_data)
 		styleDependenciesPending = YES;
 }
 
+- (NSDictionary *) getDefaultSelectedTextAttributes
+{
+	static NSDictionary *cachedValue = nil;
+	if (cachedValue == nil)
+		cachedValue = [[[[[NSTextView alloc] initWithFrame:NSMakeRect(1,1,1,1)] autorelease]
+						selectedTextAttributes] retain];
+	return cachedValue;
+}
+
 - (void) handleStyleParsingError:(NSString *)errorMessage
 {
 	NSString *messageToAdd = errorMessage;
@@ -527,7 +536,7 @@ void styleparsing_error_callback(char *error_message, void *context_data)
 		// Selection styles
 		if (style_coll->editor_selection_styles != NULL)
 		{
-			NSMutableDictionary *selAttrs = [[self.targetTextView selectedTextAttributes] mutableCopy];
+			NSMutableDictionary *selAttrs = [[self getDefaultSelectedTextAttributes] mutableCopy];
 			
 			style_attribute *cur = style_coll->editor_selection_styles;
 			while (cur != NULL)
@@ -553,6 +562,8 @@ void styleparsing_error_callback(char *error_message, void *context_data)
 			
 			[self.targetTextView setSelectedTextAttributes:selAttrs];
 		}
+		else
+			[self.targetTextView setSelectedTextAttributes:[self getDefaultSelectedTextAttributes]];
 		
 		// Current line styles
 		if (style_coll->editor_current_line_styles != NULL)
