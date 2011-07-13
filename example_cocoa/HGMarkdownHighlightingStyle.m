@@ -57,11 +57,16 @@
 			[toAdd setObject:[HGMarkdownHighlightingStyle colorFromARGBColor:cur->value->argb_color]
 					  forKey:NSBackgroundColorAttributeName];
 		
-		else if (cur->type == attr_type_font_weight && cur->value->font_weight == attr_font_weight_bold)
-			self.fontTraitsToAdd |= NSBoldFontMask;
-		
-		else if (cur->type == attr_type_font_style && cur->value->font_style == attr_font_style_italic)
-			self.fontTraitsToAdd |= NSItalicFontMask;
+		else if (cur->type == attr_type_font_style)
+		{
+			if (cur->value->font_styles->italic)
+				self.fontTraitsToAdd |= NSItalicFontMask;
+			if (cur->value->font_styles->bold)
+				self.fontTraitsToAdd |= NSBoldFontMask;
+			if (cur->value->font_styles->underlined)
+				[toAdd setObject:[NSNumber numberWithInt:NSUnderlineStyleSingle]
+						  forKey:NSUnderlineStyleAttributeName];
+		}
 		
 		else if (cur->type == attr_type_font_size_pt)
 			fontSize = (CGFloat)cur->value->font_size_pt;
