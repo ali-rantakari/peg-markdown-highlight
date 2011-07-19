@@ -596,7 +596,7 @@ Code = < ( s:Ticks1 Sp ( ( !'`' Nonspacechar )+ | !Ticks1 '`'+ | !( Sp Ticks1 ) 
        ) >
        { ADD(elem_s(CODE)); }
 
-RawHtml =   (HtmlComment | HtmlTag)
+RawHtml =   (HtmlComment | HtmlBlockScript | HtmlTag)
 
 BlankLine =     Sp Newline
 
