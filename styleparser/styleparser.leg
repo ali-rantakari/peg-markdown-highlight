@@ -513,26 +513,30 @@ void YY_NAME(input_func)(char *buf, int *result, int max_size, style_parser_data
 /* ======================================================================== */
 %}
 
-Doc =           ( (BlankLine|LineComment)* StyleDef )*
+Doc =           ( (BlankLine|LineComment)*
+                  StyleDef
+                )*
 
 StartList =     &. { $$ = NULL; }
 
 StyleDef =      x:StartList
                 l:StyleLabel
                 Sp (LineComment|Newline)
-                ( a:StyleAttrLine { x = cons(a, x); } )+
+                ( a:StyleAttrLine { x = cons(a, x); }
+                  | IndentMaybe LineComment
+                )+
                 { interpret_and_add_style((style_parser_data *)G->data,
                                           l->name, x);
                   free_sem_values(x);
                   free_sem_values(l);
                 }
 
-StyleLabel =    Indent < StyleLabelChar+ >
+StyleLabel =    IndentMaybe < StyleLabelChar+ >
                 { $$ = SEMVAL; }
                 Sp AssignOp?
                 
 
-StyleAttrLine = Indent a:StyleAttr Sp (LineComment|Newline|Eof)
+StyleAttrLine = IndentMaybe a:StyleAttr Sp (LineComment|Newline|Eof)
                 { $$ = a; }
 
 AssignOp =      ':'|'='
@@ -547,7 +551,7 @@ StyleLabelChar = [A-Za-z0-9-_]
 AttrNameChar =  [A-Za-z0-9-]
 AttrValueChar = (!Newline !Eof !BeginLineComment .)
 
-Indent =        ("\t" | " ")*
+IndentMaybe =   ("\t" | " ")*
 BlankLine =     Sp Newline
 Eof =           !.
 Spacechar =     ' ' | '\t'
@@ -558,7 +562,8 @@ Sp =            Spacechar*
 #Digit = [0-9]
 
 BeginLineComment = '#'
-LineComment =   BeginLineComment (!Newline !Eof .)* (Newline|Eof)
+AnythingTillEol = (!Newline !Eof .)* (Newline|Eof)
+LineComment =   BeginLineComment AnythingTillEol
 
 %%
 /* ======================================================================== */
