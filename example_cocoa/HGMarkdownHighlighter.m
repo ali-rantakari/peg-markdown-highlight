@@ -151,10 +151,10 @@ void styleparsing_error_callback(char *error_message, void *context_data)
 	 removeObserver:self
 	 name:NSThreadWillExitNotification
 	 object:self.workerThread];
-	self.workerThread = nil;
 	if (currentHighlightText != NULL)
 		free(currentHighlightText);
 	currentHighlightText = NULL;
+	self.workerThread = nil;
 	if (workerThreadResultsInvalid)
 		[self
 		 performSelectorOnMainThread:@selector(requestParsing)
