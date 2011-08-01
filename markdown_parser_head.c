@@ -77,11 +77,15 @@ void parse_references(parser_data *p_data);
 
 
 
-
-void remove_zero_length_raw_spans(element *elem)
+/*
+Remove RAW elements with zero length; return pointer
+to new head.
+*/
+element *remove_zero_length_raw_spans(element *elem)
 {
+    element *head = elem;
     element *parent = NULL;
-    element *c = elem;
+    element *c = head;
     while (c != NULL)
     {
         if (c->type == RAW && c->pos >= c->end)
@@ -89,7 +93,7 @@ void remove_zero_length_raw_spans(element *elem)
             if (parent != NULL) {
                 parent->next = c->next;
             } else {
-                elem = c->next;
+                head = c->next;
             }
             parent = c;
             c = c->next;
@@ -98,6 +102,7 @@ void remove_zero_length_raw_spans(element *elem)
         parent = c;
         c = c->next;
     }
+    return head;
 }
 
 /*
@@ -154,7 +159,7 @@ void process_raw_blocks(parser_data *p_data)
         {
             element *span_list = cursor->children;
             
-            remove_zero_length_raw_spans(span_list);
+            span_list = remove_zero_length_raw_spans(span_list);
             
             #if MKD_DEBUG_OUTPUT
             MKD_PRINTF("  process: "); print_raw_spans_inline(span_list); MKD_PRINTF("\n");
