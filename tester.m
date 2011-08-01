@@ -131,11 +131,10 @@ void apply_highlighting(NSMutableAttributedString *attrStr, element *elem[])
 
 NSAttributedString *highlight(NSString *str, NSMutableAttributedString *attrStr)
 {
-    int extensions = 0;
     element **result;
     
     char *md_source = (char *)[str UTF8String];
-    markdown_to_elements(md_source, extensions, &result);
+    markdown_to_elements(md_source, EXT_NONE, &result);
     
     if (attrStr == nil)
         attrStr = [[[NSMutableAttributedString alloc] initWithString:str] autorelease];
@@ -190,9 +189,8 @@ int main(int argc, char * argv[])
     {
         if (strcmp(argv[1], "-d") == 0)
         {
-            int extensions = 0;
             element **result;
-            markdown_to_elements((char *)[contents UTF8String], extensions, &result);
+            markdown_to_elements((char *)[contents UTF8String], EXT_NONE, &result);
             print_result(result);
         }
         else

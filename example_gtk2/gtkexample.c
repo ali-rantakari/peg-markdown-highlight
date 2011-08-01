@@ -98,7 +98,7 @@ void highlight_buffer(GtkTextBuffer *buffer)
 	text = gtk_text_buffer_get_text(buffer, &start, &end, FALSE);
 
 	element **result = NULL;
-	markdown_to_elements((char *)text, 0, &result);
+	markdown_to_elements((char *)text, EXT_NONE, &result);
 
 	gtk_text_buffer_remove_all_tags(buffer, &start, &end);
 

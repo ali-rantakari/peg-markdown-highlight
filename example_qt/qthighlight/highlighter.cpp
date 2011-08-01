@@ -21,7 +21,7 @@ void WorkerThread::run()
 {
     if (content == NULL)
         return;
-    markdown_to_elements(content, 0, &result);
+    markdown_to_elements(content, EXT_NONE, &result);
 }
 
 

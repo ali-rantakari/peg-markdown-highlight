@@ -63,14 +63,13 @@ void output_result(element *elem[])
 
 int main(int argc, char * argv[])
 {
-    int extensions = 0;
     element **result;
     
     FILE *file = stdin;
     if (argc > 1)
         file = fopen(argv[1], "r");
     char *md_source = get_contents(file);
-    markdown_to_elements(md_source, extensions, &result);
+    markdown_to_elements(md_source, EXT_NONE, &result);
     sort_elements_by_pos(result);
     output_result(result);
     

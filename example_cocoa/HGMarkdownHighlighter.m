@@ -72,7 +72,7 @@ void styleparsing_error_callback(char *error_message, void *context_data)
 	self.updateTimer = nil;
 	self.targetTextView = nil;
 	self.waitInterval = 1;
-	self.extensions = 0;
+	self.extensions = EXT_NONE;
 	
 	return self;
 }

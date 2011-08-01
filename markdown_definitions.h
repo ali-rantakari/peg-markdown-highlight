@@ -101,6 +101,7 @@ typedef struct Element element;
 */
 enum markdown_extensions
 {
+    EXT_NONE    = 0,        /**< No extensions */
 	EXT_NOTES   = (1 << 0)  /**< A footnote syntax like that of Pandoc or PHP Markdown Extra */
 };
 
