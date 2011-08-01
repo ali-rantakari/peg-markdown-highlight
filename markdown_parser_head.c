@@ -164,6 +164,14 @@ void process_raw_blocks(parser_data *p_data)
             {
                 MKD_PRINTF("next: span_list: %ld-%ld\n", span_list->pos, span_list->end);
                 
+                // Skip separators in the beginning, as well as
+                // separators after another separator:
+                if (span_list->type == SEPARATOR) {
+                    span_list = span_list->next;
+                    continue;
+                }
+                
+                // Store list of spans until next separator in subspan_list:
                 element *subspan_list = span_list;
                 element *previous = NULL;
                 while (span_list != NULL && span_list->type != SEPARATOR) {
@@ -179,6 +187,7 @@ void process_raw_blocks(parser_data *p_data)
                 MKD_PRINTF("    subspan process: "); print_raw_spans_inline(subspan_list); MKD_PRINTF("\n");
                 #endif
                 
+                // Process subspan_list:
                 parser_data *raw_p_data = mk_parser_data(p_data->charbuf,
                                                          subspan_list,
                                                          subspan_list->pos,
