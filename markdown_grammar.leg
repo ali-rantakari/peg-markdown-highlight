@@ -520,28 +520,24 @@ TitleDouble = '"' ( !( '"' Sp ( ')' | Newline ) ) . )* '"'
 
 AutoLink = AutoLinkUrl | AutoLinkEmail
 
-AutoLinkUrl =  < s:LocMarker { $$ = elem(AUTO_LINK_URL); }
+AutoLinkUrl =  < s:LocMarker { s->type = AUTO_LINK_URL; }
                '<'
                  < [A-Za-z]+ "://" ( !Newline !'>' . )+ >
-                 { $$->address = strdup(yytext); }
+                 { s->address = strdup(yytext); }
                '>' >
                {
-                $$->pos = s->pos;
-                $$->end = thunk->end;
-                ADD($$);
-                $$ = NULL;
+                s->end = thunk->end;
+                ADD(s);
                }
 
-AutoLinkEmail = < s:LocMarker { $$ = elem(AUTO_LINK_EMAIL); }
+AutoLinkEmail = < s:LocMarker { s->type = AUTO_LINK_EMAIL; }
                 '<'
                   < [-A-Za-z0-9+_.]+ '@' ( !Newline !'>' . )+ >
-                  { $$->address = strdup(yytext); }
+                  { s->address = strdup(yytext); }
                 '>' >
                {
-                $$->pos = s->pos;
-                $$->end = thunk->end;
-                ADD($$);
-                $$ = NULL;
+                s->end = thunk->end;
+                ADD(s);
                }
 
 Reference = < s:LocMarker
@@ -555,14 +551,15 @@ Reference = < s:LocMarker
                 FREE_ADDRESS(r);
               }
 
-Label = < s:LocMarker { $$ = mk_notype; }
+Label = < s:LocMarker
         '[' ( !'^' &{ EXT(EXT_NOTES) } | &. &{ !EXT(EXT_NOTES) } )
-        < i:LocMarker ( !']' Inline )* >
-        { $$->label = strdup(yytext); }
+        < ( !']' Inline )* >
+        { s->label = strdup(yytext); }
         ']' >
         {
-            $$->pos = s->pos;
-            $$->end = thunk->end;
+            s->pos = s->pos;
+            s->end = thunk->end;
+            $$ = s;
         }
 
 RefSrc = < Nonspacechar+ >
