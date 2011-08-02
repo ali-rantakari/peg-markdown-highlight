@@ -479,7 +479,7 @@ ReferenceLinkDouble =  < s:Label Spnl !"[]" l:Label >
                             if (reference) {
                                 $$ = elem_s(LINK);
                                 $$->label = strdup(l->label);
-                                $$->address = reference->address;
+                                $$->address = strdup(reference->address);
                             } else
                                 $$ = NULL;
                             FREE_LABEL(s);
@@ -492,7 +492,7 @@ ReferenceLinkSingle =  < s:Label (Spnl "[]")? >
                             if (reference) {
                                 $$ = elem_s(LINK);
                                 $$->label = strdup(s->label);
-                                $$->address = reference->address;
+                                $$->address = strdup(reference->address);
                             } else
                                 $$ = NULL;
                             FREE_LABEL(s);

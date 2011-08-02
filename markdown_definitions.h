@@ -89,6 +89,7 @@ struct Element
 	unsigned long end;			  /**< \brief end offset in input */
 	struct Element *next;		  /**< \brief next element in list */
 	struct Element *allElemsNext; /**< \brief next element in list of all elements */
+	int textOffset;               /**< \brief offset to text (for elements of type EXTRA_TEXT, used when the parser reads the value of 'text') */
 	char *text;					  /**< \brief text content (for elements of type EXTRA_TEXT) */
 	char *label;				  /**< \brief label (for links and references) */
 	char *address;                /**< \brief address (for links and references) */

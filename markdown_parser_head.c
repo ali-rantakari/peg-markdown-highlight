@@ -231,9 +231,15 @@ void free_elements(element **elems)
 {
     element *cursor = elems[ALL];
     while (cursor != NULL) {
-        element *old = cursor;
+        element *tofree = cursor;
         cursor = cursor->allElemsNext;
-        free(old);
+        if (tofree->text != NULL)
+            free(tofree->text);
+        if (tofree->label != NULL)
+            free(tofree->label);
+        if (tofree->address != NULL)
+            free(tofree->address);
+        free(tofree);
     }
     elems[ALL] = NULL;
     
@@ -511,6 +517,7 @@ element * mk_element(parser_data *p_data, element_type type, long pos, long end)
     result->pos = pos;
     result->end = end;
     result->next = NULL;
+    result->textOffset = 0;
     result->label = result->address = result->text = NULL;
     
     element *old_all_elements_head = p_data->head_elems[ALL];
@@ -525,9 +532,9 @@ element * mk_element(parser_data *p_data, element_type type, long pos, long end)
 element * copy_element(parser_data *p_data, element *elem)
 {
     element *result = mk_element(p_data, elem->type, elem->pos, elem->end);
-    result->label = elem->label;
-    result->text = elem->text;
-    result->address = elem->address;
+    result->label = (elem->label == NULL) ? NULL : strdup(elem->label);
+    result->text = (elem->text == NULL) ? NULL : strdup(elem->text);
+    result->address = (elem->address == NULL) ? NULL : strdup(elem->address);
     return result;
 }
 
@@ -537,7 +544,7 @@ element * mk_etext(parser_data *p_data, char *string)
     element *result;
     assert(string != NULL);
     result = mk_element(p_data, EXTRA_TEXT, 0,0);
-    result->text = string;
+    result->text = strdup(string);
     return result;
 }
 
@@ -695,16 +702,23 @@ void add_raw(parser_data *p_data, long pos, long end)
 
 void yy_input_func(char *buf, int *result, int max_size, parser_data *p_data)
 {
-    if (p_data->elem == NULL) {
+    if (p_data->elem == NULL)
+    {
         (*result) = 0;
-    } else {
-        if (p_data->elem->type == EXTRA_TEXT) {
+    }
+    else
+    {
+        if (p_data->elem->type == EXTRA_TEXT)
+        {
             int yyc;
-            if (p_data->elem->text && *p_data->elem->text != '\0') {
-                yyc = *p_data->elem->text++;
+            if (p_data->elem->text && *(p_data->elem->text + p_data->elem->textOffset) != '\0')
+            {
+                yyc = *(p_data->elem->text + p_data->elem->textOffset++);
                 MKD_PRINTF("\e[47;30m"); MKD_PUTCHAR(yyc); MKD_PRINTF("\e[0m");
                 MKD_IF(yyc == '\n') MKD_PRINTF("\e[47m \e[0m");
-            } else {
+            }
+            else
+            {
                 yyc = EOF;
                 p_data->elem = p_data->elem->next;
                 MKD_PRINTF("\e[41m \e[0m");
@@ -712,13 +726,16 @@ void yy_input_func(char *buf, int *result, int max_size, parser_data *p_data)
                     p_data->offset = p_data->elem->pos;
             }
             (*result) = (EOF == yyc) ? 0 : (*(buf) = yyc, 1);
-        } else {
+        }
+        else
+        {
             *(buf) = *(p_data->charbuf + p_data->offset);
             (*result) = (*buf != '\0');
             p_data->offset++;
             MKD_PRINTF("\e[43;30m"); MKD_PUTCHAR(*buf); MKD_PRINTF("\e[0m");
             MKD_IF(*buf == '\n') MKD_PRINTF("\e[42m \e[0m");
-            if (p_data->offset >= p_data->elem->end) {
+            if (p_data->offset >= p_data->elem->end)
+            {
                 p_data->elem = p_data->elem->next;
                 MKD_PRINTF("\e[41m \e[0m");
                 if (p_data->elem != NULL)
