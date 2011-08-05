@@ -164,6 +164,11 @@ void Print(NSString *aStr)
     [aStr writeToFile:@"/dev/stdout" atomically:NO encoding:NSUTF8StringEncoding error:NULL];
 }
 
+void PrintErr(NSString *aStr)
+{
+    [aStr writeToFile:@"/dev/stderr" atomically:NO encoding:NSUTF8StringEncoding error:NULL];
+}
+
 double get_time()
 {
     struct timeval t;
@@ -196,7 +201,7 @@ int main(int argc, char * argv[])
         else
         {
             int iterations = atoi(argv[1]);
-            printf("Doing %i iterations.\n", iterations);
+            fprintf(stderr, "Doing %i iterations.\n", iterations);
             
             NSAttributedString *attrStr = nil;
             
@@ -212,17 +217,17 @@ int main(int argc, char * argv[])
                 attrStr = highlight(contents, as[i]);
                 
                 if (stepProgress == 9) {
-                    Print([NSString stringWithFormat:@"%i", i+1]);
+                    PrintErr([NSString stringWithFormat:@"%i", i+1]);
                     stepProgress = 0;
                 } else {
-                    Print(@"-");
+                    PrintErr(@"-");
                     stepProgress++;
                 }
             }
             double endtime = get_time();
             
-            //Print([ansiHelper ansiEscapedStringWithAttributedString:attrStr]);
-            printf("\n%f\n", (endtime-starttime));
+            PrintErr(@"\n");
+            printf("%f\n", (endtime-starttime));
         }
     }
     else
