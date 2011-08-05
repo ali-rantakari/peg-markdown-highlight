@@ -90,11 +90,10 @@ element *remove_zero_length_raw_spans(element *elem)
     {
         if (c->type == RAW && c->pos >= c->end)
         {
-            if (parent != NULL) {
+            if (parent != NULL)
                 parent->next = c->next;
-            } else {
+            else
                 head = c->next;
-            }
             parent = c;
             c = c->next;
             continue;
@@ -135,7 +134,9 @@ void print_raw_spans_inline(element *elem)
         if (cur->type == SEPARATOR)
             MKD_PRINTF("<SEP %ld> ", cur->pos);
         else if (cur->type == EXTRA_TEXT) {
-            MKD_PRINTF("{ETEXT "); print_str_literal_escapes(cur->text); MKD_PRINTF("}");
+            MKD_PRINTF("{ETEXT ");
+            print_str_literal_escapes(cur->text);
+            MKD_PRINTF("}");
         }
         else
             MKD_PRINTF("(%ld-%ld) ", cur->pos, cur->end);
@@ -162,12 +163,15 @@ void process_raw_blocks(parser_data *p_data)
             span_list = remove_zero_length_raw_spans(span_list);
             
             #if MKD_DEBUG_OUTPUT
-            MKD_PRINTF("  process: "); print_raw_spans_inline(span_list); MKD_PRINTF("\n");
+            MKD_PRINTF("  process: ");
+            print_raw_spans_inline(span_list);
+            MKD_PRINTF("\n");
             #endif
             
             while (span_list != NULL)
             {
-                MKD_PRINTF("next: span_list: %ld-%ld\n", span_list->pos, span_list->end);
+                MKD_PRINTF("next: span_list: %ld-%ld\n",
+                           span_list->pos, span_list->end);
                 
                 // Skip separators in the beginning, as well as
                 // separators after another separator:
@@ -189,7 +193,9 @@ void process_raw_blocks(parser_data *p_data)
                 }
                 
                 #if MKD_DEBUG_OUTPUT
-                MKD_PRINTF("    subspan process: "); print_raw_spans_inline(subspan_list); MKD_PRINTF("\n");
+                MKD_PRINTF("    subspan process: ");
+                print_raw_spans_inline(subspan_list);
+                MKD_PRINTF("\n");
                 #endif
                 
                 // Process subspan_list:
@@ -254,7 +260,9 @@ void free_elements(element **elems)
 
 
 #define IS_CONTINUATION_BYTE(x) ((x & 0xC0) == 0x80)
-#define HAS_UTF8_BOM(x)         (((*x & 0xFF) == 0xEF) && ((*(x+1) & 0xFF) == 0xBB) && ((*(x+2) & 0xFF) == 0xBF))
+#define HAS_UTF8_BOM(x)         ( ((*x & 0xFF) == 0xEF)\
+                                  && ((*(x+1) & 0xFF) == 0xBB)\
+                                  && ((*(x+2) & 0xFF) == 0xBF) )
 
 /*
 Copy `str` to `out`, while doing the following:
@@ -299,7 +307,8 @@ void markdown_to_elements(char *text, int extensions, element **out_result[])
     parsing_elem->end = text_copy_len;
     parsing_elem->next = NULL;
     
-    parser_data *p_data = mk_parser_data(text_copy, parsing_elem, 0, extensions, NULL, NULL);
+    parser_data *p_data = mk_parser_data(text_copy, parsing_elem,
+                                         0, extensions, NULL, NULL);
     element **result = p_data->head_elems;
     
     if (*text_copy != '\0')
@@ -334,7 +343,8 @@ void markdown_to_elements(char *text, int extensions, element **out_result[])
 Mergesort linked list of elements (using comparison function `compare`),
 return new head. (Adapted slightly from Simon Tatham's algorithm.)
 */
-element *ll_mergesort(element *list, int (*compare)(const element*, const element*))
+element *ll_mergesort(element *list,
+                      int (*compare)(const element*, const element*))
 {
     if (!list)
         return NULL;
@@ -609,7 +619,8 @@ element *fix_offsets(parser_data *p_data, element *elem)
             previous_end = cursor->end;
         
         if (found_start) {
-            element *new_elem = mk_element(p_data, tail->type, this_pos, cursor->end);
+            element *new_elem = mk_element(p_data, tail->type,
+                                           this_pos, cursor->end);
             new_elem->next = tail;
             if (prev != NULL)
                 prev->next = new_elem;
@@ -633,9 +644,11 @@ void add(parser_data *p_data, element *elem)
 {
     if (elem->type != RAW_LIST)
     {
-        MKD_PRINTF("  add: %s [%ld - %ld]\n", type_name(elem->type), elem->pos, elem->end);
+        MKD_PRINTF("  add: %s [%ld - %ld]\n",
+                   type_name(elem->type), elem->pos, elem->end);
         elem = fix_offsets(p_data, elem);
-        MKD_PRINTF("     > %s [%ld - %ld]\n", type_name(elem->type), elem->pos, elem->end);
+        MKD_PRINTF("     > %s [%ld - %ld]\n",
+                   type_name(elem->type), elem->pos, elem->end);
     }
     else
     {
@@ -677,7 +690,8 @@ void add(parser_data *p_data, element *elem)
     }
 }
 
-element * add_element(parser_data *p_data, element_type type, long pos, long end)
+element * add_element(parser_data *p_data, element_type type,
+                      long pos, long end)
 {
     element *new_element = mk_element(p_data, type, pos, end);
     add(p_data, new_element);
@@ -698,50 +712,54 @@ void add_raw(parser_data *p_data, long pos, long end)
 # define YY_DEBUG 1
 #endif
 
-#define YY_INPUT(buf, result, max_size) yy_input_func(buf, &result, max_size, (parser_data *)G->data)
+#define YY_INPUT(buf, result, max_size)\
+        yy_input_func(buf, &result, max_size, (parser_data *)G->data)
 
 void yy_input_func(char *buf, int *result, int max_size, parser_data *p_data)
 {
     if (p_data->elem == NULL)
     {
         (*result) = 0;
+        return;
     }
-    else
+    
+    if (p_data->elem->type == EXTRA_TEXT)
     {
-        if (p_data->elem->type == EXTRA_TEXT)
+        int yyc;
+        bool moreToRead = (p_data->elem->text
+                           && *(p_data->elem->text
+                                + p_data->elem->textOffset) != '\0');
+        if (moreToRead)
         {
-            int yyc;
-            if (p_data->elem->text && *(p_data->elem->text + p_data->elem->textOffset) != '\0')
-            {
-                yyc = *(p_data->elem->text + p_data->elem->textOffset++);
-                MKD_PRINTF("\e[47;30m"); MKD_PUTCHAR(yyc); MKD_PRINTF("\e[0m");
-                MKD_IF(yyc == '\n') MKD_PRINTF("\e[47m \e[0m");
-            }
-            else
-            {
-                yyc = EOF;
-                p_data->elem = p_data->elem->next;
-                MKD_PRINTF("\e[41m \e[0m");
-                if (p_data->elem != NULL)
-                    p_data->offset = p_data->elem->pos;
-            }
-            (*result) = (EOF == yyc) ? 0 : (*(buf) = yyc, 1);
+            yyc = *(p_data->elem->text + p_data->elem->textOffset++);
+            MKD_PRINTF("\e[47;30m"); MKD_PUTCHAR(yyc); MKD_PRINTF("\e[0m");
+            MKD_IF(yyc == '\n') MKD_PRINTF("\e[47m \e[0m");
         }
         else
         {
-            *(buf) = *(p_data->charbuf + p_data->offset);
-            (*result) = (*buf != '\0');
-            p_data->offset++;
-            MKD_PRINTF("\e[43;30m"); MKD_PUTCHAR(*buf); MKD_PRINTF("\e[0m");
-            MKD_IF(*buf == '\n') MKD_PRINTF("\e[42m \e[0m");
-            if (p_data->offset >= p_data->elem->end)
-            {
-                p_data->elem = p_data->elem->next;
-                MKD_PRINTF("\e[41m \e[0m");
-                if (p_data->elem != NULL)
-                    p_data->offset = p_data->elem->pos;
-            }
+            yyc = EOF;
+            p_data->elem = p_data->elem->next;
+            MKD_PRINTF("\e[41m \e[0m");
+            if (p_data->elem != NULL)
+                p_data->offset = p_data->elem->pos;
         }
+        (*result) = (EOF == yyc) ? 0 : (*(buf) = yyc, 1);
+        return;
+    }
+    
+    *(buf) = *(p_data->charbuf + p_data->offset);
+    (*result) = (*buf != '\0');
+    p_data->offset++;
+    
+    MKD_PRINTF("\e[43;30m"); MKD_PUTCHAR(*buf); MKD_PRINTF("\e[0m");
+    MKD_IF(*buf == '\n') MKD_PRINTF("\e[42m \e[0m");
+    
+    if (p_data->offset >= p_data->elem->end)
+    {
+        p_data->elem = p_data->elem->next;
+        MKD_PRINTF("\e[41m \e[0m");
+        if (p_data->elem != NULL)
+            p_data->offset = p_data->elem->pos;
     }
 }
 
