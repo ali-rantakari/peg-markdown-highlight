@@ -1,9 +1,5 @@
 Parser
 ------
-- Add more style attribute types
-    - (what else does Cocoa support?)
-- Document the stylesheet parser syntax
-    - Need to first "stabilize" the syntax
 - More granular matching of elements:
     - Match whole blockquote area separately from blockquote indicator
     - Match actual content separately from syntax characters (e.g. provide
@@ -18,15 +14,23 @@ Parser
 - Reduce memory usage (profile with valgrind, Instruments or somesuch)
 
 
+Style parser
+------------
+- Add more style attribute types
+    - (what else does Cocoa support?)
+- Document the stylesheet parser syntax
+    - Need to first "stabilize" the syntax
+
+
 Cocoa
 -----
-- Fix bug: Correctly clear link attributes
 - Investigate using temporary attributes
     - In which way are they temporary? When are they removed?
 - When copying to clipboard, remove highlights if possible (make this an option?)
 - When an edit event comes to the highlighter, **don't do the timer if there
   is a parser running at the moment**, but act on the changes immediately
 - GUI widget for specifying highlighting styles
+    - (needed? stylesheets are quite easy to modify)
 - Implement (stress) tests for modifying several NSTextViews simultaneously
 
 
