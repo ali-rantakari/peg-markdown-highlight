@@ -37,50 +37,50 @@ tag_listelem *add_tag_listelem(tag_listelem *list, tag_listelem *new_elem)
 tag_listelem **make_tags_table(GtkTextBuffer *buffer)
 {
 	tag_listelem **tags_table = (tag_listelem **)malloc(sizeof(tag_listelem*)
-														* NUM_LANG_TYPES);
-	for (int i = 0; i < NUM_LANG_TYPES; i++)
+														* pmh_NUM_LANG_TYPES);
+	for (int i = 0; i < pmh_NUM_LANG_TYPES; i++)
 		tags_table[i] = NULL;
 
 	#define ADDTAG(type,name,value) tags_table[type] = add_tag_listelem(tags_table[type], mk_listelem(gtk_text_buffer_create_tag(buffer, NULL, name, value)))
 
-	ADDTAG(H6, "foreground", "#0000ff");
-	ADDTAG(H6, "weight", PANGO_WEIGHT_BOLD);
-	tags_table[H1] = tags_table[H2] =
-	tags_table[H3] = tags_table[H4] =
-	tags_table[H5] = tags_table[H6];
+	ADDTAG(pmh_H6, "foreground", "#0000ff");
+	ADDTAG(pmh_H6, "weight", PANGO_WEIGHT_BOLD);
+	tags_table[pmh_H1] = tags_table[pmh_H2] =
+	tags_table[pmh_H3] = tags_table[pmh_H4] =
+	tags_table[pmh_H5] = tags_table[pmh_H6];
 
-	ADDTAG(EMPH, "foreground", "#999900");
-	ADDTAG(EMPH, "style", PANGO_STYLE_ITALIC);
-	ADDTAG(STRONG, "foreground", "#990099");
-	ADDTAG(STRONG, "weight", PANGO_WEIGHT_BOLD);
+	ADDTAG(pmh_EMPH, "foreground", "#999900");
+	ADDTAG(pmh_EMPH, "style", PANGO_STYLE_ITALIC);
+	ADDTAG(pmh_STRONG, "foreground", "#990099");
+	ADDTAG(pmh_STRONG, "weight", PANGO_WEIGHT_BOLD);
 
-	ADDTAG(LINK, "background", "#ccccff");
-	tags_table[AUTO_LINK_EMAIL] = tags_table[AUTO_LINK_URL] = tags_table[LINK];
+	ADDTAG(pmh_LINK, "background", "#ccccff");
+	tags_table[pmh_AUTO_LINK_EMAIL] = tags_table[pmh_AUTO_LINK_URL] = tags_table[pmh_LINK];
 
-	ADDTAG(CODE, "foreground", "#3e6b3e");
-	ADDTAG(CODE, "background", "#e1e6e1");
-	tags_table[VERBATIM] = tags_table[CODE];
+	ADDTAG(pmh_CODE, "foreground", "#3e6b3e");
+	ADDTAG(pmh_CODE, "background", "#e1e6e1");
+	tags_table[pmh_VERBATIM] = tags_table[pmh_CODE];
 
-	ADDTAG(HRULE, "foreground", "#cccccc");
-	ADDTAG(HRULE, "background", "#eeeeee");
+	ADDTAG(pmh_HRULE, "foreground", "#cccccc");
+	ADDTAG(pmh_HRULE, "background", "#eeeeee");
 
-	ADDTAG(LIST_BULLET, "foreground", "#990099");
-	tags_table[LIST_ENUMERATOR] = tags_table[LIST_BULLET];
+	ADDTAG(pmh_LIST_BULLET, "foreground", "#990099");
+	tags_table[pmh_LIST_ENUMERATOR] = tags_table[pmh_LIST_BULLET];
 
-	ADDTAG(IMAGE, "foreground", "#4a5a77");
-	ADDTAG(IMAGE, "background", "#d8dde6");
+	ADDTAG(pmh_IMAGE, "foreground", "#4a5a77");
+	ADDTAG(pmh_IMAGE, "background", "#d8dde6");
 	
-	ADDTAG(REFERENCE, "foreground", "#9f92ad");
-	ADDTAG(REFERENCE, "background", "#e9e1f2");
+	ADDTAG(pmh_REFERENCE, "foreground", "#9f92ad");
+	ADDTAG(pmh_REFERENCE, "background", "#e9e1f2");
 	
-	ADDTAG(COMMENT, "foreground", "#999999");
+	ADDTAG(pmh_COMMENT, "foreground", "#999999");
 	
 	return tags_table;
 }
 
 // Return linked list of tags to apply for occurrences
 // of the language element `type`
-tag_listelem *tags_for_type(GtkTextBuffer *buffer, element_type type)
+tag_listelem *tags_for_type(GtkTextBuffer *buffer, pmh_element_type type)
 {
 	static tag_listelem **tags_table;
 	if (tags_table == NULL)
@@ -97,18 +97,18 @@ void highlight_buffer(GtkTextBuffer *buffer)
 	gtk_text_buffer_get_end_iter(buffer, &end);
 	text = gtk_text_buffer_get_text(buffer, &start, &end, FALSE);
 
-	element **result = NULL;
-	markdown_to_elements((char *)text, EXT_NONE, &result);
+	pmh_element **result = NULL;
+	pmh_markdown_to_elements((char *)text, pmh_EXT_NONE, &result);
 
 	gtk_text_buffer_remove_all_tags(buffer, &start, &end);
 
-	for (int i = 0; i < NUM_LANG_TYPES; i++)
+	for (int i = 0; i < pmh_NUM_LANG_TYPES; i++)
 	{
 		tag_listelem *tags = tags_for_type(buffer, i);
 		if (tags == NULL)
 			continue;
 
-		element *cur = result[i];
+		pmh_element *cur = result[i];
 		while (cur != NULL)
 		{
 			GtkTextIter posIter;
@@ -128,7 +128,7 @@ void highlight_buffer(GtkTextBuffer *buffer)
 		}
 	}
 
-	free_elements(result);
+	pmh_free_elements(result);
 	g_free(text);
 }
 
