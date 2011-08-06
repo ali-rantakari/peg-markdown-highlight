@@ -153,7 +153,9 @@ void print_result(pmh_element *elem[])
         pmh_element *cursor = elem[i];
         while (cursor != NULL)
         {
-            pmh_PRINTF("[%ld-%ld] 0x%x: %s\n", cursor->pos, cursor->end, (int)cursor, pmh_type_name(cursor->type));
+#if pmh_DEBUG_OUTPUT
+            fprintf(stderr, "[%ld-%ld] 0x%x: %s\n", cursor->pos, cursor->end, (int)cursor, pmh_type_name(cursor->type));
+#endif
             cursor = cursor->next;
         }
     }

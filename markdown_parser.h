@@ -17,20 +17,6 @@
 #include <assert.h>
 #include "markdown_definitions.h"
 
-#ifndef pmh_DEBUG_OUTPUT
-#define pmh_DEBUG_OUTPUT 0
-#endif
-
-#if pmh_DEBUG_OUTPUT
-#define pmh_IF(x)           if (x)
-#define pmh_PRINTF(x, ...)  fprintf(stderr, x, ##__VA_ARGS__)
-#define pmh_PUTCHAR(x)      putchar(x)
-#else
-#define pmh_IF(x)
-#define pmh_PRINTF(x, ...)
-#define pmh_PUTCHAR(x)
-#endif
-
 
 /**
 * \brief Parse Markdown text, return elements
