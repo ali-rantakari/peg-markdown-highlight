@@ -233,34 +233,34 @@ char **get_element_type_names()
     static char **elem_type_names = NULL;
     if (elem_type_names == NULL)
     {
-        elem_type_names = (char **)malloc(sizeof(char*) * NUM_LANG_TYPES);
+        elem_type_names = (char **)malloc(sizeof(char*) * pmh_NUM_LANG_TYPES);
         int i;
-        for (i = 0; i < NUM_LANG_TYPES; i++)
+        for (i = 0; i < pmh_NUM_LANG_TYPES; i++)
             elem_type_names[i] = NULL;
-        elem_type_names[LINK] = "LINK";
-        elem_type_names[AUTO_LINK_URL] = "AUTO_LINK_URL";
-        elem_type_names[AUTO_LINK_EMAIL] = "AUTO_LINK_EMAIL";
-        elem_type_names[IMAGE] = "IMAGE";
-        elem_type_names[CODE] = "CODE";
-        elem_type_names[HTML] = "HTML";
-        elem_type_names[HTML_ENTITY] = "HTML_ENTITY";
-        elem_type_names[EMPH] = "EMPH";
-        elem_type_names[STRONG] = "STRONG";
-        elem_type_names[LIST_BULLET] = "LIST_BULLET";
-        elem_type_names[LIST_ENUMERATOR] = "LIST_ENUMERATOR";
-        elem_type_names[COMMENT] = "COMMENT";
-        elem_type_names[H1] = "H1";
-        elem_type_names[H2] = "H2";
-        elem_type_names[H3] = "H3";
-        elem_type_names[H4] = "H4";
-        elem_type_names[H5] = "H5";
-        elem_type_names[H6] = "H6";
-        elem_type_names[BLOCKQUOTE] = "BLOCKQUOTE";
-        elem_type_names[VERBATIM] = "VERBATIM";
-        elem_type_names[HTMLBLOCK] = "HTMLBLOCK";
-        elem_type_names[HRULE] = "HRULE";
-        elem_type_names[REFERENCE] = "REFERENCE";
-        elem_type_names[NOTE] = "NOTE";
+        elem_type_names[pmh_LINK] = "LINK";
+        elem_type_names[pmh_AUTO_LINK_URL] = "AUTO_LINK_URL";
+        elem_type_names[pmh_AUTO_LINK_EMAIL] = "AUTO_LINK_EMAIL";
+        elem_type_names[pmh_IMAGE] = "IMAGE";
+        elem_type_names[pmh_CODE] = "CODE";
+        elem_type_names[pmh_HTML] = "HTML";
+        elem_type_names[pmh_HTML_ENTITY] = "HTML_ENTITY";
+        elem_type_names[pmh_EMPH] = "EMPH";
+        elem_type_names[pmh_STRONG] = "STRONG";
+        elem_type_names[pmh_LIST_BULLET] = "LIST_BULLET";
+        elem_type_names[pmh_LIST_ENUMERATOR] = "LIST_ENUMERATOR";
+        elem_type_names[pmh_COMMENT] = "COMMENT";
+        elem_type_names[pmh_H1] = "H1";
+        elem_type_names[pmh_H2] = "H2";
+        elem_type_names[pmh_H3] = "H3";
+        elem_type_names[pmh_H4] = "H4";
+        elem_type_names[pmh_H5] = "H5";
+        elem_type_names[pmh_H6] = "H6";
+        elem_type_names[pmh_BLOCKQUOTE] = "BLOCKQUOTE";
+        elem_type_names[pmh_VERBATIM] = "VERBATIM";
+        elem_type_names[pmh_HTMLBLOCK] = "HTMLBLOCK";
+        elem_type_names[pmh_HRULE] = "HRULE";
+        elem_type_names[pmh_REFERENCE] = "REFERENCE";
+        elem_type_names[pmh_NOTE] = "NOTE";
     }
     return elem_type_names;
 }
@@ -270,7 +270,7 @@ element_type element_type_from_name(char *name)
     char **elem_type_names = get_element_type_names();
     
     int i;
-    for (i = 0; i < NUM_LANG_TYPES; i++)
+    for (i = 0; i < pmh_NUM_LANG_TYPES; i++)
     {
         char *i_name = elem_type_names[i];
         if (i_name == NULL)
@@ -279,7 +279,7 @@ element_type element_type_from_name(char *name)
             return i;
     }
     
-    return NO_TYPE;
+    return pmh_NO_TYPE;
 }
 
 char *element_name_from_type(element_type type)
@@ -467,14 +467,14 @@ void interpret_and_add_style(style_parser_data *p_data,
     bool isCurrentLineType = false;
     bool isSelectionType = false;
     element_type type = element_type_from_name(element_type_name);
-    if (type == NO_TYPE)
+    if (type == pmh_NO_TYPE)
     {
         if (EQUALS(element_type_name, "editor"))
-            isEditorType = true, type = NO_TYPE;
+            isEditorType = true, type = pmh_NO_TYPE;
         else if (EQUALS(element_type_name, "editor-current-line"))
-            isCurrentLineType = true, type = NO_TYPE;
+            isCurrentLineType = true, type = pmh_NO_TYPE;
         else if (EQUALS(element_type_name, "editor-selection"))
-            isSelectionType = true, type = NO_TYPE;
+            isSelectionType = true, type = pmh_NO_TYPE;
         else {
             report_error(p_data,
                 "Style rule '%s' is not a language element type name or "
@@ -581,9 +581,9 @@ style_collection *new_style_collection()
                            malloc(sizeof(style_collection));
     
     sc->element_styles = (style_attribute**)
-                         malloc(sizeof(style_attribute*) * NUM_LANG_TYPES);
+                         malloc(sizeof(style_attribute*) * pmh_NUM_LANG_TYPES);
     int i;
-    for (i = 0; i < NUM_LANG_TYPES; i++)
+    for (i = 0; i < pmh_NUM_LANG_TYPES; i++)
         sc->element_styles[i] = NULL;
     
     sc->editor_styles = NULL;
@@ -599,7 +599,7 @@ void free_style_collection(style_collection *coll)
     free_style_attributes(coll->editor_current_line_styles);
     free_style_attributes(coll->editor_selection_styles);
     int i;
-    for (i = 0; i < NUM_LANG_TYPES; i++)
+    for (i = 0; i < pmh_NUM_LANG_TYPES; i++)
         free_style_attributes(coll->element_styles[i]);
     free(coll->element_styles);
     free(coll);

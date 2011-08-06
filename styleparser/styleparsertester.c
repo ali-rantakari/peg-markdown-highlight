@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
     }
     
     int i;
-    for (i = 0; i < NUM_LANG_TYPES; i++)
+    for (i = 0; i < pmh_NUM_LANG_TYPES; i++)
     {
         style_attribute *cur = styles->element_styles[i];
         

@@ -37,7 +37,7 @@ void output_result(element *elem[])
     element *cursor;
     bool firstType = true;
     int i;
-    for (i = 0; i < NUM_LANG_TYPES; i++)
+    for (i = 0; i < pmh_NUM_LANG_TYPES; i++)
     {
         cursor = elem[i];
         if (cursor == NULL)
@@ -69,7 +69,7 @@ int main(int argc, char * argv[])
     if (argc > 1)
         file = fopen(argv[1], "r");
     char *md_source = get_contents(file);
-    markdown_to_elements(md_source, EXT_NONE, &result);
+    markdown_to_elements(md_source, pmh_EXT_NONE, &result);
     sort_elements_by_pos(result);
     output_result(result);
     

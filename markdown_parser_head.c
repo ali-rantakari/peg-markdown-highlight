@@ -61,9 +61,9 @@ parser_data *mk_parser_data(char *charbuf,
     if (head_elems != NULL)
         p_data->head_elems = head_elems;
     else {
-        p_data->head_elems = (element **)malloc(sizeof(element *) * NUM_TYPES);
+        p_data->head_elems = (element **)malloc(sizeof(element *) * pmh_NUM_TYPES);
         int i;
-        for (i = 0; i < NUM_TYPES; i++)
+        for (i = 0; i < pmh_NUM_TYPES; i++)
             p_data->head_elems[i] = NULL;
     }
     return p_data;
@@ -78,7 +78,7 @@ void parse_references(parser_data *p_data);
 
 
 /*
-Remove RAW elements with zero length; return pointer
+Remove pmh_RAW elements with zero length; return pointer
 to new head.
 */
 element *remove_zero_length_raw_spans(element *elem)
@@ -88,7 +88,7 @@ element *remove_zero_length_raw_spans(element *elem)
     element *c = head;
     while (c != NULL)
     {
-        if (c->type == RAW && c->pos >= c->end)
+        if (c->type == pmh_RAW && c->pos >= c->end)
         {
             if (parent != NULL)
                 parent->next = c->next;
@@ -124,17 +124,17 @@ void print_str_literal_escapes(char *str)
 
 /*
 Print elements in a linked list of
-RAW, SEPARATOR, EXTRA_TEXT elements
+pmh_RAW, pmh_SEPARATOR, pmh_EXTRA_TEXT elements
 */
 void print_raw_spans_inline(element *elem)
 {
     element *cur = elem;
     while (cur != NULL)
     {
-        if (cur->type == SEPARATOR)
-            MKD_PRINTF("<SEP %ld> ", cur->pos);
-        else if (cur->type == EXTRA_TEXT) {
-            MKD_PRINTF("{ETEXT ");
+        if (cur->type == pmh_SEPARATOR)
+            MKD_PRINTF("<pmh_SEP %ld> ", cur->pos);
+        else if (cur->type == pmh_EXTRA_TEXT) {
+            MKD_PRINTF("{pmh_ETEXT ");
             print_str_literal_escapes(cur->text);
             MKD_PRINTF("}");
         }
@@ -145,17 +145,17 @@ void print_raw_spans_inline(element *elem)
 }
 
 /*
-Perform postprocessing parsing runs for RAW_LIST elements in `elem`,
+Perform postprocessing parsing runs for pmh_RAW_LIST elements in `elem`,
 iteratively until no such elements exist.
 */
 void process_raw_blocks(parser_data *p_data)
 {
     MKD_PRINTF("--------process_raw_blocks---------\n");
-    while (p_data->head_elems[RAW_LIST] != NULL)
+    while (p_data->head_elems[pmh_RAW_LIST] != NULL)
     {
         MKD_PRINTF("new iteration.\n");
-        element *cursor = p_data->head_elems[RAW_LIST];
-        p_data->head_elems[RAW_LIST] = NULL;
+        element *cursor = p_data->head_elems[pmh_RAW_LIST];
+        p_data->head_elems[pmh_RAW_LIST] = NULL;
         while (cursor != NULL)
         {
             element *span_list = cursor->children;
@@ -175,7 +175,7 @@ void process_raw_blocks(parser_data *p_data)
                 
                 // Skip separators in the beginning, as well as
                 // separators after another separator:
-                if (span_list->type == SEPARATOR) {
+                if (span_list->type == pmh_SEPARATOR) {
                     span_list = span_list->next;
                     continue;
                 }
@@ -183,11 +183,11 @@ void process_raw_blocks(parser_data *p_data)
                 // Store list of spans until next separator in subspan_list:
                 element *subspan_list = span_list;
                 element *previous = NULL;
-                while (span_list != NULL && span_list->type != SEPARATOR) {
+                while (span_list != NULL && span_list->type != pmh_SEPARATOR) {
                     previous = span_list;
                     span_list = span_list->next;
                 }
-                if (span_list != NULL && span_list->type == SEPARATOR) {
+                if (span_list != NULL && span_list->type == pmh_SEPARATOR) {
                     span_list = span_list->next;
                     previous->next = NULL;
                 }
@@ -220,7 +220,7 @@ void print_raw_blocks(char *text, element *elem[])
 {
     MKD_PRINTF("--------print_raw_blocks---------\n");
     MKD_PRINTF("block:\n");
-    element *cursor = elem[RAW_LIST];
+    element *cursor = elem[pmh_RAW_LIST];
     while (cursor != NULL)
     {
         print_raw_spans_inline(cursor->children);
@@ -235,7 +235,7 @@ void print_raw_blocks(char *text, element *elem[])
 /* Free all elements created while parsing */
 void free_elements(element **elems)
 {
-    element *cursor = elems[ALL];
+    element *cursor = elems[pmh_ALL];
     while (cursor != NULL) {
         element *tofree = cursor;
         cursor = cursor->allElemsNext;
@@ -247,7 +247,7 @@ void free_elements(element **elems)
             free(tofree->address);
         free(tofree);
     }
-    elems[ALL] = NULL;
+    elems[pmh_ALL] = NULL;
     
     free(elems);
 }
@@ -302,7 +302,7 @@ void markdown_to_elements(char *text, int extensions, element **out_result[])
     int text_copy_len = strcpy_preformat(text, &text_copy);
     
     element *parsing_elem = (element *)malloc(sizeof(element));
-    parsing_elem->type = RAW;
+    parsing_elem->type = pmh_RAW;
     parsing_elem->pos = 0;
     parsing_elem->end = text_copy_len;
     parsing_elem->next = NULL;
@@ -420,7 +420,7 @@ int elem_compare_by_pos(const element *a, const element *b) {
 void sort_elements_by_pos(element *element_lists[])
 {
     int i;
-    for (i = 0; i < NUM_LANG_TYPES; i++)
+    for (i = 0; i < pmh_NUM_LANG_TYPES; i++)
         element_lists[i] = ll_mergesort(element_lists[i], &elem_compare_by_pos);
 }
 
@@ -435,32 +435,32 @@ char *type_name(element_type type)
 {
     switch (type)
     {
-        case SEPARATOR:          return "SEPARATOR"; break;
-        case EXTRA_TEXT:         return "EXTRA_TEXT"; break;
-        case NO_TYPE:            return "NO TYPE"; break;
-        case RAW_LIST:           return "RAW_LIST"; break;
-        case RAW:                return "RAW"; break;
+        case pmh_SEPARATOR:          return "SEPARATOR"; break;
+        case pmh_EXTRA_TEXT:         return "EXTRA_TEXT"; break;
+        case pmh_NO_TYPE:            return "NO TYPE"; break;
+        case pmh_RAW_LIST:           return "RAW_LIST"; break;
+        case pmh_RAW:                return "RAW"; break;
         
-        case LINK:               return "LINK"; break;
-        case IMAGE:              return "IMAGE"; break;
-        case CODE:               return "CODE"; break;
-        case HTML:               return "HTML"; break;
-        case EMPH:               return "EMPH"; break;
-        case STRONG:             return "STRONG"; break;
-        case LIST_BULLET:        return "LIST_BULLET"; break;
-        case LIST_ENUMERATOR:    return "LIST_ENUMERATOR"; break;
-        case H1:                 return "H1"; break;
-        case H2:                 return "H2"; break;
-        case H3:                 return "H3"; break;
-        case H4:                 return "H4"; break;
-        case H5:                 return "H5"; break;
-        case H6:                 return "H6"; break;
-        case BLOCKQUOTE:         return "BLOCKQUOTE"; break;
-        case VERBATIM:           return "VERBATIM"; break;
-        case HTMLBLOCK:          return "HTMLBLOCK"; break;
-        case HRULE:              return "HRULE"; break;
-        case REFERENCE:          return "REFERENCE"; break;
-        case NOTE:               return "NOTE"; break;
+        case pmh_LINK:               return "LINK"; break;
+        case pmh_IMAGE:              return "IMAGE"; break;
+        case pmh_CODE:               return "CODE"; break;
+        case pmh_HTML:               return "HTML"; break;
+        case pmh_EMPH:               return "EMPH"; break;
+        case pmh_STRONG:             return "STRONG"; break;
+        case pmh_LIST_BULLET:        return "LIST_BULLET"; break;
+        case pmh_LIST_ENUMERATOR:    return "LIST_ENUMERATOR"; break;
+        case pmh_H1:                 return "H1"; break;
+        case pmh_H2:                 return "H2"; break;
+        case pmh_H3:                 return "H3"; break;
+        case pmh_H4:                 return "H4"; break;
+        case pmh_H5:                 return "H5"; break;
+        case pmh_H6:                 return "H6"; break;
+        case pmh_BLOCKQUOTE:         return "BLOCKQUOTE"; break;
+        case pmh_VERBATIM:           return "VERBATIM"; break;
+        case pmh_HTMLBLOCK:          return "HTMLBLOCK"; break;
+        case pmh_HRULE:              return "HRULE"; break;
+        case pmh_REFERENCE:          return "REFERENCE"; break;
+        case pmh_NOTE:               return "NOTE"; break;
         default:                 return "?";
     }
 }
@@ -530,8 +530,8 @@ element * mk_element(parser_data *p_data, element_type type, long pos, long end)
     result->textOffset = 0;
     result->label = result->address = result->text = NULL;
     
-    element *old_all_elements_head = p_data->head_elems[ALL];
-    p_data->head_elems[ALL] = result;
+    element *old_all_elements_head = p_data->head_elems[pmh_ALL];
+    p_data->head_elems[pmh_ALL] = result;
     result->allElemsNext = old_all_elements_head;
     
     //MKD_PRINTF("  mk_element: %s [%ld - %ld]\n", type_name(type), pos, end);
@@ -548,12 +548,12 @@ element * copy_element(parser_data *p_data, element *elem)
     return result;
 }
 
-/* construct EXTRA_TEXT element */
+/* construct pmh_EXTRA_TEXT element */
 element * mk_etext(parser_data *p_data, char *string)
 {
     element *result;
     assert(string != NULL);
-    result = mk_element(p_data, EXTRA_TEXT, 0,0);
+    result = mk_element(p_data, pmh_EXTRA_TEXT, 0,0);
     result->text = strdup(string);
     return result;
 }
@@ -561,15 +561,15 @@ element * mk_etext(parser_data *p_data, char *string)
 
 /*
 Given an element where the offsets {pos, end} represent
-locations in the *parsed text* (defined by the linked list of RAW and
-EXTRA_TEXT elements in p_data->elem), fix these offsets to represent
+locations in the *parsed text* (defined by the linked list of pmh_RAW and
+pmh_EXTRA_TEXT elements in p_data->elem), fix these offsets to represent
 corresponding offsets in the original input (p_data->charbuf). Also split
 the given element into multiple parts if its offsets span multiple
 p_data->elem elements. Return the (list of) elements with real offsets.
 */
 element *fix_offsets(parser_data *p_data, element *elem)
 {
-    if (elem->type == EXTRA_TEXT)
+    if (elem->type == pmh_EXTRA_TEXT)
         return mk_etext(p_data, elem->text);
     
     element *new_head = copy_element(p_data, elem);
@@ -586,11 +586,11 @@ element *fix_offsets(parser_data *p_data, element *elem)
     element *cursor = p_data->elem_head;
     while (cursor != NULL)
     {
-        int thislen = (cursor->type == EXTRA_TEXT)
+        int thislen = (cursor->type == pmh_EXTRA_TEXT)
                         ? strlen(cursor->text)
                         : cursor->end - cursor->pos;
         
-        if (tail_needs_pos && cursor->type != EXTRA_TEXT) {
+        if (tail_needs_pos && cursor->type != pmh_EXTRA_TEXT) {
             tail->pos = cursor->pos;
             tail_needs_pos = false;
         }
@@ -598,7 +598,7 @@ element *fix_offsets(parser_data *p_data, element *elem)
         unsigned int this_pos = cursor->pos;
         
         if (!found_start && (c <= elem->pos && elem->pos <= c+thislen)) {
-            tail->pos = (cursor->type == EXTRA_TEXT)
+            tail->pos = (cursor->type == pmh_EXTRA_TEXT)
                         ? previous_end
                         : cursor->pos + (elem->pos - c);
             this_pos = tail->pos;
@@ -606,7 +606,7 @@ element *fix_offsets(parser_data *p_data, element *elem)
         }
         
         if (!found_end && (c <= elem->end && elem->end <= c+thislen)) {
-            tail->end = (cursor->type == EXTRA_TEXT)
+            tail->end = (cursor->type == pmh_EXTRA_TEXT)
                         ? previous_end
                         : cursor->pos + (elem->end - c);
             found_end = true;
@@ -615,7 +615,7 @@ element *fix_offsets(parser_data *p_data, element *elem)
         if (found_start && found_end)
             break;
         
-        if (cursor->type != EXTRA_TEXT)
+        if (cursor->type != pmh_EXTRA_TEXT)
             previous_end = cursor->end;
         
         if (found_start) {
@@ -642,7 +642,7 @@ element *fix_offsets(parser_data *p_data, element *elem)
 /* Add an element to p_data->head_elems. */
 void add(parser_data *p_data, element *elem)
 {
-    if (elem->type != RAW_LIST)
+    if (elem->type != pmh_RAW_LIST)
     {
         MKD_PRINTF("  add: %s [%ld - %ld]\n",
                    type_name(elem->type), elem->pos, elem->end);
@@ -652,7 +652,7 @@ void add(parser_data *p_data, element *elem)
     }
     else
     {
-        MKD_PRINTF("  add: RAW_LIST ");
+        MKD_PRINTF("  add: pmh_RAW_LIST ");
         element *cursor = elem->children;
         element *previous = NULL;
         while (cursor != NULL)
@@ -700,7 +700,7 @@ element * add_element(parser_data *p_data, element_type type,
 
 void add_raw(parser_data *p_data, long pos, long end)
 {
-    add_element(p_data, RAW, pos, end);
+    add_element(p_data, pmh_RAW, pos, end);
 }
 
 
@@ -723,7 +723,7 @@ void yy_input_func(char *buf, int *result, int max_size, parser_data *p_data)
         return;
     }
     
-    if (p_data->elem->type == EXTRA_TEXT)
+    if (p_data->elem->type == pmh_EXTRA_TEXT)
     {
         int yyc;
         bool moreToRead = (p_data->elem->text

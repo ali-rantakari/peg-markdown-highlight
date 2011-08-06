@@ -36,7 +36,7 @@ void parse_references(parser_data *p_data)
     _parse(p_data, yy_References);
     p_data->parsing_only_references = false;
     
-    p_data->references = p_data->head_elems[REFERENCE];
-    p_data->head_elems[REFERENCE] = NULL;
+    p_data->references = p_data->head_elems[pmh_REFERENCE];
+    p_data->head_elems[pmh_REFERENCE] = NULL;
 }
 

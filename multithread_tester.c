@@ -70,7 +70,7 @@ void *thread_run(void *arg)
         int sleep_ms = (int)get_time() % 100;
         fprintf(stderr, "%s (iteration %i/%i, sleep %i ms after)\n", ti->name, i+1, ti->iterations, sleep_ms);
         element **result;
-        markdown_to_elements(ti->md_content, EXT_NONE, &result);
+        markdown_to_elements(ti->md_content, pmh_EXT_NONE, &result);
         free_elements(result);
         usleep(sleep_ms);
     }

@@ -20,25 +20,25 @@ void apply_highlighting(NSMutableAttributedString *attrStr, element *elem[])
     unsigned long sourceLength = [attrStr length];
     
     int order[] = {
-        H1, H2, H3, H4, H5, H6,  
-        LINK,
-        AUTO_LINK_URL,
-        AUTO_LINK_EMAIL,
-        IMAGE,
-        HTML,
-        EMPH,
-        STRONG,
-        COMMENT,
-        CODE,
-        LIST_BULLET,
-        LIST_ENUMERATOR,
-        VERBATIM,
-        HTMLBLOCK,
-        HRULE,
-        REFERENCE,
-        NOTE,
-        HTML_ENTITY,
-        BLOCKQUOTE,
+        pmh_H1, pmh_H2, pmh_H3, pmh_H4, pmh_H5, pmh_H6,  
+        pmh_LINK,
+        pmh_AUTO_LINK_URL,
+        pmh_AUTO_LINK_EMAIL,
+        pmh_IMAGE,
+        pmh_HTML,
+        pmh_EMPH,
+        pmh_STRONG,
+        pmh_COMMENT,
+        pmh_CODE,
+        pmh_LIST_BULLET,
+        pmh_LIST_ENUMERATOR,
+        pmh_VERBATIM,
+        pmh_HTMLBLOCK,
+        pmh_HRULE,
+        pmh_REFERENCE,
+        pmh_NOTE,
+        pmh_HTML_ENTITY,
+        pmh_BLOCKQUOTE,
     };
     int order_len = 24;
     
@@ -60,28 +60,28 @@ void apply_highlighting(NSMutableAttributedString *attrStr, element *elem[])
             
             switch (cursor->type)
             {
-                case H1:
-                case H2:
-                case H3:
-                case H4:
-                case H5:
-                case H6:        fgColor = [NSColor blueColor]; break;
-                case EMPH:      fgColor = [NSColor yellowColor]; break;
-                case STRONG:    fgColor = [NSColor magentaColor]; break;
-                case COMMENT:   fgColor = [NSColor blackColor]; break;
-                case CODE:
-                case VERBATIM:  fgColor = [NSColor greenColor]; break;
-                case HTML_ENTITY:
-                case HRULE:     fgColor = [NSColor cyanColor]; break;
-                case REFERENCE: fgColor = [NSColor colorWithCalibratedHue:0.67 saturation:0.5 brightness:1.0 alpha:1.0]; break;
-                case LIST_ENUMERATOR:
-                case LIST_BULLET:fgColor = [NSColor magentaColor]; break;
-                case AUTO_LINK_EMAIL:
-                case AUTO_LINK_URL:fgColor = [NSColor cyanColor]; break;
-                case IMAGE:
-                case LINK:      bgColor = [NSColor blackColor];
-                                fgColor = [NSColor cyanColor]; break;
-                case BLOCKQUOTE:fgColor = [NSColor magentaColor]; break;
+                case pmh_H1:
+                case pmh_H2:
+                case pmh_H3:
+                case pmh_H4:
+                case pmh_H5:
+                case pmh_H6:        fgColor = [NSColor blueColor]; break;
+                case pmh_EMPH:      fgColor = [NSColor yellowColor]; break;
+                case pmh_STRONG:    fgColor = [NSColor magentaColor]; break;
+                case pmh_COMMENT:   fgColor = [NSColor blackColor]; break;
+                case pmh_CODE:
+                case pmh_VERBATIM:  fgColor = [NSColor greenColor]; break;
+                case pmh_HTML_ENTITY:
+                case pmh_HRULE:     fgColor = [NSColor cyanColor]; break;
+                case pmh_REFERENCE: fgColor = [NSColor colorWithCalibratedHue:0.67 saturation:0.5 brightness:1.0 alpha:1.0]; break;
+                case pmh_LIST_ENUMERATOR:
+                case pmh_LIST_BULLET:fgColor = [NSColor magentaColor]; break;
+                case pmh_AUTO_LINK_EMAIL:
+                case pmh_AUTO_LINK_URL:fgColor = [NSColor cyanColor]; break;
+                case pmh_IMAGE:
+                case pmh_LINK:      bgColor = [NSColor blackColor];
+                                    fgColor = [NSColor cyanColor]; break;
+                case pmh_BLOCKQUOTE:fgColor = [NSColor magentaColor]; break;
                 default: break;
             }
             
@@ -134,7 +134,7 @@ NSAttributedString *highlight(NSString *str, NSMutableAttributedString *attrStr)
     element **result;
     
     char *md_source = (char *)[str UTF8String];
-    markdown_to_elements(md_source, EXT_NONE, &result);
+    markdown_to_elements(md_source, pmh_EXT_NONE, &result);
     
     if (attrStr == nil)
         attrStr = [[[NSMutableAttributedString alloc] initWithString:str] autorelease];
@@ -148,7 +148,7 @@ NSAttributedString *highlight(NSString *str, NSMutableAttributedString *attrStr)
 
 void print_result(element *elem[])
 {
-    for (int i = 0; i < NUM_TYPES; i++)
+    for (int i = 0; i < pmh_NUM_TYPES; i++)
     {
         element *cursor = elem[i];
         while (cursor != NULL)
@@ -195,7 +195,7 @@ int main(int argc, char * argv[])
         if (strcmp(argv[1], "-d") == 0)
         {
             element **result;
-            markdown_to_elements((char *)[contents UTF8String], EXT_NONE, &result);
+            markdown_to_elements((char *)[contents UTF8String], pmh_EXT_NONE, &result);
             print_result(result);
         }
         else

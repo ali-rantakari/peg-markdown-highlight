@@ -72,7 +72,7 @@ void styleparsing_error_callback(char *error_message, void *context_data)
 	self.updateTimer = nil;
 	self.targetTextView = nil;
 	self.waitInterval = 1;
-	self.extensions = EXT_NONE;
+	self.extensions = pmh_EXT_NONE;
 	
 	return self;
 }
@@ -291,13 +291,13 @@ void styleparsing_error_callback(char *error_message, void *context_data)
 			NSRange hlRange = NSMakeRange(rangePos, len);
 			
 			if (self.makeLinksClickable
-				&& (style.elementType == LINK
-					|| style.elementType == AUTO_LINK_URL
-					|| style.elementType == AUTO_LINK_EMAIL)
+				&& (style.elementType == pmh_LINK
+					|| style.elementType == pmh_AUTO_LINK_URL
+					|| style.elementType == pmh_AUTO_LINK_EMAIL)
 				&& cursor->address != NULL)
 			{
 				NSString *linkAddress = [NSString stringWithUTF8String:cursor->address];
-				if (style.elementType == AUTO_LINK_EMAIL && ![linkAddress hasPrefix:@"mailto:"])
+				if (style.elementType == pmh_AUTO_LINK_EMAIL && ![linkAddress hasPrefix:@"mailto:"])
 					linkAddress = [@"mailto:" stringByAppendingString:linkAddress];
 				[attrStr addAttribute:NSLinkAttributeName
 								value:linkAddress
@@ -397,27 +397,27 @@ void styleparsing_error_callback(char *error_message, void *context_data)
 		return defaultStyles;
 	
 	defaultStyles = [[NSArray arrayWithObjects:
-		HG_MKSTYLE(H1, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil, NSBoldFontMask),
-		HG_MKSTYLE(H2, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil, NSBoldFontMask),
-		HG_MKSTYLE(H3, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil, NSBoldFontMask),
-		HG_MKSTYLE(H4, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil, NSBoldFontMask),
-		HG_MKSTYLE(H5, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil, NSBoldFontMask),
-		HG_MKSTYLE(H6, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil, NSBoldFontMask),
-		HG_MKSTYLE(HRULE, HG_D(HG_DARK_GRAY,HG_FORE, HG_LIGHT_GRAY,HG_BACK), nil, 0),
-		HG_MKSTYLE(LIST_BULLET, HG_D(HG_DARK(HG_MAGENTA),HG_FORE), nil, 0),
-		HG_MKSTYLE(LIST_ENUMERATOR, HG_D(HG_DARK(HG_MAGENTA),HG_FORE), nil, 0),
-		HG_MKSTYLE(LINK, HG_D(HG_DARK(HG_CYAN),HG_FORE, HG_LIGHT(HG_CYAN),HG_BACK), nil, 0),
-		HG_MKSTYLE(AUTO_LINK_URL, HG_D(HG_DARK(HG_CYAN),HG_FORE, HG_LIGHT(HG_CYAN),HG_BACK), nil, 0),
-		HG_MKSTYLE(AUTO_LINK_EMAIL, HG_D(HG_DARK(HG_CYAN),HG_FORE, HG_LIGHT(HG_CYAN),HG_BACK), nil, 0),
-		HG_MKSTYLE(IMAGE, HG_D(HG_DARK(HG_MAGENTA),HG_FORE, HG_LIGHT(HG_MAGENTA),HG_BACK), nil, 0),
-		HG_MKSTYLE(REFERENCE, HG_D(HG_DIM(HG_RED),HG_FORE), nil, 0),
-		HG_MKSTYLE(CODE, HG_D(HG_DARK(HG_GREEN),HG_FORE, HG_LIGHT(HG_GREEN),HG_BACK), nil, 0),
-		HG_MKSTYLE(EMPH, HG_D(HG_DARK(HG_YELLOW),HG_FORE), nil, NSItalicFontMask),
-		HG_MKSTYLE(STRONG, HG_D(HG_DARK(HG_MAGENTA),HG_FORE), nil, NSBoldFontMask),
-		HG_MKSTYLE(HTML_ENTITY, HG_D(HG_MED_GRAY,HG_FORE), nil, 0),
-		HG_MKSTYLE(COMMENT, HG_D(HG_MED_GRAY,HG_FORE), nil, 0),
-		HG_MKSTYLE(VERBATIM, HG_D(HG_DARK(HG_GREEN),HG_FORE, HG_LIGHT(HG_GREEN),HG_BACK), nil, 0),
-		HG_MKSTYLE(BLOCKQUOTE, HG_D(HG_DARK(HG_MAGENTA),HG_FORE), HG_A(HG_BACK), NSUnboldFontMask),
+		HG_MKSTYLE(pmh_H1, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil, NSBoldFontMask),
+		HG_MKSTYLE(pmh_H2, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil, NSBoldFontMask),
+		HG_MKSTYLE(pmh_H3, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil, NSBoldFontMask),
+		HG_MKSTYLE(pmh_H4, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil, NSBoldFontMask),
+		HG_MKSTYLE(pmh_H5, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil, NSBoldFontMask),
+		HG_MKSTYLE(pmh_H6, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil, NSBoldFontMask),
+		HG_MKSTYLE(pmh_HRULE, HG_D(HG_DARK_GRAY,HG_FORE, HG_LIGHT_GRAY,HG_BACK), nil, 0),
+		HG_MKSTYLE(pmh_LIST_BULLET, HG_D(HG_DARK(HG_MAGENTA),HG_FORE), nil, 0),
+		HG_MKSTYLE(pmh_LIST_ENUMERATOR, HG_D(HG_DARK(HG_MAGENTA),HG_FORE), nil, 0),
+		HG_MKSTYLE(pmh_LINK, HG_D(HG_DARK(HG_CYAN),HG_FORE, HG_LIGHT(HG_CYAN),HG_BACK), nil, 0),
+		HG_MKSTYLE(pmh_AUTO_LINK_URL, HG_D(HG_DARK(HG_CYAN),HG_FORE, HG_LIGHT(HG_CYAN),HG_BACK), nil, 0),
+		HG_MKSTYLE(pmh_AUTO_LINK_EMAIL, HG_D(HG_DARK(HG_CYAN),HG_FORE, HG_LIGHT(HG_CYAN),HG_BACK), nil, 0),
+		HG_MKSTYLE(pmh_IMAGE, HG_D(HG_DARK(HG_MAGENTA),HG_FORE, HG_LIGHT(HG_MAGENTA),HG_BACK), nil, 0),
+		HG_MKSTYLE(pmh_REFERENCE, HG_D(HG_DIM(HG_RED),HG_FORE), nil, 0),
+		HG_MKSTYLE(pmh_CODE, HG_D(HG_DARK(HG_GREEN),HG_FORE, HG_LIGHT(HG_GREEN),HG_BACK), nil, 0),
+		HG_MKSTYLE(pmh_EMPH, HG_D(HG_DARK(HG_YELLOW),HG_FORE), nil, NSItalicFontMask),
+		HG_MKSTYLE(pmh_STRONG, HG_D(HG_DARK(HG_MAGENTA),HG_FORE), nil, NSBoldFontMask),
+		HG_MKSTYLE(pmh_HTML_ENTITY, HG_D(HG_MED_GRAY,HG_FORE), nil, 0),
+		HG_MKSTYLE(pmh_COMMENT, HG_D(HG_MED_GRAY,HG_FORE), nil, 0),
+		HG_MKSTYLE(pmh_VERBATIM, HG_D(HG_DARK(HG_GREEN),HG_FORE, HG_LIGHT(HG_GREEN),HG_BACK), nil, 0),
+		HG_MKSTYLE(pmh_BLOCKQUOTE, HG_D(HG_DARK(HG_MAGENTA),HG_FORE), HG_A(HG_BACK), NSUnboldFontMask),
 		nil] retain];
 	
 	return defaultStyles;
@@ -432,7 +432,7 @@ void styleparsing_error_callback(char *error_message, void *context_data)
 	// LINK elements, with the "pointing hand cursor" style added:
 	for (HGMarkdownHighlightingStyle *style in self.styles)
 	{
-		if (style.elementType != LINK)
+		if (style.elementType != pmh_LINK)
 			continue;
 		NSMutableDictionary *linkAttrs = [[style.attributesToAdd mutableCopy] autorelease];
 		[linkAttrs setObject:[NSCursor pointingHandCursor] forKey:NSCursorAttributeName];
@@ -497,7 +497,7 @@ void styleparsing_error_callback(char *error_message, void *context_data)
 	
 	// Set language element styles
 	int i;
-	for (i = 0; i < NUM_LANG_TYPES; i++)
+	for (i = 0; i < pmh_NUM_LANG_TYPES; i++)
 	{
 		style_attribute *cur = style_coll->element_styles[i];
 		if (cur == NULL)

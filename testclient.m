@@ -25,23 +25,23 @@ void apply_highlighting(NSMutableAttributedString *attrStr, element *elem[])
     unsigned long sourceLength = [attrStr length];
     
     int order[] = {
-        H1, H2, H3, H4, H5, H6,  
-        LINK,
-        AUTO_LINK_URL,
-        AUTO_LINK_EMAIL,
-        IMAGE,
-        HTML,
-        EMPH,
-        STRONG,
-        CODE,
-        LIST_BULLET,
-        LIST_ENUMERATOR,
-        BLOCKQUOTE,
-        VERBATIM,
-        HTMLBLOCK,
-        HRULE,
-        REFERENCE,
-        NOTE
+        pmh_H1, pmh_H2, pmh_H3, pmh_H4, pmh_H5, pmh_H6,  
+        pmh_LINK,
+        pmh_AUTO_LINK_URL,
+        pmh_AUTO_LINK_EMAIL,
+        pmh_IMAGE,
+        pmh_HTML,
+        pmh_EMPH,
+        pmh_STRONG,
+        pmh_CODE,
+        pmh_LIST_BULLET,
+        pmh_LIST_ENUMERATOR,
+        pmh_BLOCKQUOTE,
+        pmh_VERBATIM,
+        pmh_HTMLBLOCK,
+        pmh_HRULE,
+        pmh_REFERENCE,
+        pmh_NOTE
     };
     int order_len = 22;
     
@@ -61,25 +61,25 @@ void apply_highlighting(NSMutableAttributedString *attrStr, element *elem[])
             
             switch (cursor->type)
             {
-                case H1:
-                case H2:
-                case H3:
-                case H4:
-                case H5:
-                case H6:        fgColor = [NSColor blueColor]; break;
-                case EMPH:      fgColor = [NSColor yellowColor]; break;
-                case STRONG:    fgColor = [NSColor magentaColor]; break;
-                case CODE:
-                case VERBATIM:  fgColor = [NSColor greenColor]; break;
-                case HRULE:     fgColor = [NSColor cyanColor]; break;
-                case LIST_ENUMERATOR:
-                case LIST_BULLET:fgColor = [NSColor magentaColor]; break;
-                case AUTO_LINK_EMAIL:
-                case AUTO_LINK_URL:fgColor = [NSColor cyanColor]; break;
-                case IMAGE:
-                case LINK:      bgColor = [NSColor blackColor];
-                                fgColor = [NSColor cyanColor]; break;
-                case BLOCKQUOTE:removeBgColor = YES;
+                case pmh_H1:
+                case pmh_H2:
+                case pmh_H3:
+                case pmh_H4:
+                case pmh_H5:
+                case pmh_H6:        fgColor = [NSColor blueColor]; break;
+                case pmh_EMPH:      fgColor = [NSColor yellowColor]; break;
+                case pmh_STRONG:    fgColor = [NSColor magentaColor]; break;
+                case pmh_CODE:
+                case pmh_VERBATIM:  fgColor = [NSColor greenColor]; break;
+                case pmh_HRULE:     fgColor = [NSColor cyanColor]; break;
+                case pmh_LIST_ENUMERATOR:
+                case pmh_LIST_BULLET:fgColor = [NSColor magentaColor]; break;
+                case pmh_AUTO_LINK_EMAIL:
+                case pmh_AUTO_LINK_URL:fgColor = [NSColor cyanColor]; break;
+                case pmh_IMAGE:
+                case pmh_LINK:      bgColor = [NSColor blackColor];
+                                    fgColor = [NSColor cyanColor]; break;
+                case pmh_BLOCKQUOTE:removeBgColor = YES;
                                 fgColor = [NSColor magentaColor]; break;
                 default: break;
             }
@@ -136,8 +136,8 @@ element * mk_element(int type, long pos, long end)
 
 element **get_highlight_elements(NSString *markdown_str)
 {
-    element **elements = malloc(sizeof(element*) * NUM_TYPES);
-    for (int i = 0; i < NUM_TYPES; i++)
+    element **elements = malloc(sizeof(element*) * pmh_NUM_TYPES);
+    for (int i = 0; i < pmh_NUM_TYPES; i++)
         elements[i] = NULL;
     
     NSTask *task = [[NSTask alloc] init];
@@ -188,7 +188,7 @@ element **get_highlight_elements(NSString *markdown_str)
         NSScanner *scanner = [NSScanner scannerWithString:outStr];
         while (![scanner isAtEnd])
         {
-            int type = NO_TYPE;
+            int type = pmh_NO_TYPE;
             [scanner scanUpToCharactersFromSet:digitsSet intoString:NULL];
             [scanner scanInt:&type];
             [scanner scanUpToCharactersFromSet:digitsSet intoString:NULL];
