@@ -20,7 +20,7 @@ void Print(NSString *aStr)
 }
 
 
-void apply_highlighting(NSMutableAttributedString *attrStr, element *elem[])
+void apply_highlighting(NSMutableAttributedString *attrStr, pmh_element *elem[])
 {
     unsigned long sourceLength = [attrStr length];
     
@@ -48,7 +48,7 @@ void apply_highlighting(NSMutableAttributedString *attrStr, element *elem[])
     int i;
     for (i = 0; i < order_len; i++)
     {
-        element *cursor = elem[order[i]];
+        pmh_element *cursor = elem[order[i]];
         while (cursor != NULL)
         {
             if (cursor->end <= cursor->pos)
@@ -123,9 +123,9 @@ void apply_highlighting(NSMutableAttributedString *attrStr, element *elem[])
     }
 }
 
-element * mk_element(int type, long pos, long end)
+pmh_element * mk_element(int type, long pos, long end)
 {
-    element *result = malloc(sizeof(element));
+    pmh_element *result = malloc(sizeof(pmh_element));
     result->type = type;
     result->pos = pos;
     result->end = end;
@@ -134,9 +134,9 @@ element * mk_element(int type, long pos, long end)
 }
 
 
-element **get_highlight_elements(NSString *markdown_str)
+pmh_element **get_highlight_elements(NSString *markdown_str)
 {
-    element **elements = malloc(sizeof(element*) * pmh_NUM_TYPES);
+    pmh_element **elements = malloc(sizeof(pmh_element*) * pmh_NUM_TYPES);
     for (int i = 0; i < pmh_NUM_TYPES; i++)
         elements[i] = NULL;
     
@@ -201,8 +201,8 @@ element **get_highlight_elements(NSString *markdown_str)
                 [scanner scanInt:&endIndex];
                 [scanner scanUpToCharactersFromSet:digitsOrPipeSet intoString:NULL];
                 
-                element *new = mk_element(type, startIndex, endIndex);
-                element *head = elements[type];
+                pmh_element *new = mk_element(type, startIndex, endIndex);
+                pmh_element *head = elements[type];
                 elements[type] = new;
                 new->next = head;
             }
@@ -238,7 +238,7 @@ int main(int argc, char * argv[])
     int stepProgress = 0;
     for (int i = 0; i < iterations; i++)
     {
-        element **highlightElements = get_highlight_elements(contents);
+        pmh_element **highlightElements = get_highlight_elements(contents);
         attrStr = [[[NSMutableAttributedString alloc] initWithString:contents] autorelease];
         apply_highlighting(attrStr, highlightElements);
         

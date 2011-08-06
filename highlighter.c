@@ -32,9 +32,9 @@ char *get_contents(FILE *f)
 }
 
 
-void output_result(element *elem[])
+void output_result(pmh_element *elem[])
 {
-    element *cursor;
+    pmh_element *cursor;
     bool firstType = true;
     int i;
     for (i = 0; i < pmh_NUM_LANG_TYPES; i++)
@@ -63,14 +63,14 @@ void output_result(element *elem[])
 
 int main(int argc, char * argv[])
 {
-    element **result;
+    pmh_element **result;
     
     FILE *file = stdin;
     if (argc > 1)
         file = fopen(argv[1], "r");
     char *md_source = get_contents(file);
-    markdown_to_elements(md_source, pmh_EXT_NONE, &result);
-    sort_elements_by_pos(result);
+    pmh_markdown_to_elements(md_source, pmh_EXT_NONE, &result);
+    pmh_sort_elements_by_pos(result);
     output_result(result);
     
     return(0);

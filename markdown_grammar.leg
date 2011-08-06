@@ -53,7 +53,7 @@ Plain =     Inlines
 AtxInline = !Newline !(Sp? '#'* Sp Newline) Inline
 
 AtxStart =  < ( "######" | "#####" | "####" | "###" | "##" | "#" ) >
-            { $$ = elem((element_type)(pmh_H1 + (strlen(yytext) - 1))); }
+            { $$ = elem((pmh_element_type)(pmh_H1 + (strlen(yytext) - 1))); }
 
 AtxHeading = < s:AtxStart Sp? ( AtxInline )+ (Sp? '#'* Sp)? Newline >
             { ADD(elem_s(s->type)); }
@@ -79,7 +79,7 @@ SetextHeading2 =  &(RawLine SetextBottom2)
 Heading = SetextHeading | AtxHeading
 
 BlockQuote = a:BlockQuoteRaw
-            { element *rawlist = mk_element((parser_data *)G->data, pmh_RAW_LIST, 0,0);
+            { pmh_element *rawlist = mk_element((parser_data *)G->data, pmh_RAW_LIST, 0,0);
               rawlist->children = reverse(a);
               ADD(rawlist);
             }
@@ -114,14 +114,14 @@ BulletList = &Bullet (ListTight | ListLoose)
 
 ListTight = a:StartList
             ( ListItemTight
-              { element *el = mk_notype;
+              { pmh_element *el = mk_notype;
                 el->children = $$;
                 a = cons(el, a);
               } )+
             BlankLine* !(Bullet | Enumerator)
-            { element *cur = a;
+            { pmh_element *cur = a;
               while (cur != NULL) {
-                  element *rawlist = mk_element((parser_data *)G->data, pmh_RAW_LIST, 0,0);
+                  pmh_element *rawlist = mk_element((parser_data *)G->data, pmh_RAW_LIST, 0,0);
                   rawlist->children = reverse(cur->children);
                   ADD(rawlist);
                   cur = cur->next;
@@ -131,13 +131,13 @@ ListTight = a:StartList
 ListLoose = a:StartList
             ( b:ListItem BlankLine*
               { b = cons(etext("\n\n"), b); /* In loose list, \n\n added to end of each element */
-                element *el = mk_notype;
+                pmh_element *el = mk_notype;
                 el->children = b;
                 a = cons(el, a);
               } )+
-            { element *cur = a;
+            { pmh_element *cur = a;
               while (cur != NULL) {
-                  element *rawlist = mk_element((parser_data *)G->data, pmh_RAW_LIST, 0,0);
+                  pmh_element *rawlist = mk_element((parser_data *)G->data, pmh_RAW_LIST, 0,0);
                   rawlist->children = reverse(cur->children);
                   ADD(rawlist);
                   cur = cur->next;
@@ -475,7 +475,7 @@ ReferenceLink = ReferenceLinkDouble | ReferenceLinkSingle
 
 ReferenceLinkDouble =  < s:Label Spnl !"[]" l:Label >
                         {
-                        	element *reference = GET_REF(l->label);
+                        	pmh_element *reference = GET_REF(l->label);
                             if (reference) {
                                 $$ = elem_s(pmh_LINK);
                                 $$->label = strdup(l->label);
@@ -488,7 +488,7 @@ ReferenceLinkDouble =  < s:Label Spnl !"[]" l:Label >
 
 ReferenceLinkSingle =  < s:Label (Spnl "[]")? >
                         {
-                        	element *reference = GET_REF(s->label);
+                        	pmh_element *reference = GET_REF(s->label);
                             if (reference) {
                                 $$ = elem_s(pmh_LINK);
                                 $$->label = strdup(s->label);
@@ -543,7 +543,7 @@ AutoLinkEmail = < s:LocMarker { s->type = pmh_AUTO_LINK_EMAIL; }
 Reference = < s:LocMarker
               NonindentSpace !"[]" l:Label ':' Spnl r:RefSrc RefTitle > BlankLine+
               {
-                element *el = elem_s(pmh_REFERENCE);
+                pmh_element *el = elem_s(pmh_REFERENCE);
                 el->label = strdup(l->label);
                 el->address = strdup(r->address);
                 ADD(el);

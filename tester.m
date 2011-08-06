@@ -15,7 +15,7 @@
 #import "markdown_parser.h"
 
 
-void apply_highlighting(NSMutableAttributedString *attrStr, element *elem[])
+void apply_highlighting(NSMutableAttributedString *attrStr, pmh_element *elem[])
 {
     unsigned long sourceLength = [attrStr length];
     
@@ -47,7 +47,7 @@ void apply_highlighting(NSMutableAttributedString *attrStr, element *elem[])
     {
         //MKD_PRINTF("apply_highlighting: %i\n", i);
         
-        element *cursor = elem[order[i]];
+        pmh_element *cursor = elem[order[i]];
         while (cursor != NULL)
         {
             if (cursor->end <= cursor->pos)
@@ -131,29 +131,29 @@ void apply_highlighting(NSMutableAttributedString *attrStr, element *elem[])
 
 NSAttributedString *highlight(NSString *str, NSMutableAttributedString *attrStr)
 {
-    element **result;
+    pmh_element **result;
     
     char *md_source = (char *)[str UTF8String];
-    markdown_to_elements(md_source, pmh_EXT_NONE, &result);
+    pmh_markdown_to_elements(md_source, pmh_EXT_NONE, &result);
     
     if (attrStr == nil)
         attrStr = [[[NSMutableAttributedString alloc] initWithString:str] autorelease];
     apply_highlighting(attrStr, result);
     
-    free_elements(result);
+    pmh_free_elements(result);
     
     return attrStr;
 }
 
 
-void print_result(element *elem[])
+void print_result(pmh_element *elem[])
 {
     for (int i = 0; i < pmh_NUM_TYPES; i++)
     {
-        element *cursor = elem[i];
+        pmh_element *cursor = elem[i];
         while (cursor != NULL)
         {
-            MKD_PRINTF("[%ld-%ld] 0x%x: %s\n", cursor->pos, cursor->end, (int)cursor, type_name(cursor->type));
+            MKD_PRINTF("[%ld-%ld] 0x%x: %s\n", cursor->pos, cursor->end, (int)cursor, pmh_type_name(cursor->type));
             cursor = cursor->next;
         }
     }
@@ -194,8 +194,8 @@ int main(int argc, char * argv[])
     {
         if (strcmp(argv[1], "-d") == 0)
         {
-            element **result;
-            markdown_to_elements((char *)[contents UTF8String], pmh_EXT_NONE, &result);
+            pmh_element **result;
+            pmh_markdown_to_elements((char *)[contents UTF8String], pmh_EXT_NONE, &result);
             print_result(result);
         }
         else

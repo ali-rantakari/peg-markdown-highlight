@@ -55,16 +55,14 @@ int main(int argc, char * argv[])
 	FILE *stream = (strcmp(argv[argc-1], "-") == 0) ? stdin : fopen(argv[argc-1], "r");
 	char *md_source = read_utf8(stream);
 	
-	int extensions = 0;
-	
 	double starttime = get_time();
 	int i;
 	for (i = 0; i < iterations; i++)
 	{
-		element **result;
-		markdown_to_elements(md_source, extensions, &result);
+		pmh_element **result;
+		pmh_markdown_to_elements(md_source, pmh_EXT_NONE, &result);
 		if (sort)
-			sort_elements_by_pos(result);
+			pmh_sort_elements_by_pos(result);
 	}
 	double endtime = get_time();
 	

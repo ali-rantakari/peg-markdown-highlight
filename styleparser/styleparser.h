@@ -43,7 +43,7 @@ typedef union
 // Style attribute
 typedef struct style_attribute
 {
-    element_type lang_element_type;
+    pmh_element_type lang_element_type;
     attr_type type;
     char *name;
     attr_value *value;
@@ -63,8 +63,8 @@ style_collection *parse_styles(char *input, void(*error_callback)(char*,void*),
                                void *error_callback_context);
 void free_style_collection(style_collection *coll);
 
-element_type element_type_from_name(char *name);
-char *element_name_from_type(element_type type);
+pmh_element_type element_type_from_name(char *name);
+char *element_name_from_type(pmh_element_type type);
 attr_type attr_type_from_name(char *name);
 char *attr_name_from_type(attr_type type);
 

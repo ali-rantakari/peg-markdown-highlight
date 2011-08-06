@@ -121,11 +121,11 @@ void styleparsing_error_callback(char *error_message, void *context_data)
 #pragma mark -
 
 
-- (element **) parse
+- (pmh_element **) parse
 {
-	element **result = NULL;
-	markdown_to_elements(currentHighlightText, self.extensions, &result);
-	sort_elements_by_pos(result);
+	pmh_element **result = NULL;
+	pmh_markdown_to_elements(currentHighlightText, self.extensions, &result);
+	pmh_sort_elements_by_pos(result);
 	return result;
 }
 
@@ -135,7 +135,7 @@ void styleparsing_error_callback(char *error_message, void *context_data)
 {
 	NSAutoreleasePool *autoReleasePool = [[NSAutoreleasePool alloc] init];
 	
-	element **result = [self parse];
+	pmh_element **result = [self parse];
 	
 	[self
 	 performSelectorOnMainThread:@selector(parserDidParse:)
@@ -254,7 +254,7 @@ void styleparsing_error_callback(char *error_message, void *context_data)
 	self.defaultTypingAttributes = typingAttrs;
 }
 
-- (void) applyHighlighting:(element **)elements withRange:(NSRange)range
+- (void) applyHighlighting:(pmh_element **)elements withRange:(NSRange)range
 {
 	NSUInteger rangeEnd = NSMaxRange(range);
 	[[self.targetTextView textStorage] beginEditing];
@@ -265,7 +265,7 @@ void styleparsing_error_callback(char *error_message, void *context_data)
 	
 	for (HGMarkdownHighlightingStyle *style in self.styles)
 	{
-		element *cursor = elements[style.elementType];
+		pmh_element *cursor = elements[style.elementType];
 		
 		while (cursor != NULL)
 		{
@@ -337,10 +337,10 @@ void styleparsing_error_callback(char *error_message, void *context_data)
 }
 
 
-- (void) cacheElementList:(element **)list
+- (void) cacheElementList:(pmh_element **)list
 {
 	if (cachedElements != NULL) {
-		free_elements(cachedElements);
+		pmh_free_elements(cachedElements);
 		cachedElements = NULL;
 	}
 	cachedElements = list;
@@ -357,7 +357,7 @@ void styleparsing_error_callback(char *error_message, void *context_data)
 {
 	if (workerThreadResultsInvalid)
 		return;
-	[self cacheElementList:(element **)[resultPointer pointerValue]];
+	[self cacheElementList:(pmh_element **)[resultPointer pointerValue]];
 	[self applyVisibleRangeHighlighting];
 }
 

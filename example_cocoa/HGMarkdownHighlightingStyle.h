@@ -57,13 +57,13 @@
 	NSDictionary *attributesToAdd;
 	NSArray *attributesToRemove;
 	NSFontTraitMask fontTraitsToAdd;
-	element_type elementType;
+	pmh_element_type elementType;
 }
 
 + (NSColor *) colorFromARGBColor:(attr_argb_color *)argb_color;
 
 /** \brief Init a new instance. */
-- (id) initWithType:(element_type)elemType
+- (id) initWithType:(pmh_element_type)elemType
 	attributesToAdd:(NSDictionary *)toAdd
 		   toRemove:(NSArray *)toRemove
 	fontTraitsToAdd:(NSFontTraitMask)traits;
@@ -72,7 +72,7 @@
 - (id) initWithStyleAttributes:(style_attribute *)attributes;
 
 /** \brief The Markdown language element type these styles pertain to. */
-@property element_type elementType;
+@property pmh_element_type elementType;
 
 /** \brief A bitmask of the font traits to add.
  * 

@@ -21,7 +21,7 @@
 * The last (non-documented) ones are utility types used
 * by the parser itself.
 * 
-* \sa element
+* \sa pmh_element
 */
 typedef enum
 {
@@ -65,42 +65,42 @@ typedef enum
                      * separate from each other */
     pmh_NO_TYPE,    /* Placeholder element used while parsing */
     pmh_ALL         /* Linked list of *all* elements created while parsing */
-} element_type;
+} pmh_element_type;
 
 /**
-* \brief Number of types in element_type.
-* \sa element_type
+* \brief Number of types in pmh_element_type.
+* \sa pmh_element_type
 */
 #define pmh_NUM_TYPES 30
 
 /**
-* \brief Number of *language element* types in element_type.
-* \sa element_type
+* \brief Number of *language element* types in pmh_element_type.
+* \sa pmh_element_type
 */
 #define pmh_NUM_LANG_TYPES (pmh_NUM_TYPES - 6)
 
 /**
 * \brief Semantic value of a parsing action.
 */
-struct Element
+struct pmh_Element
 {
-    element_type type;            /**< \brief type of element */
+    pmh_element_type type;        /**< \brief type of element */
     unsigned long pos;            /**< \brief start offset in input */
     unsigned long end;            /**< \brief end offset in input */
-    struct Element *next;         /**< \brief next element in list */
-    struct Element *allElemsNext; /**< \brief next element in list of all elements */
+    struct pmh_Element *next;     /**< \brief next element in list */
+    struct pmh_Element *allElemsNext; /**< \brief next element in list of all elements */
     int textOffset;               /**< \brief offset to text (for elements of type pmh_EXTRA_TEXT, used when the parser reads the value of 'text') */
     char *text;                   /**< \brief text content (for elements of type pmh_EXTRA_TEXT) */
     char *label;                  /**< \brief label (for links and references) */
     char *address;                /**< \brief address (for links and references) */
-    struct Element *children;     /**< \brief children of element (for elements of type pmh_RAW_LIST) */
+    struct pmh_Element *children; /**< \brief children of element (for elements of type pmh_RAW_LIST) */
 };
-typedef struct Element element;
+typedef struct pmh_Element pmh_element;
 
 /**
 * \brief Bitfield enumeration of supported Markdown extensions.
 */
-enum markdown_extensions
+enum pmh_extensions
 {
     pmh_EXT_NONE    = 0,        /**< No extensions */
     pmh_EXT_NOTES   = (1 << 0)  /**< pmh_A footnote syntax like that of Pandoc or pmh_PHP Markdown Extra */

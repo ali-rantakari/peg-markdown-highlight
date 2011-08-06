@@ -33,7 +33,7 @@
 	NSDictionary *defaultTypingAttributes;
 	NSTimer *updateTimer;
 	NSThread *workerThread;
-	element **cachedElements;
+	pmh_element **cachedElements;
 	char *currentHighlightText;
 	BOOL workerThreadResultsInvalid;
 	BOOL styleDependenciesPending;

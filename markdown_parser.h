@@ -40,41 +40,41 @@
 * 
 * \param[in]  text        The Markdown text to parse for highlighting.
 * \param[in]  extensions  The extensions to use in parsing (a bitfield
-*                         of markdown_extensions values).
-* \param[out] out_result  An element array, indexed by type, containing
+*                         of pmh_extensions values).
+* \param[out] out_result  A pmh_element array, indexed by type, containing
 *                         the results of the parsing (linked lists of elements).
-*                         You must pass this to free_elements() when it's not
+*                         You must pass this to pmh_free_elements() when it's not
 *                         needed anymore.
 * 
-* \sa element_type
+* \sa pmh_element_type
 */
-void markdown_to_elements(char *text, int extensions, element **out_result[]);
+void pmh_markdown_to_elements(char *text, int extensions, pmh_element **out_result[]);
 
 /**
 * \brief Sort elements in list by start offset.
 * 
 * Sorts the linked lists of elements in the list returned by
-* markdown_to_elements() by their start offsets (pos).
+* pmh_markdown_to_elements() by their start offsets (pos).
 * 
 * \param[in] element_lists  Array of linked lists of elements (output
-*                           from markdown_to_elements()).
+*                           from pmh_markdown_to_elements()).
 * 
-* \sa markdown_to_elements
-* \sa element::pos
+* \sa pmh_markdown_to_elements
+* \sa pmh_element::pos
 */
-void sort_elements_by_pos(element *element_lists[]);
+void pmh_sort_elements_by_pos(pmh_element *element_lists[]);
 
 /**
-* \brief Free element array
+* \brief Free pmh_element array
 * 
-* Frees an element array returned by markdown_to_elements().
+* Frees an pmh_element array returned by pmh_markdown_to_elements().
 * 
-* \param[in]  elems  The element array resulting from calling
-*                    markdown_to_elements().
+* \param[in]  elems  The pmh_element array resulting from calling
+*                    pmh_markdown_to_elements().
 * 
-* \sa markdown_to_elements
+* \sa pmh_markdown_to_elements
 */
-void free_elements(element **elems);
+void pmh_free_elements(pmh_element **elems);
 
 /**
 * \brief Get name of type
@@ -83,7 +83,7 @@ void free_elements(element **elems);
 * 
 * \param[in]  type  The type value to get the name for.
 * 
-* \sa element_type
+* \sa pmh_element_type
 */
-char *type_name(element_type type);
+char *pmh_type_name(pmh_element_type type);
 

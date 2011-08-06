@@ -18,7 +18,7 @@
 								 alpha:(argb_color->alpha / 255.0)];
 }
 
-- (id) initWithType:(element_type)elemType
+- (id) initWithType:(pmh_element_type)elemType
 	attributesToAdd:(NSDictionary *)toAdd
 		   toRemove:(NSArray *)toRemove
 	fontTraitsToAdd:(NSFontTraitMask)traits
