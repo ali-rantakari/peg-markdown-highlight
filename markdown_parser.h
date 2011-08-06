@@ -17,18 +17,18 @@
 #include <assert.h>
 #include "markdown_definitions.h"
 
-#ifndef MKD_DEBUG_OUTPUT
-#define MKD_DEBUG_OUTPUT 0
+#ifndef pmh_DEBUG_OUTPUT
+#define pmh_DEBUG_OUTPUT 0
 #endif
 
-#if MKD_DEBUG_OUTPUT
-#define MKD_IF(x)           if (x)
-#define MKD_PRINTF(x, ...)  fprintf(stderr, x, ##__VA_ARGS__)
-#define MKD_PUTCHAR(x)      putchar(x)
+#if pmh_DEBUG_OUTPUT
+#define pmh_IF(x)           if (x)
+#define pmh_PRINTF(x, ...)  fprintf(stderr, x, ##__VA_ARGS__)
+#define pmh_PUTCHAR(x)      putchar(x)
 #else
-#define MKD_IF(x)
-#define MKD_PRINTF(x, ...)
-#define MKD_PUTCHAR(x)
+#define pmh_IF(x)
+#define pmh_PRINTF(x, ...)
+#define pmh_PUTCHAR(x)
 #endif
 
 

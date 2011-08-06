@@ -18,19 +18,19 @@ void _parse(parser_data *p_data, yyrule start_rule)
         yyparse_from(g, start_rule);
     yyparse_free(g);
     
-    MKD_PRINTF("\n\n");
+    pmh_PRINTF("\n\n");
 }
 
 void parse_markdown(parser_data *p_data)
 {
-    MKD_PRINTF("\nPARSING DOCUMENT: ");
+    pmh_PRINTF("\nPARSING DOCUMENT: ");
     
     _parse(p_data, NULL);
 }
 
 void parse_references(parser_data *p_data)
 {
-    MKD_PRINTF("\nPARSING REFERENCES: ");
+    pmh_PRINTF("\nPARSING REFERENCES: ");
     
     p_data->parsing_only_references = true;
     _parse(p_data, yy_References);

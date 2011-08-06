@@ -15,7 +15,7 @@ ifdef DEBUG
 	CFLAGS += -g -O0
 endif
 ifdef DEBUGOUT
-	CFLAGS += -DMKD_DEBUG_OUTPUT=1
+	CFLAGS += -Dpmh_DEBUG_OUTPUT=1
 endif
 
 $(GREG):

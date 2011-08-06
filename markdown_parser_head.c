@@ -112,15 +112,15 @@ represented by their corresponding espace sequences
 void print_str_literal_escapes(char *str)
 {
     char *c = str;
-    MKD_PRINTF("'");
+    pmh_PRINTF("'");
     while (*c != '\0')
     {
-        if (*c == '\n')         MKD_PRINTF("\\n");
-        else if (*c == '\t')    MKD_PRINTF("\\t");
+        if (*c == '\n')         pmh_PRINTF("\\n");
+        else if (*c == '\t')    pmh_PRINTF("\\t");
         else putchar(*c);
         c++;
     }
-    MKD_PRINTF("'");
+    pmh_PRINTF("'");
 }
 
 /*
@@ -133,14 +133,14 @@ void print_raw_spans_inline(pmh_element *elem)
     while (cur != NULL)
     {
         if (cur->type == pmh_SEPARATOR)
-            MKD_PRINTF("<pmh_SEP %ld> ", cur->pos);
+            pmh_PRINTF("<pmh_SEP %ld> ", cur->pos);
         else if (cur->type == pmh_EXTRA_TEXT) {
-            MKD_PRINTF("{pmh_ETEXT ");
+            pmh_PRINTF("{pmh_ETEXT ");
             print_str_literal_escapes(cur->text);
-            MKD_PRINTF("}");
+            pmh_PRINTF("}");
         }
         else
-            MKD_PRINTF("(%ld-%ld) ", cur->pos, cur->end);
+            pmh_PRINTF("(%ld-%ld) ", cur->pos, cur->end);
         cur = cur->next;
     }
 }
@@ -151,10 +151,10 @@ iteratively until no such elements exist.
 */
 void process_raw_blocks(parser_data *p_data)
 {
-    MKD_PRINTF("--------process_raw_blocks---------\n");
+    pmh_PRINTF("--------process_raw_blocks---------\n");
     while (p_data->head_elems[pmh_RAW_LIST] != NULL)
     {
-        MKD_PRINTF("new iteration.\n");
+        pmh_PRINTF("new iteration.\n");
         pmh_element *cursor = p_data->head_elems[pmh_RAW_LIST];
         p_data->head_elems[pmh_RAW_LIST] = NULL;
         while (cursor != NULL)
@@ -163,15 +163,15 @@ void process_raw_blocks(parser_data *p_data)
             
             span_list = remove_zero_length_raw_spans(span_list);
             
-            #if MKD_DEBUG_OUTPUT
-            MKD_PRINTF("  process: ");
+            #if pmh_DEBUG_OUTPUT
+            pmh_PRINTF("  process: ");
             print_raw_spans_inline(span_list);
-            MKD_PRINTF("\n");
+            pmh_PRINTF("\n");
             #endif
             
             while (span_list != NULL)
             {
-                MKD_PRINTF("next: span_list: %ld-%ld\n",
+                pmh_PRINTF("next: span_list: %ld-%ld\n",
                            span_list->pos, span_list->end);
                 
                 // Skip separators in the beginning, as well as
@@ -193,10 +193,10 @@ void process_raw_blocks(parser_data *p_data)
                     previous->next = NULL;
                 }
                 
-                #if MKD_DEBUG_OUTPUT
-                MKD_PRINTF("    subspan process: ");
+                #if pmh_DEBUG_OUTPUT
+                pmh_PRINTF("    subspan process: ");
                 print_raw_spans_inline(subspan_list);
-                MKD_PRINTF("\n");
+                pmh_PRINTF("\n");
                 #endif
                 
                 // Process subspan_list:
@@ -209,7 +209,7 @@ void process_raw_blocks(parser_data *p_data)
                 parse_markdown(raw_p_data);
                 free(raw_p_data);
                 
-                MKD_PRINTF("parse over\n");
+                pmh_PRINTF("parse over\n");
             }
             
             cursor = cursor->next;
@@ -219,8 +219,8 @@ void process_raw_blocks(parser_data *p_data)
 
 void print_raw_blocks(char *text, pmh_element *elem[])
 {
-    MKD_PRINTF("--------print_raw_blocks---------\n");
-    MKD_PRINTF("block:\n");
+    pmh_PRINTF("--------print_raw_blocks---------\n");
+    pmh_PRINTF("block:\n");
     pmh_element *cursor = elem[pmh_RAW_LIST];
     while (cursor != NULL)
     {
@@ -325,7 +325,7 @@ void pmh_markdown_to_elements(char *text, int extensions,
         // Parse whole document
         parse_markdown(p_data);
         
-        #if MKD_DEBUG_OUTPUT
+        #if pmh_DEBUG_OUTPUT
         print_raw_blocks(text_copy, result);
         #endif
         
@@ -537,7 +537,7 @@ pmh_element * mk_element(parser_data *p_data, pmh_element_type type,
     p_data->head_elems[pmh_ALL] = result;
     result->allElemsNext = old_all_elements_head;
     
-    //MKD_PRINTF("  mk_element: %s [%ld - %ld]\n", pmh_type_name(type), pos, end);
+    //pmh_PRINTF("  mk_element: %s [%ld - %ld]\n", pmh_type_name(type), pos, end);
     
     return result;
 }
@@ -647,38 +647,38 @@ void add(parser_data *p_data, pmh_element *elem)
 {
     if (elem->type != pmh_RAW_LIST)
     {
-        MKD_PRINTF("  add: %s [%ld - %ld]\n",
+        pmh_PRINTF("  add: %s [%ld - %ld]\n",
                    pmh_type_name(elem->type), elem->pos, elem->end);
         elem = fix_offsets(p_data, elem);
-        MKD_PRINTF("     > %s [%ld - %ld]\n",
+        pmh_PRINTF("     > %s [%ld - %ld]\n",
                    pmh_type_name(elem->type), elem->pos, elem->end);
     }
     else
     {
-        MKD_PRINTF("  add: pmh_RAW_LIST ");
+        pmh_PRINTF("  add: pmh_RAW_LIST ");
         pmh_element *cursor = elem->children;
         pmh_element *previous = NULL;
         while (cursor != NULL)
         {
             pmh_element *next = cursor->next;
-            MKD_PRINTF("(%ld-%ld)>", cursor->pos, cursor->end);
+            pmh_PRINTF("(%ld-%ld)>", cursor->pos, cursor->end);
             pmh_element *new_cursor = fix_offsets(p_data, cursor);
             if (previous != NULL)
                 previous->next = new_cursor;
             else
                 elem->children = new_cursor;
-            MKD_PRINTF("(%ld-%ld)", new_cursor->pos, new_cursor->end);
+            pmh_PRINTF("(%ld-%ld)", new_cursor->pos, new_cursor->end);
             while (new_cursor->next != NULL) {
                 new_cursor = new_cursor->next;
-                MKD_PRINTF("(%ld-%ld)", new_cursor->pos, new_cursor->end);
+                pmh_PRINTF("(%ld-%ld)", new_cursor->pos, new_cursor->end);
             }
-            MKD_PRINTF(" ");
+            pmh_PRINTF(" ");
             if (next != NULL)
                 new_cursor->next = next;
             previous = new_cursor;
             cursor = next;
         }
-        MKD_PRINTF("\n");
+        pmh_PRINTF("\n");
     }
     
     if (p_data->head_elems[elem->type] == NULL)
@@ -735,14 +735,14 @@ void yy_input_func(char *buf, int *result, int max_size, parser_data *p_data)
         if (moreToRead)
         {
             yyc = *(p_data->elem->text + p_data->elem->textOffset++);
-            MKD_PRINTF("\e[47;30m"); MKD_PUTCHAR(yyc); MKD_PRINTF("\e[0m");
-            MKD_IF(yyc == '\n') MKD_PRINTF("\e[47m \e[0m");
+            pmh_PRINTF("\e[47;30m"); pmh_PUTCHAR(yyc); pmh_PRINTF("\e[0m");
+            pmh_IF(yyc == '\n') pmh_PRINTF("\e[47m \e[0m");
         }
         else
         {
             yyc = EOF;
             p_data->elem = p_data->elem->next;
-            MKD_PRINTF("\e[41m \e[0m");
+            pmh_PRINTF("\e[41m \e[0m");
             if (p_data->elem != NULL)
                 p_data->offset = p_data->elem->pos;
         }
@@ -754,13 +754,13 @@ void yy_input_func(char *buf, int *result, int max_size, parser_data *p_data)
     (*result) = (*buf != '\0');
     p_data->offset++;
     
-    MKD_PRINTF("\e[43;30m"); MKD_PUTCHAR(*buf); MKD_PRINTF("\e[0m");
-    MKD_IF(*buf == '\n') MKD_PRINTF("\e[42m \e[0m");
+    pmh_PRINTF("\e[43;30m"); pmh_PUTCHAR(*buf); pmh_PRINTF("\e[0m");
+    pmh_IF(*buf == '\n') pmh_PRINTF("\e[42m \e[0m");
     
     if (p_data->offset >= p_data->elem->end)
     {
         p_data->elem = p_data->elem->next;
-        MKD_PRINTF("\e[41m \e[0m");
+        pmh_PRINTF("\e[41m \e[0m");
         if (p_data->elem != NULL)
             p_data->offset = p_data->elem->pos;
     }

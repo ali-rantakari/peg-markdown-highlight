@@ -45,7 +45,7 @@ void apply_highlighting(NSMutableAttributedString *attrStr, pmh_element *elem[])
     int i;
     for (i = 0; i < order_len; i++)
     {
-        //MKD_PRINTF("apply_highlighting: %i\n", i);
+        //pmh_PRINTF("apply_highlighting: %i\n", i);
         
         pmh_element *cursor = elem[order[i]];
         while (cursor != NULL)
@@ -85,7 +85,7 @@ void apply_highlighting(NSMutableAttributedString *attrStr, pmh_element *elem[])
                 default: break;
             }
             
-            //MKD_PRINTF("  %i-%i\n", cursor->pos, cursor->end);
+            //pmh_PRINTF("  %i-%i\n", cursor->pos, cursor->end);
             if (fgColor != nil || bgColor != nil) {
                 unsigned long rangePosLimitedLow = MAX(cursor->pos, (unsigned long)0);
                 unsigned long rangePos = MIN(rangePosLimitedLow, sourceLength);
@@ -153,7 +153,7 @@ void print_result(pmh_element *elem[])
         pmh_element *cursor = elem[i];
         while (cursor != NULL)
         {
-            MKD_PRINTF("[%ld-%ld] 0x%x: %s\n", cursor->pos, cursor->end, (int)cursor, pmh_type_name(cursor->type));
+            pmh_PRINTF("[%ld-%ld] 0x%x: %s\n", cursor->pos, cursor->end, (int)cursor, pmh_type_name(cursor->type));
             cursor = cursor->next;
         }
     }
