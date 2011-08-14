@@ -79,6 +79,7 @@ typedef enum
 */
 #define pmh_NUM_LANG_TYPES (pmh_NUM_TYPES - 6)
 
+
 /**
 * \brief Semantic value of a parsing action.
 */
@@ -88,12 +89,8 @@ struct pmh_Element
     unsigned long pos;            /**< \brief start offset in input */
     unsigned long end;            /**< \brief end offset in input */
     struct pmh_Element *next;     /**< \brief next element in list */
-    struct pmh_Element *allElemsNext; /**< \brief next element in list of all elements */
-    int textOffset;               /**< \brief offset to text (for elements of type pmh_EXTRA_TEXT, used when the parser reads the value of 'text') */
-    char *text;                   /**< \brief text content (for elements of type pmh_EXTRA_TEXT) */
     char *label;                  /**< \brief label (for links and references) */
     char *address;                /**< \brief address (for links and references) */
-    struct pmh_Element *children; /**< \brief children of element (for elements of type pmh_RAW_LIST) */
 };
 typedef struct pmh_Element pmh_element;
 

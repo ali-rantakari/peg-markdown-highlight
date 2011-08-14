@@ -32,6 +32,40 @@
 #endif
 
 
+
+struct pmh_RealElement
+{
+    // "Public" members:
+    // -----------------------------------------------
+    pmh_element_type type;
+    unsigned long pos;
+    unsigned long end;
+    struct pmh_RealElement *next;
+    char *label;
+    char *address;
+    
+    // "Private" members for use by the parser itself:
+    // -----------------------------------------------
+    
+    // next element in list of all elements:
+    struct pmh_RealElement *allElemsNext;
+    
+    // offset to text (for elements of type pmh_EXTRA_TEXT, used when the
+    // parser reads the value of 'text'):
+    int textOffset;
+    
+    // text content (for elements of type pmh_EXTRA_TEXT):
+    char *text;
+    
+    // children of element (for elements of type pmh_RAW_LIST)
+    struct pmh_RealElement *children;
+};
+typedef struct pmh_RealElement pmh_realelement;
+
+
+
+
+
 typedef struct
 {
     /* Buffer of characters to be parsed: */
@@ -39,8 +73,8 @@ typedef struct
     
     /* Linked list of {start, end} offset pairs determining which parts */
     /* of charbuf to actually parse: */
-    pmh_element *elem;
-    pmh_element *elem_head;
+    pmh_realelement *elem;
+    pmh_realelement *elem_head;
     
     /* Current parsing offset within charbuf: */
     unsigned long offset;
@@ -50,21 +84,21 @@ typedef struct
     int extensions;
     
     /* Array of parsing result elements, indexed by type: */
-    pmh_element **head_elems;
+    pmh_realelement **head_elems;
     
     /* Whether we are parsing only references: */
     bool parsing_only_references;
     
     /* List of reference elements: */
-    pmh_element *references;
+    pmh_realelement *references;
 } parser_data;
 
 parser_data *mk_parser_data(char *charbuf,
-                            pmh_element *parsing_elems,
+                            pmh_realelement *parsing_elems,
                             unsigned long offset,
                             int extensions,
-                            pmh_element **head_elems,
-                            pmh_element *references)
+                            pmh_realelement **head_elems,
+                            pmh_realelement *references)
 {
     parser_data *p_data = (parser_data *)malloc(sizeof(parser_data));
     p_data->extensions = extensions;
@@ -76,8 +110,8 @@ parser_data *mk_parser_data(char *charbuf,
     if (head_elems != NULL)
         p_data->head_elems = head_elems;
     else {
-        p_data->head_elems = (pmh_element **)
-                             malloc(sizeof(pmh_element *) * pmh_NUM_TYPES);
+        p_data->head_elems = (pmh_realelement **)
+                             malloc(sizeof(pmh_realelement *) * pmh_NUM_TYPES);
         int i;
         for (i = 0; i < pmh_NUM_TYPES; i++)
             p_data->head_elems[i] = NULL;
@@ -97,11 +131,11 @@ void parse_references(parser_data *p_data);
 Remove pmh_RAW elements with zero length; return pointer
 to new head.
 */
-pmh_element *remove_zero_length_raw_spans(pmh_element *elem)
+pmh_realelement *remove_zero_length_raw_spans(pmh_realelement *elem)
 {
-    pmh_element *head = elem;
-    pmh_element *parent = NULL;
-    pmh_element *c = head;
+    pmh_realelement *head = elem;
+    pmh_realelement *parent = NULL;
+    pmh_realelement *c = head;
     while (c != NULL)
     {
         if (c->type == pmh_RAW && c->pos >= c->end)
@@ -142,9 +176,9 @@ void print_str_literal_escapes(char *str)
 Print elements in a linked list of
 pmh_RAW, pmh_SEPARATOR, pmh_EXTRA_TEXT elements
 */
-void print_raw_spans_inline(pmh_element *elem)
+void print_raw_spans_inline(pmh_realelement *elem)
 {
-    pmh_element *cur = elem;
+    pmh_realelement *cur = elem;
     while (cur != NULL)
     {
         if (cur->type == pmh_SEPARATOR)
@@ -170,11 +204,11 @@ void process_raw_blocks(parser_data *p_data)
     while (p_data->head_elems[pmh_RAW_LIST] != NULL)
     {
         pmh_PRINTF("new iteration.\n");
-        pmh_element *cursor = p_data->head_elems[pmh_RAW_LIST];
+        pmh_realelement *cursor = p_data->head_elems[pmh_RAW_LIST];
         p_data->head_elems[pmh_RAW_LIST] = NULL;
         while (cursor != NULL)
         {
-            pmh_element *span_list = cursor->children;
+            pmh_realelement *span_list = (pmh_realelement*)cursor->children;
             
             span_list = remove_zero_length_raw_spans(span_list);
             
@@ -197,8 +231,8 @@ void process_raw_blocks(parser_data *p_data)
                 }
                 
                 // Store list of spans until next separator in subspan_list:
-                pmh_element *subspan_list = span_list;
-                pmh_element *previous = NULL;
+                pmh_realelement *subspan_list = span_list;
+                pmh_realelement *previous = NULL;
                 while (span_list != NULL && span_list->type != pmh_SEPARATOR) {
                     previous = span_list;
                     span_list = span_list->next;
@@ -232,11 +266,11 @@ void process_raw_blocks(parser_data *p_data)
     }
 }
 
-void print_raw_blocks(char *text, pmh_element *elem[])
+void print_raw_blocks(char *text, pmh_realelement *elem[])
 {
     pmh_PRINTF("--------print_raw_blocks---------\n");
     pmh_PRINTF("block:\n");
-    pmh_element *cursor = elem[pmh_RAW_LIST];
+    pmh_realelement *cursor = elem[pmh_RAW_LIST];
     while (cursor != NULL)
     {
         print_raw_spans_inline(cursor->children);
@@ -251,9 +285,9 @@ void print_raw_blocks(char *text, pmh_element *elem[])
 /* Free all elements created while parsing */
 void pmh_free_elements(pmh_element **elems)
 {
-    pmh_element *cursor = elems[pmh_ALL];
+    pmh_realelement *cursor = (pmh_realelement*)elems[pmh_ALL];
     while (cursor != NULL) {
-        pmh_element *tofree = cursor;
+        pmh_realelement *tofree = cursor;
         cursor = cursor->allElemsNext;
         if (tofree->text != NULL)
             free(tofree->text);
@@ -318,7 +352,7 @@ void pmh_markdown_to_elements(char *text, int extensions,
     char *text_copy = NULL;
     int text_copy_len = strcpy_preformat(text, &text_copy);
     
-    pmh_element *parsing_elem = (pmh_element *)malloc(sizeof(pmh_element));
+    pmh_realelement *parsing_elem = (pmh_realelement *)malloc(sizeof(pmh_realelement));
     parsing_elem->type = pmh_RAW;
     parsing_elem->pos = 0;
     parsing_elem->end = text_copy_len;
@@ -326,7 +360,7 @@ void pmh_markdown_to_elements(char *text, int extensions,
     
     parser_data *p_data = mk_parser_data(text_copy, parsing_elem,
                                          0, extensions, NULL, NULL);
-    pmh_element **result = p_data->head_elems;
+    pmh_realelement **result = p_data->head_elems;
     
     if (*text_copy != '\0')
     {
@@ -351,7 +385,7 @@ void pmh_markdown_to_elements(char *text, int extensions,
     free(parsing_elem);
     free(text_copy);
     
-    *out_result = result;
+    *out_result = (pmh_element**)result;
 }
 
 
@@ -488,13 +522,13 @@ bool extension(parser_data *p_data, int ext)
     return ((p_data->extensions & ext) != 0);
 }
 
-/* return reference pmh_element for a given label */
-pmh_element *get_reference(parser_data *p_data, char *label)
+/* return reference pmh_realelement for a given label */
+pmh_realelement *get_reference(parser_data *p_data, char *label)
 {
     if (!label)
         return NULL;
     
-    pmh_element *cursor = p_data->references;
+    pmh_realelement *cursor = p_data->references;
     while (cursor != NULL)
     {
         if (cursor->label && strcmp(label, cursor->label) == 0)
@@ -506,11 +540,11 @@ pmh_element *get_reference(parser_data *p_data, char *label)
 
 
 /* cons an element/list onto a list, returning pointer to new head */
-static pmh_element * cons(pmh_element *elem, pmh_element *list)
+static pmh_realelement * cons(pmh_realelement *elem, pmh_realelement *list)
 {
     assert(elem != NULL);
     
-    pmh_element *cur = elem;
+    pmh_realelement *cur = elem;
     while (cur->next != NULL) {
         cur = cur->next;
     }
@@ -521,10 +555,10 @@ static pmh_element * cons(pmh_element *elem, pmh_element *list)
 
 
 /* reverse a list, returning pointer to new list */
-static pmh_element *reverse(pmh_element *list)
+static pmh_realelement *reverse(pmh_realelement *list)
 {
-    pmh_element *new_head = NULL;
-    pmh_element *next = NULL;
+    pmh_realelement *new_head = NULL;
+    pmh_realelement *next = NULL;
     while (list != NULL) {
         next = list->next;
         list->next = new_head;
@@ -536,11 +570,11 @@ static pmh_element *reverse(pmh_element *list)
 
 
 
-/* construct pmh_element */
-pmh_element * mk_element(parser_data *p_data, pmh_element_type type,
+/* construct pmh_realelement */
+pmh_realelement * mk_element(parser_data *p_data, pmh_element_type type,
                          long pos, long end)
 {
-    pmh_element *result = (pmh_element *)malloc(sizeof(pmh_element));
+    pmh_realelement *result = (pmh_realelement *)malloc(sizeof(pmh_realelement));
     result->type = type;
     result->pos = pos;
     result->end = end;
@@ -548,7 +582,7 @@ pmh_element * mk_element(parser_data *p_data, pmh_element_type type,
     result->textOffset = 0;
     result->label = result->address = result->text = NULL;
     
-    pmh_element *old_all_elements_head = p_data->head_elems[pmh_ALL];
+    pmh_realelement *old_all_elements_head = p_data->head_elems[pmh_ALL];
     p_data->head_elems[pmh_ALL] = result;
     result->allElemsNext = old_all_elements_head;
     
@@ -557,19 +591,19 @@ pmh_element * mk_element(parser_data *p_data, pmh_element_type type,
     return result;
 }
 
-pmh_element * copy_element(parser_data *p_data, pmh_element *elem)
+pmh_realelement * copy_element(parser_data *p_data, pmh_realelement *elem)
 {
-    pmh_element *result = mk_element(p_data, elem->type, elem->pos, elem->end);
+    pmh_realelement *result = mk_element(p_data, elem->type, elem->pos, elem->end);
     result->label = (elem->label == NULL) ? NULL : strdup(elem->label);
     result->text = (elem->text == NULL) ? NULL : strdup(elem->text);
     result->address = (elem->address == NULL) ? NULL : strdup(elem->address);
     return result;
 }
 
-/* construct pmh_EXTRA_TEXT pmh_element */
-pmh_element * mk_etext(parser_data *p_data, char *string)
+/* construct pmh_EXTRA_TEXT pmh_realelement */
+pmh_realelement * mk_etext(parser_data *p_data, char *string)
 {
-    pmh_element *result;
+    pmh_realelement *result;
     assert(string != NULL);
     result = mk_element(p_data, pmh_EXTRA_TEXT, 0,0);
     result->text = strdup(string);
@@ -582,18 +616,18 @@ Given an element where the offsets {pos, end} represent
 locations in the *parsed text* (defined by the linked list of pmh_RAW and
 pmh_EXTRA_TEXT elements in p_data->elem), fix these offsets to represent
 corresponding offsets in the original input (p_data->charbuf). Also split
-the given pmh_element into multiple parts if its offsets span multiple
+the given pmh_realelement into multiple parts if its offsets span multiple
 p_data->elem elements. Return the (list of) elements with real offsets.
 */
-pmh_element *fix_offsets(parser_data *p_data, pmh_element *elem)
+pmh_realelement *fix_offsets(parser_data *p_data, pmh_realelement *elem)
 {
     if (elem->type == pmh_EXTRA_TEXT)
         return mk_etext(p_data, elem->text);
     
-    pmh_element *new_head = copy_element(p_data, elem);
+    pmh_realelement *new_head = copy_element(p_data, elem);
     
-    pmh_element *tail = new_head;
-    pmh_element *prev = NULL;
+    pmh_realelement *tail = new_head;
+    pmh_realelement *prev = NULL;
     
     bool found_start = false;
     bool found_end = false;
@@ -601,7 +635,7 @@ pmh_element *fix_offsets(parser_data *p_data, pmh_element *elem)
     unsigned long previous_end = 0;
     unsigned long c = 0;
     
-    pmh_element *cursor = p_data->elem_head;
+    pmh_realelement *cursor = p_data->elem_head;
     while (cursor != NULL)
     {
         int thislen = (cursor->type == pmh_EXTRA_TEXT)
@@ -637,7 +671,7 @@ pmh_element *fix_offsets(parser_data *p_data, pmh_element *elem)
             previous_end = cursor->end;
         
         if (found_start) {
-            pmh_element *new_elem = mk_element(p_data, tail->type,
+            pmh_realelement *new_elem = mk_element(p_data, tail->type,
                                            this_pos, cursor->end);
             new_elem->next = tail;
             if (prev != NULL)
@@ -658,7 +692,7 @@ pmh_element *fix_offsets(parser_data *p_data, pmh_element *elem)
 
 
 /* Add an element to p_data->head_elems. */
-void add(parser_data *p_data, pmh_element *elem)
+void add(parser_data *p_data, pmh_realelement *elem)
 {
     if (elem->type != pmh_RAW_LIST)
     {
@@ -671,13 +705,13 @@ void add(parser_data *p_data, pmh_element *elem)
     else
     {
         pmh_PRINTF("  add: pmh_RAW_LIST ");
-        pmh_element *cursor = elem->children;
-        pmh_element *previous = NULL;
+        pmh_realelement *cursor = elem->children;
+        pmh_realelement *previous = NULL;
         while (cursor != NULL)
         {
-            pmh_element *next = cursor->next;
+            pmh_realelement *next = cursor->next;
             pmh_PRINTF("(%ld-%ld)>", cursor->pos, cursor->end);
-            pmh_element *new_cursor = fix_offsets(p_data, cursor);
+            pmh_realelement *new_cursor = fix_offsets(p_data, cursor);
             if (previous != NULL)
                 previous->next = new_cursor;
             else
@@ -700,7 +734,7 @@ void add(parser_data *p_data, pmh_element *elem)
         p_data->head_elems[elem->type] = elem;
     else
     {
-        pmh_element *last = elem;
+        pmh_realelement *last = elem;
         while (last->next != NULL)
             last = last->next;
         last->next = p_data->head_elems[elem->type];
@@ -708,10 +742,10 @@ void add(parser_data *p_data, pmh_element *elem)
     }
 }
 
-pmh_element * add_element(parser_data *p_data, pmh_element_type type,
+pmh_realelement * add_element(parser_data *p_data, pmh_element_type type,
                       long pos, long end)
 {
-    pmh_element *new_element = mk_element(p_data, type, pos, end);
+    pmh_realelement *new_element = mk_element(p_data, type, pos, end);
     add(p_data, new_element);
     return new_element;
 }
@@ -725,7 +759,7 @@ void add_raw(parser_data *p_data, long pos, long end)
 
 
 
-# define YYSTYPE pmh_element *
+# define YYSTYPE pmh_realelement *
 #ifdef __DEBUG__
 # define YY_DEBUG 1
 #endif
