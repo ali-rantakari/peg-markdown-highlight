@@ -3,7 +3,7 @@
  * Copyright 2011 Ali Rantakari -- http://hasseg.org
  * Licensed under the GPL2+ and MIT licenses (see LICENSE for more info).
  * 
- * markdown_grammar.leg
+ * pmh_grammar.leg
  * 
  * This is a slightly adapted version of the PEG grammar from John MacFarlane's
  * peg-markdown compiler.

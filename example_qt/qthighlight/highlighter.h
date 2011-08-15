@@ -14,7 +14,7 @@
 #include <QThread>
 
 extern "C" {
-#include "markdown_parser.h"
+#include "pmh_parser.h"
 }
 
 QT_BEGIN_NAMESPACE

@@ -6,7 +6,7 @@
  */
 
 #import <Cocoa/Cocoa.h>
-#import "markdown_definitions.h"
+#import "pmh_definitions.h"
 #import "styleparser.h"
 
 

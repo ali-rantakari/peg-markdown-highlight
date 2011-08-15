@@ -12,7 +12,7 @@
 #include <sys/time.h>
 #import <Foundation/Foundation.h>
 #import "ANSIEscapeHelper.h"
-#import "markdown_parser.h"
+#import "pmh_parser.h"
 
 
 void apply_highlighting(NSMutableAttributedString *attrStr, pmh_element *elem[])

@@ -9,7 +9,7 @@
 
 #include <gtk/gtk.h>
 #include <string.h>
-#include "markdown_parser.h"
+#include "pmh_parser.h"
 
 // Element in list of text style tags
 typedef struct TagListelem

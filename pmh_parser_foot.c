@@ -2,7 +2,7 @@
  * Copyright 2011 Ali Rantakari -- http://hasseg.org
  * Licensed under the GPL2+ and MIT licenses (see LICENSE for more info).
  * 
- * markdown_parser_foot.c
+ * pmh_parser_foot.c
  * 
  * Code to be appended to the end of the parser code generated from the
  * PEG grammar.

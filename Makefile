@@ -22,50 +22,50 @@ $(GREG):
 	@echo '------- building greg'
 	CC=gcc make -C $(GREGDIR)
 
-markdown_parser_core.c : markdown_grammar.leg $(GREG)
+pmh_parser_core.c : pmh_grammar.leg $(GREG)
 	@echo '------- generating parser core from grammar'
 	$(GREG) -o $@ $<
 
-markdown_parser.c : markdown_parser_core.c markdown_parser_head.c markdown_parser_foot.c tools/combine_parser_files.sh
+pmh_parser.c : pmh_parser_core.c pmh_parser_head.c pmh_parser_foot.c tools/combine_parser_files.sh
 	@echo '------- combining parser code'
 	./tools/combine_parser_files.sh > $@
 
-markdown_parser.o : markdown_parser.c markdown_parser.h markdown_definitions.h
-	@echo '------- building markdown_parser.o'
+pmh_parser.o : pmh_parser.c pmh_parser.h pmh_definitions.h
+	@echo '------- building pmh_parser.o'
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 ANSIEscapeHelper.o : ANSIEscapeHelper.m ANSIEscapeHelper.h
 	@echo '------- building ANSIEscapeHelper.o'
 	clang -Wall -O3 -c -o $@ $<
 
-$(TESTER) : tester.m markdown_parser.o ANSIEscapeHelper.o ANSIEscapeHelper.h
+$(TESTER) : tester.m pmh_parser.o ANSIEscapeHelper.o ANSIEscapeHelper.h
 	@echo '------- building tester'
-	clang $(CFLAGS) $(OBJC_CFLAGS) -o $@ markdown_parser.o ANSIEscapeHelper.o $<
+	clang $(CFLAGS) $(OBJC_CFLAGS) -o $@ pmh_parser.o ANSIEscapeHelper.o $<
 
 $(TEST_CLIENT) : testclient.m ANSIEscapeHelper.o ANSIEscapeHelper.h
 	@echo '------- building testclient'
 	clang $(CFLAGS) $(OBJC_CFLAGS) -o $@ ANSIEscapeHelper.o $<
 
-$(HIGHLIGHTER) : highlighter.c markdown_parser.o
+$(HIGHLIGHTER) : highlighter.c pmh_parser.o
 	@echo '------- building highlighter'
-	$(CC) $(CFLAGS) -o $@ markdown_parser.o $<
+	$(CC) $(CFLAGS) -o $@ pmh_parser.o $<
 
-$(MULTITHREAD_TESTER) : multithread_tester.c markdown_parser.o
+$(MULTITHREAD_TESTER) : multithread_tester.c pmh_parser.o
 	@echo '------- building multithread_tester'
-	$(CC) $(CFLAGS) -o $@ markdown_parser.o $<
+	$(CC) $(CFLAGS) -o $@ pmh_parser.o $<
 
-$(BENCH) : bench.c markdown_parser.o
+$(BENCH) : bench.c pmh_parser.o
 	@echo '------- building bench'
-	$(CC) $(CFLAGS) -o $@ markdown_parser.o $<
+	$(CC) $(CFLAGS) -o $@ pmh_parser.o $<
 
-docs: markdown_parser.h markdown_definitions.h doxygen/doxygen.cfg doxygen/doxygen.h doxygen/doxygen_footer.html example_cocoa/HGMarkdownHighlighter.h
+docs: pmh_parser.h pmh_definitions.h doxygen/doxygen.cfg doxygen/doxygen.h doxygen/doxygen_footer.html example_cocoa/HGMarkdownHighlighter.h
 	doxygen doxygen/doxygen.cfg
 	touch docs
 
 .PHONY: clean test
 
 clean:
-	rm -f markdown_parser_core.c markdown_parser.c *.o $(TESTER) $(TEST_CLIENT) $(HIGHLIGHTER) $(BENCH) $(MULTITHREAD_TESTER); \
+	rm -f pmh_parser_core.c pmh_parser.c *.o $(TESTER) $(TEST_CLIENT) $(HIGHLIGHTER) $(BENCH) $(MULTITHREAD_TESTER); \
 	rm -rf *.dSYM; \
 	make -C $(GREGDIR) clean
 

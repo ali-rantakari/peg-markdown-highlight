@@ -2,7 +2,7 @@
  * Copyright 2011 Ali Rantakari -- http://hasseg.org
  * Licensed under the GPL2+ and MIT licenses (see LICENSE for more info).
  * 
- * markdown_parser.h
+ * pmh_parser.h
  */
 
 /** \file
@@ -15,7 +15,7 @@
 
 #include <stdlib.h>
 #include <assert.h>
-#include "markdown_definitions.h"
+#include "pmh_definitions.h"
 
 
 /**

@@ -11,7 +11,7 @@
 
 #import <Foundation/Foundation.h>
 #import "ANSIEscapeHelper.h"
-#import "markdown_definitions.h"
+#import "pmh_definitions.h"
 
 
 void Print(NSString *aStr)

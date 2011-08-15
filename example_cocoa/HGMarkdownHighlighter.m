@@ -6,7 +6,7 @@
  */
 
 #import "HGMarkdownHighlighter.h"
-#import "markdown_parser.h"
+#import "pmh_parser.h"
 #import "styleparser.h"
 
 

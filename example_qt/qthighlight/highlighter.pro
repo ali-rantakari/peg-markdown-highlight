@@ -1,8 +1,8 @@
-HEADERS         = markdown_parser.h \
-                  markdown_definitions.h \
+HEADERS         = pmh_parser.h \
+                  pmh_definitions.h \
                   highlighter.h \
                   mainwindow.h
-SOURCES         = markdown_parser.c\
+SOURCES         = pmh_parser.c\
                   highlighter.cpp \
                   mainwindow.cpp \
                   main.cpp

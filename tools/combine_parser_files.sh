@@ -5,13 +5,13 @@
 # one file.
 # 
 
-HEADER_ROW=$(grep -nF '/// header_code_here' markdown_parser_core.c | awk 'BEGIN{FS=":"};{print $1}')
+HEADER_ROW=$(grep -nF '/// header_code_here' pmh_parser_core.c | awk 'BEGIN{FS=":"};{print $1}')
 HEADER_ROW_BEFORE=$(expr $HEADER_ROW - 1)
 HEADER_ROW_AFTER=$(expr $HEADER_ROW + 1)
 
-head -n ${HEADER_ROW_BEFORE} markdown_parser_core.c
-cat markdown_parser_head.c
-tail -n +${HEADER_ROW_AFTER} markdown_parser_core.c
-cat markdown_parser_foot.c
+head -n ${HEADER_ROW_BEFORE} pmh_parser_core.c
+cat pmh_parser_head.c
+tail -n +${HEADER_ROW_AFTER} pmh_parser_core.c
+cat pmh_parser_foot.c
 
 

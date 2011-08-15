@@ -2,13 +2,13 @@
  * Copyright 2011 Ali Rantakari -- http://hasseg.org
  * Licensed under the GPL2+ and MIT licenses (see LICENSE for more info).
  * 
- * markdown_parser_head.c
+ * pmh_parser_head.c
  * 
  * Code to be inserted into the beginning of the parser code generated
  * from the PEG grammar.
  */
 
-#include "markdown_parser.h"
+#include "pmh_parser.h"
 
 #ifndef pmh_DEBUG_OUTPUT
 #define pmh_DEBUG_OUTPUT 0
@@ -38,7 +38,7 @@
 struct pmh_RealElement
 {
     // "Public" members:
-    // (these must match what's defined in markdown_definitions.h)
+    // (these must match what's defined in pmh_definitions.h)
     // -----------------------------------------------
     pmh_element_type type;
     unsigned long pos;

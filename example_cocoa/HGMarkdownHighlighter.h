@@ -6,7 +6,7 @@
  */
 
 #import <Cocoa/Cocoa.h>
-#import "markdown_definitions.h"
+#import "pmh_definitions.h"
 #import "HGMarkdownHighlightingStyle.h"
 
 /**
@@ -103,9 +103,9 @@
 
 /** \brief The extensions to use for parsing.
  * 
- * A bitfield of markdown_extensions values.
+ * A bitfield of pmh_extensions values.
  * 
- * \sa markdown_extensions
+ * \sa pmh_extensions
  */
 @property int extensions;
 

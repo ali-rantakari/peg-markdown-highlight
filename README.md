@@ -51,30 +51,30 @@ shell script that is used to combine some files in a `make` step.
 
 You need to add the following files into your project:
 
-- `markdown_definitions.h`
-- `markdown_parser.h`
-- `markdown_parser.c`
+- `pmh_definitions.h`
+- `pmh_parser.h`
+- `pmh_parser.c`
 
-`markdown_parser.c` implements the parser and must be generated with `make`.
-`markdown_parser.h` contains the parser's public interface and
-`markdown_definitions.h` some public definitions you might want to use in files
+`pmh_parser.c` implements the parser and must be generated with `make`.
+`pmh_parser.h` contains the parser's public interface and
+`pmh_definitions.h` some public definitions you might want to use in files
 where you don't wish to import the parser interface itself.
 
 
 ### Compiling in Microsoft Visual C++
 
-First you need to generate `markdown_parser.c` somehow. There are two main
+First you need to generate `pmh_parser.c` somehow. There are two main
 ways to do this:
 
 - Use a Linux or OS X machine to generate it
 - Generate it on Windows using MinGW (you'd run `make` in the MinGW shell)
 
-Whichever way you go, the command you run is `make markdown_parser.c`.
+Whichever way you go, the command you run is `make pmh_parser.c`.
 
 MSVC does not support some of the GNU extensions the code uses, but it should
 compile it nicely as C++ (just change the extensions to `.cpp` or set some
 magic switch in the project settings to get the same effect). You may need to
-insert the following to the beginning of `markdown_parser.c`:
+insert the following to the beginning of `pmh_parser.c`:
 
     #include "stdafx.h"
 
