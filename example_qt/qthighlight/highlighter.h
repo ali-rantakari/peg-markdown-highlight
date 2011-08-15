@@ -27,12 +27,12 @@ public:
     ~WorkerThread();
     void run();
     char *content;
-    element **result;
+    pmh_element **result;
 };
 
 struct HighlightingStyle
 {
-    element_type type;
+    pmh_element_type type;
     QTextCharFormat format;
 };
 
@@ -58,7 +58,7 @@ private:
     QTextDocument *document;
     WorkerThread *workerThread;
     bool parsePending;
-    element **cached_elements;
+    pmh_element **cached_elements;
     QVector<HighlightingStyle> *highlightingStyles;
 
     void clearFormatting();
