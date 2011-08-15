@@ -33,9 +33,12 @@
 
 
 
+// Internal language element occurrence structure, containing
+// both public and private members:
 struct pmh_RealElement
 {
     // "Public" members:
+    // (these must match what's defined in markdown_definitions.h)
     // -----------------------------------------------
     pmh_element_type type;
     unsigned long pos;
@@ -65,7 +68,7 @@ typedef struct pmh_RealElement pmh_realelement;
 
 
 
-
+// Parser state data:
 typedef struct
 {
     /* Buffer of characters to be parsed: */
@@ -80,7 +83,7 @@ typedef struct
     unsigned long offset;
     
     /* The extensions to use for parsing (bitfield */
-    /* of enum markdown_extensions): */
+    /* of enum pmh_extensions): */
     int extensions;
     
     /* Array of parsing result elements, indexed by type: */
