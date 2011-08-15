@@ -97,12 +97,12 @@ typedef enum
 */
 struct pmh_Element
 {
-    pmh_element_type type;    /**< \brief type of element */
-    unsigned long pos;        /**< \brief start character offset in input */
-    unsigned long end;        /**< \brief end character offset in input */
-    struct pmh_Element *next; /**< \brief next element in list */
-    char *label;              /**< \brief label (for links and references) */
-    char *address;            /**< \brief address (for links and references) */
+    pmh_element_type type;    /**< \brief Type of element */
+    unsigned long pos;        /**< \brief Start character offset in input */
+    unsigned long end;        /**< \brief End character offset in input */
+    struct pmh_Element *next; /**< \brief Next element in list */
+    char *label;              /**< \brief Label (for links and references) */
+    char *address;            /**< \brief Address (for links and references) */
 };
 typedef struct pmh_Element pmh_element;
 
