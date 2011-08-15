@@ -4,6 +4,6 @@
 * application, see HGMarkdownHighlighter.
 * 
 * For parsing a Markdown document for syntax highlighting purposes in any C program,
-* see markdown_to_elements().
+* see pmh_markdown_to_elements().
 * 
 */
