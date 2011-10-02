@@ -1,3 +1,15 @@
+/* PEG Markdown Highlight
+ * Copyright 2011 Ali Rantakari -- http://hasseg.org
+ * Licensed under the GPL2+ and MIT licenses (see LICENSE for more info).
+ * 
+ * pmh_styleparser.h
+ * 
+ * Public interface of a parser for custom syntax highlighting stylesheets.
+ */
+
+/** \file
+* \brief Style parser public interface.
+*/
 
 #include "pmh_definitions.h"
 #include <stdbool.h>
@@ -15,9 +27,7 @@ typedef struct
     int alpha;  /**< Alpha (opacity) color component (0-255) */
 } pmh_attr_argb_color;
 
-/**
-* \brief Font style attribute value.
-*/
+/** \brief Font style attribute value. */
 typedef struct
 {
     bool italic;
@@ -25,9 +35,7 @@ typedef struct
     bool underlined;
 } pmh_attr_font_styles;
 
-/**
-* \brief Style attribute types.
-*/
+/** \brief Style attribute types. */
 typedef enum
 {
     pmh_attr_type_foreground_color, /**< Foreground color */
@@ -56,9 +64,7 @@ typedef union
     char *string;                       /**< Arbitrary custom string value */
 } pmh_attr_value;
 
-/**
-* \brief Style attribute.
-*/
+/** \brief Style attribute. */
 typedef struct pmh_style_attribute
 {
     pmh_element_type lang_element_type; /**< The Markdown language element this
@@ -69,27 +75,75 @@ typedef struct pmh_style_attribute
     struct pmh_style_attribute *next;   /**< Next attribute in linked list */
 } pmh_style_attribute;
 
-/**
-* \brief Collection of styles.
-*/
+/** \brief Collection of styles. */
 typedef struct
 {
     /** Styles that apply to the editor in general */
     pmh_style_attribute *editor_styles;
     
-    pmh_style_attribute *editor_current_line_styles;    /**<  */
-    pmh_style_attribute *editor_selection_styles;       /**<  */
-    pmh_style_attribute **element_styles;               /**<  */
+    /** Styles that apply to the line in the editor where the caret (insertion
+        point) resides */
+    pmh_style_attribute *editor_current_line_styles;
+    
+    /** Styles that apply to the range of selected text in the editor */
+    pmh_style_attribute *editor_selection_styles;
+    
+    /** Styles that apply to specific Markdown language elements */
+    pmh_style_attribute **element_styles;
 } pmh_style_collection;
 
 
+/**
+* \brief Parse stylesheet string, return style collection
+* 
+* \param[in] input                   The stylesheet string to parse.
+* \param[in] error_callback          Callback function to be called when errors
+*                                    occur during parsing. The first argument
+*                                    to the callback function is the error
+*                                    message and the second one the line number
+*                                    in the original input where the error
+*                                    occurred. The last argument will always
+*                                    get the value you pass in for the
+*                                    error_callback_context argument to this
+*                                    function.
+*                                    Pass in NULL to suppress error reporting.
+* \param[in] error_callback_context  Arbitrary context pointer for the error
+*                                    callback function; will be passed in as
+*                                    the last argument to error_callback.
+* 
+* \return A pmh_style_collection. You must pass this value to
+*         pmh_free_style_collection() when it's not needed anymore.
+*/
 pmh_style_collection *pmh_parse_styles(char *input,
                                        void(*error_callback)(char*,int,void*),
                                        void *error_callback_context);
-void pmh_free_style_collection(pmh_style_collection *coll);
+
+/**
+* \brief Free a pmh_style_collection.
+* 
+* Frees a pmh_style_collection value returned by pmh_parse_styles().
+* 
+* \param[in] collection  The collection to free.
+*/
+void pmh_free_style_collection(pmh_style_collection *collection);
+
+/**
+* \brief Get pmh_attr_type from attribute name.
+* 
+* Given a style attribute name (as used in the stylesheets), return the
+* corresponding pmh_attr_type value.
+*/
+pmh_attr_type pmh_attr_type_from_name(char *name);
+
+/**
+* \brief Get attribute name from pmh_attr_type.
+* 
+* Given a pmh_attr_type value, return the corresponding style attribute name
+* (as used in the stylesheets).
+*/
+char *pmh_attr_name_from_type(pmh_attr_type type);
 
 pmh_element_type pmh_element_type_from_name(char *name);
 char *pmh_element_name_from_type(pmh_element_type type);
-pmh_attr_type pmh_attr_type_from_name(char *name);
-char *pmh_attr_name_from_type(pmh_attr_type type);
+
 

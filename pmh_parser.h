@@ -29,12 +29,13 @@
 *                         of pmh_extensions values).
 * \param[out] out_result  A pmh_element array, indexed by type, containing
 *                         the results of the parsing (linked lists of elements).
-*                         You must pass this to pmh_free_elements() when it's not
-*                         needed anymore.
+*                         You must pass this to pmh_free_elements() when it's
+*                         not needed anymore.
 * 
 * \sa pmh_element_type
 */
-void pmh_markdown_to_elements(char *text, int extensions, pmh_element **out_result[]);
+void pmh_markdown_to_elements(char *text, int extensions,
+                              pmh_element **out_result[]);
 
 /**
 * \brief Sort elements in list by start offset.
@@ -65,9 +66,9 @@ void pmh_free_elements(pmh_element **elems);
 /**
 * \brief Get name of type
 * 
-* Returns the name of the given type as a null-terminated string.
-* 
 * \param[in]  type  The type value to get the name for.
+* 
+* \return The name of the given type as a null-terminated string.
 * 
 * \sa pmh_element_type
 */

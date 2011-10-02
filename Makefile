@@ -58,7 +58,7 @@ $(BENCH) : bench.c pmh_parser.o
 	@echo '------- building bench'
 	$(CC) $(CFLAGS) -o $@ pmh_parser.o $<
 
-docs: pmh_parser.h pmh_definitions.h doxygen/doxygen.cfg doxygen/doxygen.h doxygen/doxygen_footer.html example_cocoa/HGMarkdownHighlighter.h
+docs: pmh_parser.h pmh_definitions.h styleparser/pmh_styleparser.h doxygen/doxygen.cfg doxygen/doxygen.h doxygen/doxygen_footer.html example_cocoa/HGMarkdownHighlighter.h
 	doxygen doxygen/doxygen.cfg
 	touch docs
 
