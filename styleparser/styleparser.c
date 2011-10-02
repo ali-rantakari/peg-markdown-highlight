@@ -55,7 +55,6 @@ int our_vasprintf(char **strptr, const char *fmt, va_list argptr)
 typedef struct
 {
     char *input;
-    int pos;
     void (*error_callback)(char*,void*);
     void *error_callback_context;
     int styles_pos;
@@ -877,7 +876,6 @@ style_parser_data *new_style_parser_data(char *input)
     style_parser_data *p_data = (style_parser_data*)
                                 malloc(sizeof(style_parser_data));
     p_data->input = input;
-    p_data->pos = 0;
     p_data->styles_pos = 0;
     p_data->styles = new_style_collection();
     return p_data;
