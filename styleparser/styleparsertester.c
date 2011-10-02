@@ -53,12 +53,15 @@ void print_styles(pmh_style_attribute *list)
                    list->value->argb_color->blue);
         else if (list->type == pmh_attr_type_font_style)
         {
+            bool any_styles = false;
             if (list->value->font_styles->bold == true)
-                printf("bold ");
+                printf("bold "), any_styles = true;
             if (list->value->font_styles->italic == true)
-                printf("italic ");
+                printf("italic "), any_styles = true;
             if (list->value->font_styles->underlined == true)
-                printf("underlined ");
+                printf("underlined "), any_styles = true;
+            if (!any_styles)
+                printf("(none)");
             printf("\n");
         }
         else if (list->type == pmh_attr_type_font_size_pt)
