@@ -766,10 +766,55 @@ bool parse_attribute_line(style_parser_data *p_data, char *line,
 }
 
 
+#define HAS_UTF8_BOM(x)         ( ((*x & 0xFF) == 0xEF)\
+                                  && ((*(x+1) & 0xFF) == 0xBB)\
+                                  && ((*(x+2) & 0xFF) == 0xBF) )
+
+// - Removes UTF-8 BOM
+// - Standardizes line endings to \n
+char *strcpy_preformat(char *str)
+{
+    char *new_str = (char *)malloc(sizeof(char) * strlen(str) + 1);
+    
+    char *c = str;
+    int i = 0;
+    
+    if (HAS_UTF8_BOM(c))
+        c += 3;
+    
+    while (*c != '\0')
+    {
+        if (*c == '\r' && *(c+1) == '\n')
+        {
+            *(new_str+i) = '\n';
+            i++;
+            c += 2;
+        }
+        else if (*c == '\r')
+        {
+            *(new_str+i) = '\n';
+            i++;
+            c++;
+        }
+        else
+        {
+            *(new_str+i) = *c;
+            i++;
+            c++;
+        }
+    }
+    *(new_str+i) = '\0';
+    
+    return new_str;
+}
+
+
 
 void _sty_parse(style_parser_data *p_data)
 {
-    // TODO: standardize line endings to \n
+    // We don't have to worry about leaking the original p_data->input;
+    // the user of the library is responsible for that:
+    p_data->input = strcpy_preformat(p_data->input);
     
     block *blocks = get_blocks(p_data->input);
     
@@ -837,6 +882,7 @@ void _sty_parse(style_parser_data *p_data)
     }
     
     free_blocks(blocks);
+    free(p_data->input);
 }
 
 
