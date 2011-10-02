@@ -449,7 +449,8 @@ style_attribute *interpret_attributes(style_parser_data *p_data,
                 else if (EQUALS(standardized_value, "underlined"))
                     attr->value->font_styles->underlined = true;
                 else {
-                    report_error(p_data, "Value '%s' is invalid for attribute '%s'",
+                    report_error(p_data,
+                                 "Value '%s' is invalid for attribute '%s'",
                                  standardized_value, cur->name);
                 }
                 
@@ -477,27 +478,27 @@ style_attribute *interpret_attributes(style_parser_data *p_data,
 
 
 void interpret_and_add_style(style_parser_data *p_data,
-                             char *element_type_name,
+                             char *style_rule_name,
                              sem_value *raw_attributes)
 {
     bool isEditorType = false;
     bool isCurrentLineType = false;
     bool isSelectionType = false;
-    pmh_element_type type = element_type_from_name(element_type_name);
+    pmh_element_type type = element_type_from_name(style_rule_name);
     if (type == pmh_NO_TYPE)
     {
-        if (EQUALS(element_type_name, "editor"))
+        if (EQUALS(style_rule_name, "editor"))
             isEditorType = true, type = pmh_NO_TYPE;
-        else if (EQUALS(element_type_name, "editor-current-line"))
+        else if (EQUALS(style_rule_name, "editor-current-line"))
             isCurrentLineType = true, type = pmh_NO_TYPE;
-        else if (EQUALS(element_type_name, "editor-selection"))
+        else if (EQUALS(style_rule_name, "editor-selection"))
             isSelectionType = true, type = pmh_NO_TYPE;
         else {
             report_error(p_data,
                 "Style rule '%s' is not a language element type name or "
                 "one of the following: 'editor', 'editor-current-line', "
                 "'editor-selection'",
-                element_type_name);
+                style_rule_name);
             return;
         }
     }
@@ -633,9 +634,12 @@ block *get_blocks(char *input)
 }
 
 
+#define ASSIGNMENT_OP_UITEXT        "':' or '='"
 #define IS_ASSIGNMENT_OP(c)         ((c) == ':' || (c) == '=')
 #define IS_STYLE_RULE_NAME_CHAR(c)  \
     ( (c) != '\0' && !isspace(c) && !IS_ASSIGNMENT_OP(c) )
+#define IS_ATTRIBUTE_NAME_CHAR(c)  \
+    ( (c) != '\0' && !IS_ASSIGNMENT_OP(c) )
 
 char *get_style_rule_name(char *line)
 {
@@ -644,19 +648,70 @@ char *get_style_rule_name(char *line)
          (*(line+start_index) != '\0' && isspace(*(line+start_index)));
          start_index++);
     
-    size_t end_index;
-    for (end_index = start_index;
-         IS_STYLE_RULE_NAME_CHAR(*(line + end_index));
-         end_index++);
+    size_t value_end_index;
+    for (value_end_index = start_index;
+         IS_STYLE_RULE_NAME_CHAR(*(line + value_end_index));
+         value_end_index++);
     
-    size_t len = end_index - start_index;
-    char *ret = (char *)malloc(sizeof(char)*len + 1);
-    *ret = '\0';
-    strncat(ret, (line + start_index), len);
+    size_t value_len = value_end_index - start_index;
+    char *value = (char *)malloc(sizeof(char)*value_len + 1);
+    *value = '\0';
+    strncat(value, (line + start_index), value_len);
     
-    return ret;
+    return value;
 }
 
+bool parse_attribute_line(style_parser_data *p_data, char *line,
+                          char **out_attr_name, char **out_attr_value)
+{
+    size_t name_start_index;
+    for (name_start_index = 0;
+         ( *(line+name_start_index) != '\0' &&
+           isspace(*(line+name_start_index)) );
+         name_start_index++);
+    
+    size_t name_end_index;
+    for (name_end_index = name_start_index;
+         IS_ATTRIBUTE_NAME_CHAR(*(line + name_end_index));
+         name_end_index++);
+    
+    size_t assignment_end_index;
+    for (assignment_end_index = name_end_index;
+         ( *(line + assignment_end_index) != '\0' &&
+           !IS_ASSIGNMENT_OP(*(line + assignment_end_index)) );
+         assignment_end_index++);
+    if (IS_ASSIGNMENT_OP(*(line + assignment_end_index)))
+        assignment_end_index++;
+    else
+    {
+        report_error(p_data,
+                     "Invalid attribute definition: line does not contain "
+                     "an assignment operator (%s): '%s'",
+                     ASSIGNMENT_OP_UITEXT, line);
+        return false;
+    }
+    
+    size_t name_len = name_end_index - name_start_index;
+    char *attr_name = (char *)malloc(sizeof(char)*name_len + 1);
+    *attr_name = '\0';
+    strncat(attr_name, (line + name_start_index), name_len);
+    *out_attr_name = attr_name;
+    
+    size_t attr_value_len = strlen(line) - assignment_end_index;
+    char *attr_value_str = (char *)malloc(sizeof(char)*attr_value_len + 1);
+    *attr_value_str = '\0';
+    strncat(attr_value_str, (line + assignment_end_index), attr_value_len);
+    *out_attr_value = attr_value_str;
+    
+    return true;
+}
+
+
+#if pmh_DEBUG_OUTPUT
+#define pmhsp_PRINTF(x, ...) fprintf(stderr, x, ##__VA_ARGS__)
+#else
+#define pmhsp_PRINTF(x, ...)
+#endif
 
 void _sty_parse(style_parser_data *p_data)
 {
@@ -667,30 +722,58 @@ void _sty_parse(style_parser_data *p_data)
     block *block_cur = blocks;
     while (block_cur != NULL)
     {
-        printf("Block:\n");
+        pmhsp_PRINTF("Block:\n");
         multi_value *header_line = block_cur->lines;
-        if (header_line != NULL)
-        {
-            printf("  Head line (len %ld): '%s'\n",
-                   header_line->length, header_line->value);
-            char *style_rule_name = get_style_rule_name(header_line->value);
-            printf("  Style rule name: '%s'\n", style_rule_name);
-            
-            multi_value *attr_line_cur = header_line->next;
-            if (attr_line_cur == NULL)
-                report_error(p_data,
-                             "No style attributes defined for style rule '%s'",
-                             style_rule_name);
-            
-            while (attr_line_cur != NULL)
-            {
-                printf("  Attr line (len %ld): '%s'\n",
-                       attr_line_cur->length, attr_line_cur->value);
-                attr_line_cur = attr_line_cur->next;
-            }
-            
-            free(style_rule_name);
+        if (header_line == NULL) {
+            block_cur = block_cur->next;
+            continue;
         }
+        
+        pmhsp_PRINTF("  Head line (len %ld): '%s'\n",
+                     header_line->length, header_line->value);
+        char *style_rule_name = get_style_rule_name(header_line->value);
+        pmhsp_PRINTF("  Style rule name: '%s'\n", style_rule_name);
+        
+        multi_value *attr_line_cur = header_line->next;
+        if (attr_line_cur == NULL)
+            report_error(p_data,
+                         "No style attributes defined for style rule '%s'",
+                         style_rule_name);
+        
+        sem_value *attributes_head = NULL;
+        
+        while (attr_line_cur != NULL)
+        {
+            if (!line_is_comment(attr_line_cur))
+            {
+                pmhsp_PRINTF("  Attr line (len %ld): '%s'\n",
+                             attr_line_cur->length, attr_line_cur->value);
+                char *attr_name_str;
+                char *attr_value_str;
+                bool success = parse_attribute_line(p_data,
+                                                    attr_line_cur->value,
+                                                    &attr_name_str,
+                                                    &attr_value_str);
+                if (success)
+                {
+                    pmhsp_PRINTF("  Attr: '%s' Value: '%s'\n",
+                                 attr_name_str, attr_value_str);
+                    sem_value *attribute = new_sem_value(attr_name_str,
+                                                         attr_value_str);
+                    attribute->next = attributes_head;
+                    attributes_head = attribute;
+                }
+            }
+            attr_line_cur = attr_line_cur->next;
+        }
+        
+        if (attributes_head != NULL)
+        {
+            interpret_and_add_style(p_data, style_rule_name, attributes_head);
+        }
+        
+        free(style_rule_name);
+        
         block_cur = block_cur->next;
     }
     
