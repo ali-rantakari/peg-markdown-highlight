@@ -21,6 +21,9 @@ clean:
 	rm -f *.o styleparsertester; \
 	rm -rf *.dSYM; \
 
+analyze:
+	clang --analyze styleparser.c
+
 leak-check: $(TESTER)
 	valgrind --leak-check=full --dsymutil=yes ./styleparsertester < styles/teststyle.style
 
