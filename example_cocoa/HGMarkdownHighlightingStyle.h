@@ -60,7 +60,7 @@
 	pmh_element_type elementType;
 }
 
-+ (NSColor *) colorFromARGBColor:(attr_argb_color *)argb_color;
++ (NSColor *) colorFromARGBColor:(pmh_attr_argb_color *)argb_color;
 
 /** \brief Init a new instance. */
 - (id) initWithType:(pmh_element_type)elemType
@@ -69,7 +69,7 @@
 	fontTraitsToAdd:(NSFontTraitMask)traits;
 
 /** \brief Init a new instance based on styles from the stylesheet parser. */
-- (id) initWithStyleAttributes:(style_attribute *)attributes;
+- (id) initWithStyleAttributes:(pmh_style_attribute *)attributes;
 
 /** \brief The Markdown language element type these styles pertain to. */
 @property pmh_element_type elementType;

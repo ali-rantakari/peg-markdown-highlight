@@ -22,29 +22,29 @@ char *get_contents(FILE *f)
     return content;
 }
 
-void print_styles(style_attribute *list)
+void print_styles(pmh_style_attribute *list)
 {
     while (list != NULL)
     {
-        char *attr_name = (list->type == attr_type_other)
+        char *attr_name = (list->type == pmh_attr_type_other)
                           ? list->name
-                          : attr_name_from_type(list->type);
+                          : pmh_attr_name_from_type(list->type);
         
-        if (list->type == attr_type_other)
+        if (list->type == pmh_attr_type_other)
             printf("  \"%s\" = ", attr_name);
         else
             printf("  %s = ", attr_name);
         
-        if (list->type == attr_type_background_color
-            || list->type == attr_type_foreground_color
-            || list->type == attr_type_caret_color
+        if (list->type == pmh_attr_type_background_color
+            || list->type == pmh_attr_type_foreground_color
+            || list->type == pmh_attr_type_caret_color
             )
             printf("%i,%i,%i,%i\n",
                    list->value->argb_color->alpha,
                    list->value->argb_color->red,
                    list->value->argb_color->green,
                    list->value->argb_color->blue);
-        else if (list->type == attr_type_font_style)
+        else if (list->type == pmh_attr_type_font_style)
         {
             if (list->value->font_styles->bold == true)
                 printf("bold ");
@@ -54,11 +54,11 @@ void print_styles(style_attribute *list)
                 printf("underlined ");
             printf("\n");
         }
-        else if (list->type == attr_type_font_size_pt)
+        else if (list->type == pmh_attr_type_font_size_pt)
             printf("%i pt\n", list->value->font_size_pt);
-        else if (list->type == attr_type_font_family)
+        else if (list->type == pmh_attr_type_font_family)
             printf("\"%s\"\n", list->value->font_family);
-        else if (list->type == attr_type_other)
+        else if (list->type == pmh_attr_type_other)
             printf("\"%s\"\n", list->value->string);
         else
             printf("??? (unknown attribute type)\n");
@@ -75,7 +75,7 @@ void parsing_error_callback(char *error_message, int line_number,
 int main(int argc, char *argv[])
 {
     char *input = get_contents(stdin);
-    style_collection *styles = parse_styles(input, &parsing_error_callback, NULL);
+    pmh_style_collection *styles = pmh_parse_styles(input, &parsing_error_callback, NULL);
     
     printf("------\n");
     
@@ -101,15 +101,15 @@ int main(int argc, char *argv[])
     int i;
     for (i = 0; i < pmh_NUM_LANG_TYPES; i++)
     {
-        style_attribute *cur = styles->element_styles[i];
+        pmh_style_attribute *cur = styles->element_styles[i];
         
         if (cur == NULL)
             continue;
-        printf("%s:\n", element_name_from_type(cur->lang_element_type));
+        printf("%s:\n", pmh_element_name_from_type(cur->lang_element_type));
         print_styles(cur);
     }
     
-    free_style_collection(styles);
+    pmh_free_style_collection(styles);
     free(input);
     
     return 0;

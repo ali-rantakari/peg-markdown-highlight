@@ -492,14 +492,14 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 		return;
 	
 	char *c_stylesheet = (char *)[stylesheet UTF8String];
-	style_collection *style_coll = NULL;
+	pmh_style_collection *style_coll = NULL;
 	
 	if (errorDelegate == nil)
-		style_coll = parse_styles(c_stylesheet, NULL, NULL);
+		style_coll = pmh_parse_styles(c_stylesheet, NULL, NULL);
 	else
 	{
 		[styleParsingErrors removeAllObjects];
-		style_coll = parse_styles(c_stylesheet, &styleparsing_error_callback, self);
+		style_coll = pmh_parse_styles(c_stylesheet, &styleparsing_error_callback, self);
 		if ([styleParsingErrors count] > 0)
 			[errorDelegate performSelector:errorSelector
 							    withObject:styleParsingErrors];
@@ -511,7 +511,7 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 	int i;
 	for (i = 0; i < pmh_NUM_LANG_TYPES; i++)
 	{
-		style_attribute *cur = style_coll->element_styles[i];
+		pmh_style_attribute *cur = style_coll->element_styles[i];
 		if (cur == NULL)
 			continue;
 		HGMarkdownHighlightingStyle *style = [[[HGMarkdownHighlightingStyle alloc]
@@ -529,16 +529,16 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 		// General editor styles
 		if (style_coll->editor_styles != NULL)
 		{
-			style_attribute *cur = style_coll->editor_styles;
+			pmh_style_attribute *cur = style_coll->editor_styles;
 			while (cur != NULL)
 			{
-				if (cur->type == attr_type_background_color)
+				if (cur->type == pmh_attr_type_background_color)
 					[self.targetTextView setBackgroundColor:[HGMarkdownHighlightingStyle
 															 colorFromARGBColor:cur->value->argb_color]];
-				else if (cur->type == attr_type_foreground_color)
+				else if (cur->type == pmh_attr_type_foreground_color)
 					[self.targetTextView setTextColor:[HGMarkdownHighlightingStyle
 													   colorFromARGBColor:cur->value->argb_color]];
-				else if (cur->type == attr_type_caret_color)
+				else if (cur->type == pmh_attr_type_caret_color)
 					[self.targetTextView setInsertionPointColor:[HGMarkdownHighlightingStyle
 																 colorFromARGBColor:cur->value->argb_color]];
 				cur = cur->next;
@@ -550,20 +550,20 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 		{
 			NSMutableDictionary *selAttrs = [[self getDefaultSelectedTextAttributes] mutableCopy];
 			
-			style_attribute *cur = style_coll->editor_selection_styles;
+			pmh_style_attribute *cur = style_coll->editor_selection_styles;
 			while (cur != NULL)
 			{
 				// Cocoa (as of Mac OS 10.6.6) supports only foreground color,
 				// background color and underlining attributes for selections:
-				if (cur->type == attr_type_background_color)
+				if (cur->type == pmh_attr_type_background_color)
 					[selAttrs setObject:[HGMarkdownHighlightingStyle
 										 colorFromARGBColor:cur->value->argb_color]
 								 forKey:NSBackgroundColorAttributeName];
-				else if (cur->type == attr_type_foreground_color)
+				else if (cur->type == pmh_attr_type_foreground_color)
 					[selAttrs setObject:[HGMarkdownHighlightingStyle
 										 colorFromARGBColor:cur->value->argb_color]
 								 forKey:NSForegroundColorAttributeName];
-				else if (cur->type == attr_type_font_style)
+				else if (cur->type == pmh_attr_type_font_style)
 				{
 					if (cur->value->font_styles->underlined)
 						[selAttrs setObject:[NSNumber numberWithInt:NSUnderlineStyleSingle]
@@ -590,7 +590,7 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 		[self readClearTextStylesFromTextView];
 	}
 	
-	free_style_collection(style_coll);
+	pmh_free_style_collection(style_coll);
 	[self highlightNow];
 }
 

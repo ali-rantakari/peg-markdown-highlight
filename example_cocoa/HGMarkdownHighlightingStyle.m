@@ -10,7 +10,7 @@
 
 @implementation HGMarkdownHighlightingStyle
 
-+ (NSColor *) colorFromARGBColor:(attr_argb_color *)argb_color
++ (NSColor *) colorFromARGBColor:(pmh_attr_argb_color *)argb_color
 {
 	return [NSColor colorWithDeviceRed:(argb_color->red / 255.0)
 								 green:(argb_color->green / 255.0)
@@ -34,12 +34,12 @@
 	return self;
 }
 
-- (id) initWithStyleAttributes:(style_attribute *)attributes
+- (id) initWithStyleAttributes:(pmh_style_attribute *)attributes
 {
 	if (!(self = [super init]))
 		return nil;
 	
-	style_attribute *cur = attributes;
+	pmh_style_attribute *cur = attributes;
 	self.elementType = cur->lang_element_type;
 	self.fontTraitsToAdd = 0;
 	
@@ -49,15 +49,15 @@
 	
 	while (cur != NULL)
 	{
-		if (cur->type == attr_type_foreground_color)
+		if (cur->type == pmh_attr_type_foreground_color)
 			[toAdd setObject:[HGMarkdownHighlightingStyle colorFromARGBColor:cur->value->argb_color]
 					  forKey:NSForegroundColorAttributeName];
 		
-		else if (cur->type == attr_type_background_color)
+		else if (cur->type == pmh_attr_type_background_color)
 			[toAdd setObject:[HGMarkdownHighlightingStyle colorFromARGBColor:cur->value->argb_color]
 					  forKey:NSBackgroundColorAttributeName];
 		
-		else if (cur->type == attr_type_font_style)
+		else if (cur->type == pmh_attr_type_font_style)
 		{
 			if (cur->value->font_styles->italic)
 				self.fontTraitsToAdd |= NSItalicFontMask;
@@ -68,10 +68,10 @@
 						  forKey:NSUnderlineStyleAttributeName];
 		}
 		
-		else if (cur->type == attr_type_font_size_pt)
+		else if (cur->type == pmh_attr_type_font_size_pt)
 			fontSize = (CGFloat)cur->value->font_size_pt;
 		
-		else if (cur->type == attr_type_font_family)
+		else if (cur->type == pmh_attr_type_font_family)
 			fontName = [NSString stringWithUTF8String:cur->value->font_family];
 		
 		cur = cur->next;

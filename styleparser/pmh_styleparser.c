@@ -58,7 +58,7 @@ typedef struct
     void (*error_callback)(char*,int,void*);
     void *error_callback_context;
     int styles_pos;
-    style_collection *styles;
+    pmh_style_collection *styles;
 } style_parser_data;
 
 typedef struct raw_attribute
@@ -157,13 +157,13 @@ char *standardize_str(char *str)
 
 
 
-attr_argb_color *new_argb_color(int r, int g, int b, int a)
+pmh_attr_argb_color *new_argb_color(int r, int g, int b, int a)
 {
-    attr_argb_color *c = (attr_argb_color *)malloc(sizeof(attr_argb_color));
+    pmh_attr_argb_color *c = (pmh_attr_argb_color *)malloc(sizeof(pmh_attr_argb_color));
     c->red = r; c->green = g; c->blue = b; c->alpha = a;
     return c;
 }
-attr_argb_color *new_argb_from_hex(long hex, bool has_alpha)
+pmh_attr_argb_color *new_argb_from_hex(long hex, bool has_alpha)
 {
     // 0xaarrggbb
     int a = has_alpha ? ((hex >> 24) & 0xFF) : 255;
@@ -172,7 +172,7 @@ attr_argb_color *new_argb_from_hex(long hex, bool has_alpha)
     int b = (hex & 0xFF);
     return new_argb_color(r,g,b,a);
 }
-attr_argb_color *new_argb_from_hex_str(style_parser_data *p_data,
+pmh_attr_argb_color *new_argb_from_hex_str(style_parser_data *p_data,
                                        int attr_line_number, char *str)
 {
     // "aarrggbb"
@@ -197,52 +197,52 @@ attr_argb_color *new_argb_from_hex_str(style_parser_data *p_data,
     return new_argb_from_hex(num, (len == 8));
 }
 
-attr_value *new_attr_value()
+pmh_attr_value *new_attr_value()
 {
-    return (attr_value *)malloc(sizeof(attr_value));
+    return (pmh_attr_value *)malloc(sizeof(pmh_attr_value));
 }
 
-attr_font_styles *new_font_styles()
+pmh_attr_font_styles *new_font_styles()
 {
-    attr_font_styles *ret = (attr_font_styles *)
-                            malloc(sizeof(attr_font_styles));
+    pmh_attr_font_styles *ret = (pmh_attr_font_styles *)
+                            malloc(sizeof(pmh_attr_font_styles));
     ret->italic = false;
     ret->bold = false;
     ret->underlined = false;
     return ret;
 }
 
-style_attribute *new_attr(char *name, attr_type type)
+pmh_style_attribute *new_attr(char *name, pmh_attr_type type)
 {
-    style_attribute *attr = (style_attribute *)malloc(sizeof(style_attribute));
+    pmh_style_attribute *attr = (pmh_style_attribute *)malloc(sizeof(pmh_style_attribute));
     attr->name = strdup(name);
     attr->type = type;
     attr->next = NULL;
     return attr;
 }
 
-void free_style_attributes(style_attribute *list)
+void free_style_attributes(pmh_style_attribute *list)
 {
-    style_attribute *cur = list;
+    pmh_style_attribute *cur = list;
     while (cur != NULL)
     {
         if (cur->name != NULL)
             free(cur->name);
         if (cur->value != NULL)
         {
-            if (cur->type == attr_type_foreground_color
-                || cur->type == attr_type_background_color
-                || cur->type == attr_type_caret_color)
+            if (cur->type == pmh_attr_type_foreground_color
+                || cur->type == pmh_attr_type_background_color
+                || cur->type == pmh_attr_type_caret_color)
                 free(cur->value->argb_color);
-            else if (cur->type == attr_type_font_family)
+            else if (cur->type == pmh_attr_type_font_family)
                 free(cur->value->font_family);
-            else if (cur->type == attr_type_font_style)
+            else if (cur->type == pmh_attr_type_font_style)
                 free(cur->value->font_styles);
-            else if (cur->type == attr_type_other)
+            else if (cur->type == pmh_attr_type_other)
                 free(cur->value->string);
             free(cur->value);
         }
-        style_attribute *this = cur;
+        pmh_style_attribute *this = cur;
         cur = cur->next;
         free(this);
     }
@@ -290,7 +290,7 @@ char **get_element_type_names()
     return elem_type_names;
 }
 
-pmh_element_type element_type_from_name(char *name)
+pmh_element_type pmh_element_type_from_name(char *name)
 {
     char **elem_type_names = get_element_type_names();
     
@@ -307,7 +307,7 @@ pmh_element_type element_type_from_name(char *name)
     return pmh_NO_TYPE;
 }
 
-char *element_name_from_type(pmh_element_type type)
+char *pmh_element_name_from_type(pmh_element_type type)
 {
     char **elem_type_names = get_element_type_names();
     char* ret = elem_type_names[type];
@@ -318,36 +318,36 @@ char *element_name_from_type(pmh_element_type type)
 
 
 #define IF_ATTR_NAME(x) if (strcmp(x, name) == 0)
-attr_type attr_type_from_name(char *name)
+pmh_attr_type pmh_attr_type_from_name(char *name)
 {
-    IF_ATTR_NAME("color") return attr_type_foreground_color;
-    else IF_ATTR_NAME("foreground") return attr_type_foreground_color;
-    else IF_ATTR_NAME("foreground-color") return attr_type_foreground_color;
-    else IF_ATTR_NAME("background") return attr_type_background_color;
-    else IF_ATTR_NAME("background-color") return attr_type_background_color;
-    else IF_ATTR_NAME("caret") return attr_type_caret_color;
-    else IF_ATTR_NAME("caret-color") return attr_type_caret_color;
-    else IF_ATTR_NAME("font-size") return attr_type_font_size_pt;
-    else IF_ATTR_NAME("font-family") return attr_type_font_family;
-    else IF_ATTR_NAME("font-style") return attr_type_font_style;
-    return attr_type_other;
+    IF_ATTR_NAME("color") return pmh_attr_type_foreground_color;
+    else IF_ATTR_NAME("foreground") return pmh_attr_type_foreground_color;
+    else IF_ATTR_NAME("foreground-color") return pmh_attr_type_foreground_color;
+    else IF_ATTR_NAME("background") return pmh_attr_type_background_color;
+    else IF_ATTR_NAME("background-color") return pmh_attr_type_background_color;
+    else IF_ATTR_NAME("caret") return pmh_attr_type_caret_color;
+    else IF_ATTR_NAME("caret-color") return pmh_attr_type_caret_color;
+    else IF_ATTR_NAME("font-size") return pmh_attr_type_font_size_pt;
+    else IF_ATTR_NAME("font-family") return pmh_attr_type_font_family;
+    else IF_ATTR_NAME("font-style") return pmh_attr_type_font_style;
+    return pmh_attr_type_other;
 }
 
-char *attr_name_from_type(attr_type type)
+char *pmh_attr_name_from_type(pmh_attr_type type)
 {
     switch (type)
     {
-        case attr_type_foreground_color:
+        case pmh_attr_type_foreground_color:
             return "foreground-color"; break;
-        case attr_type_background_color:
+        case pmh_attr_type_background_color:
             return "background-color"; break;
-        case attr_type_caret_color:
+        case pmh_attr_type_caret_color:
             return "caret-color"; break;
-        case attr_type_font_size_pt:
+        case pmh_attr_type_font_size_pt:
             return "font-size"; break;
-        case attr_type_font_family:
+        case pmh_attr_type_font_family:
             return "font-family"; break;
-        case attr_type_font_style:
+        case pmh_attr_type_font_style:
             return "font-style"; break;
         default:
             return "unknown";
@@ -416,23 +416,23 @@ void free_multi_value(multi_value *val)
 
 #define EQUALS(a,b) (strcmp(a, b) == 0)
 
-style_attribute *interpret_attributes(style_parser_data *p_data,
+pmh_style_attribute *interpret_attributes(style_parser_data *p_data,
                                       pmh_element_type lang_element_type,
                                       raw_attribute *raw_attributes)
 {
-    style_attribute *attrs = NULL;
+    pmh_style_attribute *attrs = NULL;
     
     raw_attribute *cur = raw_attributes;
     while (cur != NULL)
     {
-        attr_type atype = attr_type_from_name(cur->name);
-        style_attribute *attr = new_attr(cur->name, atype);
+        pmh_attr_type atype = pmh_attr_type_from_name(cur->name);
+        pmh_style_attribute *attr = new_attr(cur->name, atype);
         attr->lang_element_type = lang_element_type;
         attr->value = new_attr_value();
         
-        if (atype == attr_type_foreground_color
-            || atype == attr_type_background_color
-            || atype == attr_type_caret_color)
+        if (atype == pmh_attr_type_foreground_color
+            || atype == pmh_attr_type_background_color
+            || atype == pmh_attr_type_caret_color)
         {
             char *hexstr = trim_str(cur->value);
             // new_argb_from_hex_str() reports conversion errors
@@ -443,7 +443,7 @@ style_attribute *interpret_attributes(style_parser_data *p_data,
                 attr = NULL;
             }
         }
-        else if (atype == attr_type_font_size_pt)
+        else if (atype == pmh_attr_type_font_size_pt)
         {
             char *endptr = NULL;
             attr->value->font_size_pt = (int)strtol(cur->value, &endptr, 10);
@@ -455,11 +455,11 @@ style_attribute *interpret_attributes(style_parser_data *p_data,
                 attr = NULL;
             }
         }
-        else if (atype == attr_type_font_family)
+        else if (atype == pmh_attr_type_font_family)
         {
             attr->value->font_family = trim_str_dup(cur->value);
         }
-        else if (atype == attr_type_font_style)
+        else if (atype == pmh_attr_type_font_style)
         {
             attr->value->font_styles = new_font_styles();
             multi_value *values = split_multi_value(cur->value, ',');
@@ -485,7 +485,7 @@ style_attribute *interpret_attributes(style_parser_data *p_data,
             }
             free_multi_value(values);
         }
-        else if (atype == attr_type_other)
+        else if (atype == pmh_attr_type_other)
         {
             attr->value->string = trim_str_dup(cur->value);
         }
@@ -511,7 +511,7 @@ void interpret_and_add_style(style_parser_data *p_data,
     bool isEditorType = false;
     bool isCurrentLineType = false;
     bool isSelectionType = false;
-    pmh_element_type type = element_type_from_name(style_rule_name);
+    pmh_element_type type = pmh_element_type_from_name(style_rule_name);
     if (type == pmh_NO_TYPE)
     {
         if (EQUALS(style_rule_name, "editor"))
@@ -529,7 +529,7 @@ void interpret_and_add_style(style_parser_data *p_data,
             return;
         }
     }
-    style_attribute *attrs = interpret_attributes(p_data, type, raw_attributes);
+    pmh_style_attribute *attrs = interpret_attributes(p_data, type, raw_attributes);
     if (isEditorType)
         p_data->styles->editor_styles = attrs;
     else if (isCurrentLineType)
@@ -908,13 +908,13 @@ void _sty_parse(style_parser_data *p_data)
 
 
 
-style_collection *new_style_collection()
+pmh_style_collection *new_style_collection()
 {
-    style_collection *sc = (style_collection *)
-                           malloc(sizeof(style_collection));
+    pmh_style_collection *sc = (pmh_style_collection *)
+                           malloc(sizeof(pmh_style_collection));
     
-    sc->element_styles = (style_attribute**)
-                         malloc(sizeof(style_attribute*) * pmh_NUM_LANG_TYPES);
+    sc->element_styles = (pmh_style_attribute**)
+                         malloc(sizeof(pmh_style_attribute*) * pmh_NUM_LANG_TYPES);
     int i;
     for (i = 0; i < pmh_NUM_LANG_TYPES; i++)
         sc->element_styles[i] = NULL;
@@ -926,7 +926,7 @@ style_collection *new_style_collection()
     return sc;
 }
 
-void free_style_collection(style_collection *coll)
+void pmh_free_style_collection(pmh_style_collection *coll)
 {
     free_style_attributes(coll->editor_styles);
     free_style_attributes(coll->editor_current_line_styles);
@@ -948,9 +948,9 @@ style_parser_data *new_style_parser_data(char *input)
     return p_data;
 }
 
-style_collection *parse_styles(char *input,
-                               void(*error_callback)(char*,int,void*),
-                               void *error_callback_context)
+pmh_style_collection *pmh_parse_styles(char *input,
+                                       void(*error_callback)(char*,int,void*),
+                                       void *error_callback_context)
 {
     style_parser_data *p_data = new_style_parser_data(input);
     p_data->error_callback = error_callback;
@@ -958,7 +958,7 @@ style_collection *parse_styles(char *input,
     
     _sty_parse(p_data);
     
-    style_collection *ret = p_data->styles;
+    pmh_style_collection *ret = p_data->styles;
     free(p_data);
     return ret;
 }
