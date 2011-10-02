@@ -84,9 +84,12 @@ insert the following to the beginning of `pmh_parser.c`:
 Stylesheet Parser
 -------------------------------------------------------------------------------
 
-The stylesheet parser files are located in the `/styleparser` folder. The `pmh_styleparser.h` file contains the style parser's public interface and the `pmh_styleparser.c` file implements it.
+The stylesheet parser files are located in the `/styleparser` folder. The
+`pmh_styleparser.h` file contains the style parser's public interface and the
+`pmh_styleparser.c` file implements it.
 
-The stylesheet syntax is documented in `/styleparser/stylesheet_syntax.md`. This file is compiled into an HTML format upon running `make docs`.
+The stylesheet syntax is documented in `/styleparser/stylesheet_syntax.md`.
+This file is compiled into an HTML format upon running `make docs`.
 
 
 
