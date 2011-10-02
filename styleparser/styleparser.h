@@ -59,7 +59,8 @@ typedef struct
     style_attribute **element_styles;
 } style_collection;
 
-style_collection *parse_styles(char *input, void(*error_callback)(char*,void*),
+style_collection *parse_styles(char *input,
+                               void(*error_callback)(char*,int,void*),
                                void *error_callback_context);
 void free_style_collection(style_collection *coll);
 

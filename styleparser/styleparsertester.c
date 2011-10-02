@@ -66,9 +66,10 @@ void print_styles(style_attribute *list)
     }
 }
 
-void parsing_error_callback(char *error_message, void *context_data)
+void parsing_error_callback(char *error_message, int line_number,
+                            void *context_data)
 {
-    fprintf(stderr, "ERROR: %s\n", error_message);
+    fprintf(stderr, "ERROR (line %i): %s\n", line_number, error_message);
 }
 
 int main(int argc, char *argv[])

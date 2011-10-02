@@ -55,7 +55,7 @@ int our_vasprintf(char **strptr, const char *fmt, va_list argptr)
 typedef struct
 {
     char *input;
-    void (*error_callback)(char*,void*);
+    void (*error_callback)(char*,int,void*);
     void *error_callback_context;
     int styles_pos;
     style_collection *styles;
@@ -65,14 +65,16 @@ typedef struct raw_attribute
 {
     char *name;
     char *value;
+    int line_number;
     struct raw_attribute *next;
 } raw_attribute;
 
-raw_attribute *new_raw_attribute(char *name, char *value)
+raw_attribute *new_raw_attribute(char *name, char *value, int line_number)
 {
     raw_attribute *v = (raw_attribute *)malloc(sizeof(raw_attribute));
     v->name = name;
     v->value = value;
+    v->line_number = line_number;
     v->next = NULL;
     return v;
 }
@@ -91,7 +93,7 @@ void free_raw_attributes(raw_attribute *list)
 }
 
 
-void report_error(style_parser_data *p_data, char *str, ...)
+void report_error(style_parser_data *p_data, int line_number, char *str, ...)
 {
     if (p_data->error_callback == NULL)
         return;
@@ -100,7 +102,8 @@ void report_error(style_parser_data *p_data, char *str, ...)
     char *errmsg;
     our_vasprintf(&errmsg, str, argptr);
     va_end(argptr);
-    p_data->error_callback(errmsg, p_data->error_callback_context);
+    p_data->error_callback(errmsg, line_number,
+                           p_data->error_callback_context);
     free(errmsg);
 }
 
@@ -169,12 +172,13 @@ attr_argb_color *new_argb_from_hex(long hex, bool has_alpha)
     int b = (hex & 0xFF);
     return new_argb_color(r,g,b,a);
 }
-attr_argb_color *new_argb_from_hex_str(style_parser_data *p_data, char *str)
+attr_argb_color *new_argb_from_hex_str(style_parser_data *p_data,
+                                       int attr_line_number, char *str)
 {
     // "aarrggbb"
     int len = strlen(str);
     if (len != 6 && len != 8) {
-        report_error(p_data,
+        report_error(p_data, attr_line_number,
                      "Value '%s' is not a valid color value: it should be a "
                      "hexadecimal number, 6 or 8 characters long.",
                      str);
@@ -183,7 +187,7 @@ attr_argb_color *new_argb_from_hex_str(style_parser_data *p_data, char *str)
     char *endptr = NULL;
     long num = strtol(str, &endptr, 16);
     if (*endptr != '\0') {
-        report_error(p_data,
+        report_error(p_data, attr_line_number,
                      "Value '%s' is not a valid color value: the character "
                      "'%c' is invalid. The color value should be a hexadecimal "
                      "number, 6 or 8 characters long.",
@@ -355,6 +359,7 @@ typedef struct multi_value
 {
     char *value;
     size_t length;
+    int line_number;
     struct multi_value *next;
 } multi_value;
 
@@ -372,6 +377,7 @@ multi_value *split_multi_value(char *input, char separator)
         multi_value *mv = (multi_value *)malloc(sizeof(multi_value));
         mv->value = (char *)malloc(sizeof(char)*i + 1);
         mv->length = i;
+        mv->line_number = 0;
         mv->next = NULL;
         *mv->value = '\0';
         strncat(mv->value, c, i);
@@ -409,6 +415,7 @@ void free_multi_value(multi_value *val)
 
 
 #define EQUALS(a,b) (strcmp(a, b) == 0)
+
 style_attribute *interpret_attributes(style_parser_data *p_data,
                                       pmh_element_type lang_element_type,
                                       raw_attribute *raw_attributes)
@@ -429,7 +436,8 @@ style_attribute *interpret_attributes(style_parser_data *p_data,
         {
             char *hexstr = trim_str(cur->value);
             // new_argb_from_hex_str() reports conversion errors
-            attr->value->argb_color = new_argb_from_hex_str(p_data, hexstr);
+            attr->value->argb_color =
+                new_argb_from_hex_str(p_data, cur->line_number, hexstr);
             if (attr->value->argb_color == NULL) {
                 free_style_attributes(attr);
                 attr = NULL;
@@ -440,7 +448,8 @@ style_attribute *interpret_attributes(style_parser_data *p_data,
             char *endptr = NULL;
             attr->value->font_size_pt = (int)strtol(cur->value, &endptr, 10);
             if (endptr == cur->value) {
-                report_error(p_data, "Value '%s' is invalid for attribute '%s'",
+                report_error(p_data, cur->line_number,
+                             "Value '%s' is invalid for attribute '%s'",
                              cur->value, cur->name);
                 free_style_attributes(attr);
                 attr = NULL;
@@ -466,7 +475,7 @@ style_attribute *interpret_attributes(style_parser_data *p_data,
                 else if (EQUALS(standardized_value, "underlined"))
                     attr->value->font_styles->underlined = true;
                 else {
-                    report_error(p_data,
+                    report_error(p_data, cur->line_number,
                                  "Value '%s' is invalid for attribute '%s'",
                                  standardized_value, cur->name);
                 }
@@ -496,6 +505,7 @@ style_attribute *interpret_attributes(style_parser_data *p_data,
 
 void interpret_and_add_style(style_parser_data *p_data,
                              char *style_rule_name,
+                             int style_rule_line_number,
                              raw_attribute *raw_attributes)
 {
     bool isEditorType = false;
@@ -511,7 +521,7 @@ void interpret_and_add_style(style_parser_data *p_data,
         else if (EQUALS(style_rule_name, "editor-selection"))
             isSelectionType = true, type = pmh_NO_TYPE;
         else {
-            report_error(p_data,
+            report_error(p_data, style_rule_line_number,
                 "Style rule '%s' is not a language element type name or "
                 "one of the following: 'editor', 'editor-current-line', "
                 "'editor-selection'",
@@ -605,12 +615,16 @@ block *get_blocks(char *input)
     
     multi_value *discarded_lines = NULL;
     
+    int line_number_counter = 1;
+    
     multi_value *lines = split_multi_value(input, '\n');
     multi_value *previous_line = NULL;
     multi_value *line_cur = lines;
     while (line_cur != NULL)
     {
         bool discard_line = false;
+        
+        line_cur->line_number = line_number_counter++;
         
         if (line_is_empty(line_cur))
         {
@@ -667,70 +681,76 @@ block *get_blocks(char *input)
 #define ASSIGNMENT_OP_UITEXT        "':' or '='"
 #define IS_ASSIGNMENT_OP(c)         ((c) == ':' || (c) == '=')
 #define IS_STYLE_RULE_NAME_CHAR(c)  \
-    ( (c) != '\0' && !isspace(c) && !char_begins_linecomment(c) && !IS_ASSIGNMENT_OP(c) )
+    ( (c) != '\0' && !isspace(c) \
+      && !char_begins_linecomment(c) && !IS_ASSIGNMENT_OP(c) )
 #define IS_ATTRIBUTE_NAME_CHAR(c)  \
     ( (c) != '\0' && !char_begins_linecomment(c) && !IS_ASSIGNMENT_OP(c) )
 #define IS_ATTRIBUTE_VALUE_CHAR(c)  \
     ( (c) != '\0' && !char_begins_linecomment(c) )
 
-char *get_style_rule_name(char *line)
+char *get_style_rule_name(multi_value *line)
 {
+    char *str = line->value;
+    
     // Scan past leading whitespace:
     size_t start_index;
     for (start_index = 0;
-         (*(line+start_index) != '\0' && isspace(*(line+start_index)));
+         (*(str+start_index) != '\0' && isspace(*(str+start_index)));
          start_index++);
     
     // Scan until style rule name characters end:
     size_t value_end_index;
     for (value_end_index = start_index;
-         IS_STYLE_RULE_NAME_CHAR(*(line + value_end_index));
+         IS_STYLE_RULE_NAME_CHAR(*(str + value_end_index));
          value_end_index++);
     
     // Copy style rule name:
     size_t value_len = value_end_index - start_index;
     char *value = (char *)malloc(sizeof(char)*value_len + 1);
     *value = '\0';
-    strncat(value, (line + start_index), value_len);
+    strncat(value, (str + start_index), value_len);
     
     return value;
 }
 
-bool parse_attribute_line(style_parser_data *p_data, char *line,
+bool parse_attribute_line(style_parser_data *p_data, multi_value *line,
                           char **out_attr_name, char **out_attr_value)
 {
+    char *str = line->value;
+    
     // Scan past leading whitespace:
     size_t name_start_index;
     for (name_start_index = 0;
-         ( *(line+name_start_index) != '\0' &&
-           isspace(*(line+name_start_index)) );
+         ( *(str+name_start_index) != '\0' &&
+           isspace(*(str+name_start_index)) );
          name_start_index++);
     
     // Scan until attribute name characters end:
     size_t name_end_index;
     for (name_end_index = name_start_index;
-         IS_ATTRIBUTE_NAME_CHAR(*(line + name_end_index));
+         IS_ATTRIBUTE_NAME_CHAR(*(str + name_end_index));
          name_end_index++);
     // Scan backwards to trim trailing whitespace off:
-    while (name_start_index < name_end_index && isspace(*(line + name_end_index - 1)))
+    while (name_start_index < name_end_index
+           && isspace(*(str + name_end_index - 1)))
         name_end_index--;
     
     // Scan until just after the first assignment operator:
     size_t assignment_end_index;
     for (assignment_end_index = name_end_index;
-         ( *(line + assignment_end_index) != '\0' &&
-           !IS_ASSIGNMENT_OP(*(line + assignment_end_index)) );
+         ( *(str + assignment_end_index) != '\0' &&
+           !IS_ASSIGNMENT_OP(*(str + assignment_end_index)) );
          assignment_end_index++);
     
     // Scan over the found assignment operator, or report error:
-    if (IS_ASSIGNMENT_OP(*(line + assignment_end_index)))
+    if (IS_ASSIGNMENT_OP(*(str + assignment_end_index)))
         assignment_end_index++;
     else
     {
-        report_error(p_data,
-                     "Invalid attribute definition: line does not contain "
+        report_error(p_data, line->line_number,
+                     "Invalid attribute definition: str does not contain "
                      "an assignment operator (%s): '%s'",
-                     ASSIGNMENT_OP_UITEXT, line);
+                     ASSIGNMENT_OP_UITEXT, str);
         return false;
     }
     
@@ -738,21 +758,21 @@ bool parse_attribute_line(style_parser_data *p_data, char *line,
     // Scan until attribute value characters end:
     size_t value_end_index;
     for (value_end_index = value_start_index;
-         IS_ATTRIBUTE_VALUE_CHAR(*(line + value_end_index));
+         IS_ATTRIBUTE_VALUE_CHAR(*(str + value_end_index));
          value_end_index++);
     
     // Copy attribute name:
     size_t name_len = name_end_index - name_start_index;
     char *attr_name = (char *)malloc(sizeof(char)*name_len + 1);
     *attr_name = '\0';
-    strncat(attr_name, (line + name_start_index), name_len);
+    strncat(attr_name, (str + name_start_index), name_len);
     *out_attr_name = attr_name;
     
     // Copy attribute value:
     size_t attr_value_len = value_end_index - assignment_end_index;
     char *attr_value_str = (char *)malloc(sizeof(char)*attr_value_len + 1);
     *attr_value_str = '\0';
-    strncat(attr_value_str, (line + assignment_end_index), attr_value_len);
+    strncat(attr_value_str, (str + assignment_end_index), attr_value_len);
     *out_attr_value = attr_value_str;
     
     return true;
@@ -823,12 +843,12 @@ void _sty_parse(style_parser_data *p_data)
         
         pmhsp_PRINTF("  Head line (len %ld): '%s'\n",
                      header_line->length, header_line->value);
-        char *style_rule_name = get_style_rule_name(header_line->value);
+        char *style_rule_name = get_style_rule_name(header_line);
         pmhsp_PRINTF("  Style rule name: '%s'\n", style_rule_name);
         
         multi_value *attr_line_cur = header_line->next;
         if (attr_line_cur == NULL)
-            report_error(p_data,
+            report_error(p_data, header_line->line_number,
                          "No style attributes defined for style rule '%s'",
                          style_rule_name);
         
@@ -847,15 +867,16 @@ void _sty_parse(style_parser_data *p_data)
             char *attr_name_str;
             char *attr_value_str;
             bool success = parse_attribute_line(p_data,
-                                                attr_line_cur->value,
+                                                attr_line_cur,
                                                 &attr_name_str,
                                                 &attr_value_str);
             if (success)
             {
                 pmhsp_PRINTF("  Attr: '%s' Value: '%s'\n",
                              attr_name_str, attr_value_str);
-                raw_attribute *attribute = new_raw_attribute(attr_name_str,
-                                                     attr_value_str);
+                raw_attribute *attribute =
+                    new_raw_attribute(attr_name_str, attr_value_str,
+                                      attr_line_cur->line_number);
                 attribute->next = attributes_head;
                 attributes_head = attribute;
             }
@@ -865,7 +886,8 @@ void _sty_parse(style_parser_data *p_data)
         
         if (attributes_head != NULL)
         {
-            interpret_and_add_style(p_data, style_rule_name, attributes_head);
+            interpret_and_add_style(p_data, style_rule_name,
+                                    header_line->line_number, attributes_head);
             free_raw_attributes(attributes_head);
         }
         
@@ -920,7 +942,8 @@ style_parser_data *new_style_parser_data(char *input)
     return p_data;
 }
 
-style_collection *parse_styles(char *input, void(*error_callback)(char*,void*),
+style_collection *parse_styles(char *input,
+                               void(*error_callback)(char*,int,void*),
                                void *error_callback_context)
 {
     style_parser_data *p_data = new_style_parser_data(input);
