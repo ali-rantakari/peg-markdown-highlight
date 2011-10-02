@@ -673,6 +673,9 @@ block *get_blocks(char *input)
         line_cur = next_cur;
     }
     
+    if (current_block != NULL && tail != current_block)
+        tail->next = current_block;
+    
     free_multi_value(discarded_lines);
     
     return head;
