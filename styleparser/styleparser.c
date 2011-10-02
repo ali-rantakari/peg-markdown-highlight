@@ -127,6 +127,23 @@ char *trim_str(char *str)
     return str;
 }
 
+char *trim_str_dup(char *str)
+{
+    size_t start = 0;
+    while (isspace(*(str + start)))
+        start++;
+    size_t end = strlen(str) - 1;
+    while (start < end && isspace(*(str + end)))
+        end--;
+    
+    size_t len = end - start + 1;
+    char *ret = (char *)malloc(sizeof(char)*len + 1);
+    *ret = '\0';
+    strncat(ret, (str + start), len);
+    
+    return ret;
+}
+
 char *strcpy_lower(char *str)
 {
     char *low = strdup(str);
@@ -439,7 +456,7 @@ style_attribute *interpret_attributes(style_parser_data *p_data,
         }
         else if (atype == attr_type_font_family)
         {
-            attr->value->font_family = strdup(cur->value);
+            attr->value->font_family = trim_str_dup(cur->value);
         }
         else if (atype == attr_type_font_style)
         {
@@ -469,7 +486,7 @@ style_attribute *interpret_attributes(style_parser_data *p_data,
         }
         else if (atype == attr_type_other)
         {
-            attr->value->string = strdup(cur->value);
+            attr->value->string = trim_str_dup(cur->value);
         }
         
         if (attr != NULL) {
