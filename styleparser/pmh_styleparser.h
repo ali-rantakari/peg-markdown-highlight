@@ -127,23 +127,4 @@ pmh_style_collection *pmh_parse_styles(char *input,
 */
 void pmh_free_style_collection(pmh_style_collection *collection);
 
-/**
-* \brief Get pmh_attr_type from attribute name.
-* 
-* Given a style attribute name (as used in the stylesheets), return the
-* corresponding pmh_attr_type value.
-*/
-pmh_attr_type pmh_attr_type_from_name(char *name);
-
-/**
-* \brief Get attribute name from pmh_attr_type.
-* 
-* Given a pmh_attr_type value, return the corresponding style attribute name
-* (as used in the stylesheets).
-*/
-char *pmh_attr_name_from_type(pmh_attr_type type);
-
-pmh_element_type pmh_element_type_from_name(char *name);
-char *pmh_element_name_from_type(pmh_element_type type);
-
 

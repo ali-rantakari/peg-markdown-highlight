@@ -4,6 +4,13 @@
 #include <string.h>
 #include "pmh_styleparser.h"
 
+
+extern pmh_attr_type pmh_attr_type_from_name(char *name);
+extern char *pmh_attr_name_from_type(pmh_attr_type type);
+extern pmh_element_type pmh_element_type_from_name(char *name);
+extern char *pmh_element_name_from_type(pmh_element_type type);
+
+
 #define READ_BUFFER_LEN 1024
 char *get_contents(FILE *f)
 {
