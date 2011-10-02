@@ -665,9 +665,11 @@ block *get_blocks(char *input)
 #define ASSIGNMENT_OP_UITEXT        "':' or '='"
 #define IS_ASSIGNMENT_OP(c)         ((c) == ':' || (c) == '=')
 #define IS_STYLE_RULE_NAME_CHAR(c)  \
-    ( (c) != '\0' && !isspace(c) && !IS_ASSIGNMENT_OP(c) )
+    ( (c) != '\0' && !isspace(c) && !char_begins_linecomment(c) && !IS_ASSIGNMENT_OP(c) )
 #define IS_ATTRIBUTE_NAME_CHAR(c)  \
-    ( (c) != '\0' && !IS_ASSIGNMENT_OP(c) )
+    ( (c) != '\0' && !char_begins_linecomment(c) && !IS_ASSIGNMENT_OP(c) )
+#define IS_ATTRIBUTE_VALUE_CHAR(c)  \
+    ( (c) != '\0' && !char_begins_linecomment(c) )
 
 char *get_style_rule_name(char *line)
 {
@@ -730,6 +732,13 @@ bool parse_attribute_line(style_parser_data *p_data, char *line,
         return false;
     }
     
+    size_t value_start_index = assignment_end_index;
+    // Scan until attribute value characters end:
+    size_t value_end_index;
+    for (value_end_index = value_start_index;
+         IS_ATTRIBUTE_VALUE_CHAR(*(line + value_end_index));
+         value_end_index++);
+    
     // Copy attribute name:
     size_t name_len = name_end_index - name_start_index;
     char *attr_name = (char *)malloc(sizeof(char)*name_len + 1);
@@ -738,7 +747,7 @@ bool parse_attribute_line(style_parser_data *p_data, char *line,
     *out_attr_name = attr_name;
     
     // Copy attribute value:
-    size_t attr_value_len = strlen(line) - assignment_end_index;
+    size_t attr_value_len = value_end_index - assignment_end_index;
     char *attr_value_str = (char *)malloc(sizeof(char)*attr_value_len + 1);
     *attr_value_str = '\0';
     strncat(attr_value_str, (line + assignment_end_index), attr_value_len);
