@@ -22,5 +22,5 @@ clean:
 	rm -rf *.dSYM; \
 
 leak-check: $(TESTER)
-	valgrind --leak-check=full ./styleparsertester < styles/teststyle.style
+	valgrind --leak-check=full --dsymutil=yes ./styleparsertester < styles/teststyle.style
 
