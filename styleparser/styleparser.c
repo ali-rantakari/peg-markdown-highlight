@@ -62,30 +62,30 @@ typedef struct
     style_collection *styles;
 } style_parser_data;
 
-typedef struct sem_value
+typedef struct raw_attribute
 {
     char *name;
     char *value;
-    struct sem_value *next;
-} sem_value;
+    struct raw_attribute *next;
+} raw_attribute;
 
-sem_value *new_sem_value(char *name, char *value)
+raw_attribute *new_raw_attribute(char *name, char *value)
 {
-    sem_value *v = (sem_value *)malloc(sizeof(sem_value));
+    raw_attribute *v = (raw_attribute *)malloc(sizeof(raw_attribute));
     v->name = name;
     v->value = value;
     v->next = NULL;
     return v;
 }
 
-void free_sem_values(sem_value *list)
+void free_raw_attributes(raw_attribute *list)
 {
-    sem_value *cur = list;
+    raw_attribute *cur = list;
     while (cur != NULL)
     {
         if (cur->name != NULL) free(cur->name);
         if (cur->value != NULL) free(cur->value);
-        sem_value *this = cur;
+        raw_attribute *this = cur;
         cur = cur->next;
         free(this);
     }
@@ -412,11 +412,11 @@ void free_multi_value(multi_value *val)
 #define EQUALS(a,b) (strcmp(a, b) == 0)
 style_attribute *interpret_attributes(style_parser_data *p_data,
                                       pmh_element_type lang_element_type,
-                                      sem_value *raw_attributes)
+                                      raw_attribute *raw_attributes)
 {
     style_attribute *attrs = NULL;
     
-    sem_value *cur = raw_attributes;
+    raw_attribute *cur = raw_attributes;
     while (cur != NULL)
     {
         attr_type atype = attr_type_from_name(cur->name);
@@ -497,7 +497,7 @@ style_attribute *interpret_attributes(style_parser_data *p_data,
 
 void interpret_and_add_style(style_parser_data *p_data,
                              char *style_rule_name,
-                             sem_value *raw_attributes)
+                             raw_attribute *raw_attributes)
 {
     bool isEditorType = false;
     bool isCurrentLineType = false;
@@ -795,7 +795,7 @@ void _sty_parse(style_parser_data *p_data)
                          "No style attributes defined for style rule '%s'",
                          style_rule_name);
         
-        sem_value *attributes_head = NULL;
+        raw_attribute *attributes_head = NULL;
         
         while (attr_line_cur != NULL)
         {
@@ -817,7 +817,7 @@ void _sty_parse(style_parser_data *p_data)
             {
                 pmhsp_PRINTF("  Attr: '%s' Value: '%s'\n",
                              attr_name_str, attr_value_str);
-                sem_value *attribute = new_sem_value(attr_name_str,
+                raw_attribute *attribute = new_raw_attribute(attr_name_str,
                                                      attr_value_str);
                 attribute->next = attributes_head;
                 attributes_head = attribute;
@@ -829,7 +829,7 @@ void _sty_parse(style_parser_data *p_data)
         if (attributes_head != NULL)
         {
             interpret_and_add_style(p_data, style_rule_name, attributes_head);
-            free_sem_values(attributes_head);
+            free_raw_attributes(attributes_head);
         }
         
         free(style_rule_name);
