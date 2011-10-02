@@ -97,7 +97,7 @@ Attribute assignment lines **may be indented**.
 
 ### Attribute Names and Types
 
-The following is a list of all valid attribute names, and the values that may be defined for them:
+The following is a list of predefined attribute names, and the values that may be defined for them:
 
 - `foreground-color` *(aliases: `foreground` and `color`)*
     - See the *Color Attribute Values* subsection for information about valid values for this attribute.
@@ -114,6 +114,9 @@ The following is a list of all valid attribute names, and the values that may be
         - `italic`
         - `bold`
         - `underlined`
+
+Applications may also include support for any **custom attribute names and values** they desire &mdash; attributes other than the ones listed above will be included in the style parser results, with their values stored as strings.
+
 
 ## Color Attribute Values
 
