@@ -60,7 +60,7 @@ void print_styles(style_attribute *list)
         else if (list->type == attr_type_other)
             printf("\"%s\"\n", list->value->string);
         else
-            printf("???\n");
+            printf("??? (unknown attribute type)\n");
         list = list->next;
     }
 }
