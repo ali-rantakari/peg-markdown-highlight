@@ -633,6 +633,30 @@ block *get_blocks(char *input)
 }
 
 
+#define IS_ASSIGNMENT_OP(c)         ((c) == ':' || (c) == '=')
+#define IS_STYLE_RULE_NAME_CHAR(c)  \
+    ( (c) != '\0' && !isspace(c) && !IS_ASSIGNMENT_OP(c) )
+
+char *get_style_rule_name(char *line)
+{
+    size_t start_index;
+    for (start_index = 0;
+         (*(line+start_index) != '\0' && isspace(*(line+start_index)));
+         start_index++);
+    
+    size_t end_index;
+    for (end_index = start_index;
+         IS_STYLE_RULE_NAME_CHAR(*(line + end_index));
+         end_index++);
+    
+    size_t len = end_index - start_index;
+    char *ret = (char *)malloc(sizeof(char)*len + 1);
+    *ret = '\0';
+    strncat(ret, (line + start_index), len);
+    
+    return ret;
+}
+
 
 void _sty_parse(style_parser_data *p_data)
 {
@@ -644,11 +668,28 @@ void _sty_parse(style_parser_data *p_data)
     while (block_cur != NULL)
     {
         printf("Block:\n");
-        multi_value *line_cur = block_cur->lines;
-        while (line_cur != NULL)
+        multi_value *header_line = block_cur->lines;
+        if (header_line != NULL)
         {
-            printf("  Line (%ld): '%s'\n", line_cur->length, line_cur->value);
-            line_cur = line_cur->next;
+            printf("  Head line (len %ld): '%s'\n",
+                   header_line->length, header_line->value);
+            char *style_rule_name = get_style_rule_name(header_line->value);
+            printf("  Style rule name: '%s'\n", style_rule_name);
+            
+            multi_value *attr_line_cur = header_line->next;
+            if (attr_line_cur == NULL)
+                report_error(p_data,
+                             "No style attributes defined for style rule '%s'",
+                             style_rule_name);
+            
+            while (attr_line_cur != NULL)
+            {
+                printf("  Attr line (len %ld): '%s'\n",
+                       attr_line_cur->length, attr_line_cur->value);
+                attr_line_cur = attr_line_cur->next;
+            }
+            
+            free(style_rule_name);
         }
         block_cur = block_cur->next;
     }
