@@ -7,7 +7,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "pmh_definitions.h"
-#import "styleparser.h"
+#import "pmh_styleparser.h"
 
 
 #define HG_MKSTYLE(elem, add, remove, traits)	[[[HGMarkdownHighlightingStyle alloc] initWithType:(elem) attributesToAdd:(add) toRemove:(remove) fontTraitsToAdd:(traits)] autorelease]

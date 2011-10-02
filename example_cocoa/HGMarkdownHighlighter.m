@@ -7,16 +7,22 @@
 
 #import "HGMarkdownHighlighter.h"
 #import "pmh_parser.h"
-#import "styleparser.h"
+#import "pmh_styleparser.h"
 
+#define kStyleParsingErrorInfoKey_ErrorMessage @"message"
+#define kStyleParsingErrorInfoKey_LineNumber @"lineNumber"
 
-void styleparsing_error_callback(char *error_message, void *context_data)
+void styleparsing_error_callback(char *error_message, int line_number, void *context_data)
 {
 	NSString *errMsg = [NSString stringWithUTF8String:error_message];
 	if (errMsg == nil)
 		NSLog(@"Cannot interpret error message as UTF-8: '%s'", error_message);
+	NSDictionary *errInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+							 errMsg, kStyleParsingErrorInfoKey_ErrorMessage,
+							 [NSNumber numberWithInt:line_number], kStyleParsingErrorInfoKey_LineNumber,
+							 nil];
 	[((HGMarkdownHighlighter *)context_data) performSelector:@selector(handleStyleParsingError:)
-												  withObject:errMsg];
+												  withObject:errInfo];
 }
 
 
@@ -464,11 +470,17 @@ void styleparsing_error_callback(char *error_message, void *context_data)
 	return cachedValue;
 }
 
-- (void) handleStyleParsingError:(NSString *)errorMessage
+- (void) handleStyleParsingError:(NSDictionary *)errorInfo
 {
-	NSString *messageToAdd = errorMessage;
+	NSString *errorMessage = (NSString *)[errorInfo objectForKey:kStyleParsingErrorInfoKey_ErrorMessage];
+	NSString *messageToAdd = nil;
 	if (errorMessage == nil)
 		messageToAdd = @"<broken error message>";
+	else
+	{
+		int lineNumber = [(NSNumber *)[errorInfo objectForKey:kStyleParsingErrorInfoKey_LineNumber] intValue];
+		messageToAdd = [NSString stringWithFormat:@"(Line %i): %@", lineNumber, errorMessage];
+	}
 	[styleParsingErrors addObject:messageToAdd];
 }
 
