@@ -775,6 +775,7 @@ void _sty_parse(style_parser_data *p_data)
         if (attributes_head != NULL)
         {
             interpret_and_add_style(p_data, style_rule_name, attributes_head);
+            free_sem_values(attributes_head);
         }
         
         free(style_rule_name);
