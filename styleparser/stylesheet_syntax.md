@@ -43,7 +43,31 @@ Each begins with the ***name* of the rule**, which is always on its own line, an
 - **`editor`**: Styles that apply to the whole document/editor
 - **`editor-current-line`**: Styles that apply to the current line in the editor (i.e. the line where the caret is)
 - **`editor-selection`**: Styles that apply to the selected range in the editor when the user makes a selection in the text
-- A Markdown element type (like `EMPH`, `REFERENCE` or `H1`): Styles that apply to occurrences of that particular element
+- A Markdown element type (like `EMPH`, `REFERENCE` or `H1`): Styles that apply to occurrences of that particular element. The supported element types are:
+    - **`LINK`:** Explicit link (like `[click here][ref]`)
+    - **`AUTO_LINK_URL`:** Implicit URL link (like `<http://google.com>`)
+    - **`AUTO_LINK_EMAIL`:** Implicit email link (like `<first.last@google.com>`)
+    - **`IMAGE`:** Image definition
+    - **`CODE`:** Code (inline)
+    - **`HTML`:** HTML
+    - **`HTML_ENTITY`:** HTML special entity definition (like `&hellip;`)
+    - **`EMPH`:** Emphasized text
+    - **`STRONG`:** Strong text
+    - **`LIST_BULLET`:** Bullet for an unordered list item
+    - **`LIST_ENUMERATOR`:** Enumerator for an ordered list item
+    - **`COMMENT`:** (HTML) Comment
+    - **`H1`:** Header, level 1
+    - **`H2`:** Header, level 2
+    - **`H3`:** Header, level 3
+    - **`H4`:** Header, level 4
+    - **`H5`:** Header, level 5
+    - **`H6`:** Header, level 6
+    - **`BLOCKQUOTE`:** Blockquote
+    - **`VERBATIM`:** Verbatim (e.g. block of code)
+    - **`HTMLBLOCK`:** Block of HTML
+    - **`HRULE`:** Horizontal rule
+    - **`REFERENCE`:** Reference
+    - **`NOTE`:** Note
 
 The name may be optionally prefixed with an assignment operator (either `:` or `=`):
 
