@@ -13,6 +13,7 @@ This project contains:
 - Helper classes for syntax highlighting `NSTextView`s in Cocoa applications.
 - A simple example on how to highlight a `GtkTextView` in a GTK+ application.
 - A simple example on how to highlight a `QTextEdit` in a Qt application.
+- A parser for stylesheets that define syntax highlighting styles
 
 _Copyright 2011 Ali Rantakari_ -- <http://hasseg.org>
 
@@ -78,6 +79,14 @@ insert the following to the beginning of `pmh_parser.c`:
 
     #include "stdafx.h"
 
+
+
+Stylesheet Parser
+-------------------------------------------------------------------------------
+
+The stylesheet parser files are located in the `/styleparser` folder. The `pmh_styleparser.h` file contains the style parser's public interface and the `pmh_styleparser.c` file implements it.
+
+The stylesheet syntax is documented in `/styleparser/stylesheet_syntax.md`. This file is compiled into an HTML format upon running `make docs`.
 
 
 

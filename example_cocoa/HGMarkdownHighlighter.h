@@ -129,7 +129,14 @@
  */
 - (void) readClearTextStylesFromTextView;
 
-/** \brief todo
+/** \brief Parse stylesheet and apply the resulting styles.
+ * 
+ * \param[in] stylesheet  The stylesheet string to parse
+ * \param[in] delegate    Delegate object to handle stylesheet parsing errors
+ * \param[in] selector    Selector to be invoked on the specified delegate object
+ *                        when errors occur in stylesheet parsing. The argument
+ *                        sent with the message is an NSArray containing
+ *                        error messages (NSStrings).
  */
 - (void) applyStylesFromStylesheet:(NSString *)stylesheet
 				 withErrorDelegate:(id)delegate

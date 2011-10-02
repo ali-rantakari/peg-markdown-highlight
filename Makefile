@@ -58,8 +58,10 @@ $(BENCH) : bench.c pmh_parser.o
 	@echo '------- building bench'
 	$(CC) $(CFLAGS) -o $@ pmh_parser.o $<
 
-docs: pmh_parser.h pmh_definitions.h styleparser/pmh_styleparser.h doxygen/doxygen.cfg doxygen/doxygen.h doxygen/doxygen_footer.html example_cocoa/HGMarkdownHighlighter.h
+docs: pmh_parser.h pmh_definitions.h styleparser/pmh_styleparser.h tools/markdown.css styleparser/stylesheet_syntax.md doxygen/doxygen.cfg doxygen/doxygen.h doxygen/doxygen_footer.html example_cocoa/HGMarkdownHighlighter.h
 	doxygen doxygen/doxygen.cfg
+	tools/compile_markdown.sh styleparser/stylesheet_syntax.md "PEG Markdown Highlight Stylesheet Syntax" > docs/html/stylesheet_syntax.html
+	cp tools/markdown.css docs/html/.
 	touch docs
 
 .PHONY: clean test
