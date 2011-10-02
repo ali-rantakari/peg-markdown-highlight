@@ -530,21 +530,21 @@ bool char_begins_linecomment(char c)
 
 bool line_is_comment(multi_value *line)
 {
-    char c;
-    for (c = *(line->value); c != '\0'; c++)
+    char *c;
+    for (c = line->value; *c != '\0'; c++)
     {
-        if (!char_is_whitespace(c))
-            return char_begins_linecomment(c);
+        if (!char_is_whitespace(*c))
+            return char_begins_linecomment(*c);
     }
     return false;
 }
 
 bool line_is_empty(multi_value *line)
 {
-    char c;
-    for (c = *(line->value); c != '\0'; c++)
+    char *c;
+    for (c = line->value; *c != '\0'; c++)
     {
-        if (!char_is_whitespace(c))
+        if (!char_is_whitespace(*c))
             return false;
     }
     return true;
