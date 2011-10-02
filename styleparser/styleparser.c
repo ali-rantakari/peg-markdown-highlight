@@ -702,6 +702,8 @@ bool parse_attribute_line(style_parser_data *p_data, char *line,
     for (name_end_index = name_start_index;
          IS_ATTRIBUTE_NAME_CHAR(*(line + name_end_index));
          name_end_index++);
+    while (name_start_index < name_end_index && isspace(*(line + name_end_index - 1)))
+        name_end_index--;
     
     size_t assignment_end_index;
     for (assignment_end_index = name_end_index;
