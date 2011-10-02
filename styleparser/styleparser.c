@@ -15,6 +15,13 @@
 #include <ctype.h>
 
 
+#if pmh_DEBUG_OUTPUT
+#define pmhsp_PRINTF(x, ...) fprintf(stderr, x, ##__VA_ARGS__)
+#else
+#define pmhsp_PRINTF(x, ...)
+#endif
+
+
 // vasprintf is not in the C standard nor in POSIX so we provide our own
 int our_vasprintf(char **strptr, const char *fmt, va_list argptr)
 {
@@ -382,10 +389,10 @@ void free_multi_value(multi_value *val)
     while (cur != NULL)
     {
         multi_value *this = cur;
-        multi_value *next = this->next;
+        multi_value *next_cur = cur->next;
         free(this->value);
         free(this);
-        cur = next;
+        cur = next_cur;
     }
 }
 
@@ -587,13 +594,19 @@ block *get_blocks(char *input)
     block *tail = NULL;
     block *current_block = NULL;
     
+    multi_value *discarded_lines = NULL;
+    
     multi_value *lines = split_multi_value(input, '\n');
     multi_value *previous_line = NULL;
     multi_value *line_cur = lines;
     while (line_cur != NULL)
     {
+        bool discard_line = false;
+        
         if (line_is_empty(line_cur))
         {
+            discard_line = true;
+            
             if (current_block != NULL)
             {
                 // terminate block
@@ -603,7 +616,13 @@ block *get_blocks(char *input)
                 previous_line->next = NULL;
             }
         }
-        else if (!line_is_comment(line_cur))
+        else if (line_is_comment(line_cur))
+        {
+            // Do not discard (i.e. free()) comment lines within blocks:
+            if (current_block == NULL)
+                discard_line = true;
+        }
+        else
         {
             if (current_block == NULL)
             {
@@ -618,18 +637,26 @@ block *get_blocks(char *input)
                 tail = current_block;
             }
         }
-        previous_line = line_cur;
-        multi_value *next = line_cur->next;
-        line_cur = next;
+        
+        multi_value *next_cur = line_cur->next;
+        previous_line = (discard_line) ? NULL : line_cur;
+        
+        if (discard_line) {
+            line_cur->next = discarded_lines;
+            discarded_lines = line_cur;
+        }
+        
+        line_cur = next_cur;
     }
     
     if (current_block != NULL)
     {
         // terminate block
         tail->next = current_block;
-        tail = current_block;
         current_block = NULL;
     }
+    
+    free_multi_value(discarded_lines);
     
     return head;
 }
@@ -708,11 +735,6 @@ bool parse_attribute_line(style_parser_data *p_data, char *line,
 }
 
 
-#if pmh_DEBUG_OUTPUT
-#define pmhsp_PRINTF(x, ...) fprintf(stderr, x, ##__VA_ARGS__)
-#else
-#define pmhsp_PRINTF(x, ...)
-#endif
 
 void _sty_parse(style_parser_data *p_data)
 {
