@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "styleparser.h"
+#include "pmh_styleparser.h"
 
 #define READ_BUFFER_LEN 1024
 char *get_contents(FILE *f)

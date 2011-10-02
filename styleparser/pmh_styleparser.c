@@ -7,7 +7,7 @@
  * 
  */
 
-#include "styleparser.h"
+#include "pmh_styleparser.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -785,7 +785,7 @@ bool parse_attribute_line(style_parser_data *p_data, multi_value *line,
 
 // - Removes UTF-8 BOM
 // - Standardizes line endings to \n
-char *strcpy_preformat(char *str)
+char *strcpy_preformat_style(char *str)
 {
     char *new_str = (char *)malloc(sizeof(char) * strlen(str) + 1);
     
@@ -827,7 +827,7 @@ void _sty_parse(style_parser_data *p_data)
 {
     // We don't have to worry about leaking the original p_data->input;
     // the user of the library is responsible for that:
-    p_data->input = strcpy_preformat(p_data->input);
+    p_data->input = strcpy_preformat_style(p_data->input);
     
     block *blocks = get_blocks(p_data->input);
     
