@@ -853,6 +853,7 @@ void _sty_parse(style_parser_data *p_data)
                          style_rule_name);
         
         raw_attribute *attributes_head = NULL;
+        raw_attribute *attributes_tail = NULL;
         
         while (attr_line_cur != NULL)
         {
@@ -877,8 +878,13 @@ void _sty_parse(style_parser_data *p_data)
                 raw_attribute *attribute =
                     new_raw_attribute(attr_name_str, attr_value_str,
                                       attr_line_cur->line_number);
-                attribute->next = attributes_head;
-                attributes_head = attribute;
+                if (attributes_head == NULL) {
+                    attributes_head = attribute;
+                    attributes_tail = attribute;
+                } else {
+                    attributes_tail->next = attribute;
+                    attributes_tail = attribute;
+                }
             }
             
             attr_line_cur = attr_line_cur->next;
