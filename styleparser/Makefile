@@ -5,6 +5,9 @@ CFLAGS ?= -Wall -Wswitch -Wshadow -Wsign-compare -Werror -O3 -std=gnu89
 ifdef DEBUG
 	CFLAGS += -g -O0
 endif
+ifdef DEBUGOUT
+	CFLAGS += -Dpmh_DEBUG_OUTPUT=1
+endif
 
 styleparser.o : styleparser.c styleparser.h
 	@echo '------- building styleparser.o'
