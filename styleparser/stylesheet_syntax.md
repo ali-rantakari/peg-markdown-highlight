@@ -69,7 +69,7 @@ Each begins with the ***name* of the rule**, which is always on its own line, an
     - **`REFERENCE`:** Reference
     - **`NOTE`:** Note
 
-The name may be optionally prefixed with an assignment operator (either `:` or `=`):
+The name may be optionally followed by an assignment operator (either `:` or `=`):
 
     H1:
     foreground: ff00ff
