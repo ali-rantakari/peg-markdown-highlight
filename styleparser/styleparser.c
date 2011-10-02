@@ -745,26 +745,30 @@ void _sty_parse(style_parser_data *p_data)
         
         while (attr_line_cur != NULL)
         {
-            if (!line_is_comment(attr_line_cur))
+            if (line_is_comment(attr_line_cur))
             {
-                pmhsp_PRINTF("  Attr line (len %ld): '%s'\n",
-                             attr_line_cur->length, attr_line_cur->value);
-                char *attr_name_str;
-                char *attr_value_str;
-                bool success = parse_attribute_line(p_data,
-                                                    attr_line_cur->value,
-                                                    &attr_name_str,
-                                                    &attr_value_str);
-                if (success)
-                {
-                    pmhsp_PRINTF("  Attr: '%s' Value: '%s'\n",
-                                 attr_name_str, attr_value_str);
-                    sem_value *attribute = new_sem_value(attr_name_str,
-                                                         attr_value_str);
-                    attribute->next = attributes_head;
-                    attributes_head = attribute;
-                }
+                attr_line_cur = attr_line_cur->next;
+                continue;
             }
+            
+            pmhsp_PRINTF("  Attr line (len %ld): '%s'\n",
+                         attr_line_cur->length, attr_line_cur->value);
+            char *attr_name_str;
+            char *attr_value_str;
+            bool success = parse_attribute_line(p_data,
+                                                attr_line_cur->value,
+                                                &attr_name_str,
+                                                &attr_value_str);
+            if (success)
+            {
+                pmhsp_PRINTF("  Attr: '%s' Value: '%s'\n",
+                             attr_name_str, attr_value_str);
+                sem_value *attribute = new_sem_value(attr_name_str,
+                                                     attr_value_str);
+                attribute->next = attributes_head;
+                attributes_head = attribute;
+            }
+            
             attr_line_cur = attr_line_cur->next;
         }
         
