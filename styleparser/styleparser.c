@@ -91,13 +91,6 @@ void free_sem_values(sem_value *list)
     }
 }
 
-/*
-static sem_value *cons(sem_value *elem, sem_value *list)
-{
-    elem->next = list;
-    return elem;
-}
-*/
 
 void report_error(style_parser_data *p_data, char *str, ...)
 {
