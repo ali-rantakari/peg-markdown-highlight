@@ -633,7 +633,8 @@ block *get_blocks(char *input)
             if (current_block != NULL)
             {
                 // terminate block
-                tail->next = current_block;
+                if (tail != current_block)
+                    tail->next = current_block;
                 tail = current_block;
                 current_block = NULL;
                 previous_line->next = NULL;
