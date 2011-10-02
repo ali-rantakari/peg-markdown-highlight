@@ -356,6 +356,7 @@ multi_value *split_multi_value(char *input, char separator)
         multi_value *mv = (multi_value *)malloc(sizeof(multi_value));
         mv->value = (char *)malloc(sizeof(char)*i + 1);
         mv->length = i;
+        mv->next = NULL;
         *mv->value = '\0';
         strncat(mv->value, c, i);
         
