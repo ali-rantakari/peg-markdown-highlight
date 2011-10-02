@@ -37,6 +37,7 @@ void print_styles(style_attribute *list)
         
         if (list->type == attr_type_background_color
             || list->type == attr_type_foreground_color
+            || list->type == attr_type_caret_color
             )
             printf("%i,%i,%i,%i\n",
                    list->value->argb_color->alpha,
