@@ -658,13 +658,6 @@ block *get_blocks(char *input)
         line_cur = next_cur;
     }
     
-    if (current_block != NULL)
-    {
-        // terminate block
-        tail->next = current_block;
-        current_block = NULL;
-    }
-    
     free_multi_value(discarded_lines);
     
     return head;
