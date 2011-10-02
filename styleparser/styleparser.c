@@ -671,16 +671,19 @@ block *get_blocks(char *input)
 
 char *get_style_rule_name(char *line)
 {
+    // Scan past leading whitespace:
     size_t start_index;
     for (start_index = 0;
          (*(line+start_index) != '\0' && isspace(*(line+start_index)));
          start_index++);
     
+    // Scan until style rule name characters end:
     size_t value_end_index;
     for (value_end_index = start_index;
          IS_STYLE_RULE_NAME_CHAR(*(line + value_end_index));
          value_end_index++);
     
+    // Copy style rule name:
     size_t value_len = value_end_index - start_index;
     char *value = (char *)malloc(sizeof(char)*value_len + 1);
     *value = '\0';
@@ -692,24 +695,30 @@ char *get_style_rule_name(char *line)
 bool parse_attribute_line(style_parser_data *p_data, char *line,
                           char **out_attr_name, char **out_attr_value)
 {
+    // Scan past leading whitespace:
     size_t name_start_index;
     for (name_start_index = 0;
          ( *(line+name_start_index) != '\0' &&
            isspace(*(line+name_start_index)) );
          name_start_index++);
     
+    // Scan until attribute name characters end:
     size_t name_end_index;
     for (name_end_index = name_start_index;
          IS_ATTRIBUTE_NAME_CHAR(*(line + name_end_index));
          name_end_index++);
+    // Scan backwards to trim trailing whitespace off:
     while (name_start_index < name_end_index && isspace(*(line + name_end_index - 1)))
         name_end_index--;
     
+    // Scan until just after the first assignment operator:
     size_t assignment_end_index;
     for (assignment_end_index = name_end_index;
          ( *(line + assignment_end_index) != '\0' &&
            !IS_ASSIGNMENT_OP(*(line + assignment_end_index)) );
          assignment_end_index++);
+    
+    // Scan over the found assignment operator, or report error:
     if (IS_ASSIGNMENT_OP(*(line + assignment_end_index)))
         assignment_end_index++;
     else
@@ -721,12 +730,14 @@ bool parse_attribute_line(style_parser_data *p_data, char *line,
         return false;
     }
     
+    // Copy attribute name:
     size_t name_len = name_end_index - name_start_index;
     char *attr_name = (char *)malloc(sizeof(char)*name_len + 1);
     *attr_name = '\0';
     strncat(attr_name, (line + name_start_index), name_len);
     *out_attr_name = attr_name;
     
+    // Copy attribute value:
     size_t attr_value_len = strlen(line) - assignment_end_index;
     char *attr_value_str = (char *)malloc(sizeof(char)*attr_value_len + 1);
     *attr_value_str = '\0';
