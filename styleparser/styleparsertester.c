@@ -29,7 +29,12 @@ void print_styles(style_attribute *list)
         char *attr_name = (list->type == attr_type_other)
                           ? list->name
                           : attr_name_from_type(list->type);
-        printf("  %s = ", attr_name);
+        
+        if (list->type == attr_type_other)
+            printf("  \"%s\" = ", attr_name);
+        else
+            printf("  %s = ", attr_name);
+        
         if (list->type == attr_type_background_color
             || list->type == attr_type_foreground_color
             )
