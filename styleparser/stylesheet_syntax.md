@@ -48,25 +48,25 @@ Each begins with the ***name* of the rule**, which is always on its own line, an
     - **`AUTO_LINK_URL`:** Implicit URL link (like `<http://google.com>`)
     - **`AUTO_LINK_EMAIL`:** Implicit email link (like `<first.last@google.com>`)
     - **`IMAGE`:** Image definition
-    - **`CODE`:** Code (inline)
-    - **`HTML`:** HTML
-    - **`HTML_ENTITY`:** HTML special entity definition (like `&hellip;`)
+    - **`REFERENCE`:** Reference (like `[id]: http://www.google.com`)
+    - **`CODE`:** Inline code
     - **`EMPH`:** Emphasized text
     - **`STRONG`:** Strong text
     - **`LIST_BULLET`:** Bullet for an unordered list item
     - **`LIST_ENUMERATOR`:** Enumerator for an ordered list item
-    - **`COMMENT`:** (HTML) Comment
     - **`H1`:** Header, level 1
     - **`H2`:** Header, level 2
     - **`H3`:** Header, level 3
     - **`H4`:** Header, level 4
     - **`H5`:** Header, level 5
     - **`H6`:** Header, level 6
-    - **`BLOCKQUOTE`:** Blockquote
-    - **`VERBATIM`:** Verbatim (e.g. block of code)
-    - **`HTMLBLOCK`:** Block of HTML
+    - **`BLOCKQUOTE`:** Blockquote marker
+    - **`VERBATIM`:** Block of code
     - **`HRULE`:** Horizontal rule
-    - **`REFERENCE`:** Reference
+    - **`HTML`:** HTML tag
+    - **`HTML_ENTITY`:** HTML special entity definition (like `&hellip;`)
+    - **`HTMLBLOCK`:** Block of HTML
+    - **`COMMENT`:** (HTML) Comment
     - **`NOTE`:** Note
 
 The name may be optionally followed by an assignment operator (either `:` or `=`):
@@ -97,7 +97,7 @@ Attribute assignment lines **may be indented**.
 
 ### Attribute Names and Types
 
-The following is a list of predefined attribute names, and the values that may be defined for them:
+The following is a list of the names of predefined attributes, and the values they may be assigned:
 
 - `foreground-color` *(aliases: `foreground` and `color`)*
     - See the *Color Attribute Values* subsection for information about valid values for this attribute.
