@@ -9,7 +9,7 @@
  */
 
 
-void _parse(parser_data *p_data, yyrule start_rule)
+static void _parse(parser_data *p_data, yyrule start_rule)
 {
     GREG *g = yyparse_new(p_data);
     if (start_rule == NULL)
@@ -21,14 +21,14 @@ void _parse(parser_data *p_data, yyrule start_rule)
     pmh_PRINTF("\n\n");
 }
 
-void parse_markdown(parser_data *p_data)
+static void parse_markdown(parser_data *p_data)
 {
     pmh_PRINTF("\nPARSING DOCUMENT: ");
     
     _parse(p_data, NULL);
 }
 
-void parse_references(parser_data *p_data)
+static void parse_references(parser_data *p_data)
 {
     pmh_PRINTF("\nPARSING REFERENCES: ");
     
