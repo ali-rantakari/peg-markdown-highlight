@@ -67,7 +67,7 @@ $(STYLEPARSERTESTER) : styleparsertester.c pmh_styleparser.o pmh_parser.o
 	@echo '------- building styleparsertester'
 	$(CC) $(CFLAGS) -o $@ pmh_styleparser.o pmh_parser.o $<
 
-docs: pmh_parser.h pmh_definitions.h styleparser/pmh_styleparser.h tools/markdown.css stylesheet_syntax.md doxygen/doxygen.cfg doxygen/doxygen.h doxygen/doxygen_footer.html example_cocoa/HGMarkdownHighlighter.h
+docs: pmh_parser.h pmh_definitions.h pmh_styleparser.h tools/markdown.css stylesheet_syntax.md doxygen/doxygen.cfg doxygen/doxygen.h doxygen/doxygen_footer.html example_cocoa/HGMarkdownHighlighter.h
 	doxygen doxygen/doxygen.cfg
 	tools/compile_markdown.sh stylesheet_syntax.md "PEG Markdown Highlight Stylesheet Syntax" > docs/html/stylesheet_syntax.html
 	cp tools/markdown.css docs/html/.
