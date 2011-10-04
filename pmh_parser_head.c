@@ -51,11 +51,11 @@ struct pmh_RealElement
     // -----------------------------------------------
     
     // next element in list of all elements:
-    struct pmh_RealElement *allElemsNext;
+    struct pmh_RealElement *all_elems_next;
     
     // offset to text (for elements of type pmh_EXTRA_TEXT, used when the
     // parser reads the value of 'text'):
-    int textOffset;
+    int text_offset;
     
     // text content (for elements of type pmh_EXTRA_TEXT):
     char *text;
@@ -291,7 +291,7 @@ void pmh_free_elements(pmh_element **elems)
     pmh_realelement *cursor = (pmh_realelement*)elems[pmh_ALL];
     while (cursor != NULL) {
         pmh_realelement *tofree = cursor;
-        cursor = cursor->allElemsNext;
+        cursor = cursor->all_elems_next;
         if (tofree->text != NULL)
             free(tofree->text);
         if (tofree->label != NULL)
@@ -582,12 +582,12 @@ pmh_realelement * mk_element(parser_data *p_data, pmh_element_type type,
     result->pos = pos;
     result->end = end;
     result->next = NULL;
-    result->textOffset = 0;
+    result->text_offset = 0;
     result->label = result->address = result->text = NULL;
     
     pmh_realelement *old_all_elements_head = p_data->head_elems[pmh_ALL];
     p_data->head_elems[pmh_ALL] = result;
-    result->allElemsNext = old_all_elements_head;
+    result->all_elems_next = old_all_elements_head;
     
     //pmh_PRINTF("  mk_element: %s [%ld - %ld]\n", pmh_type_name(type), pos, end);
     
@@ -783,10 +783,10 @@ void yy_input_func(char *buf, int *result, int max_size, parser_data *p_data)
         int yyc;
         bool moreToRead = (p_data->current_elem->text
                            && *(p_data->current_elem->text
-                                + p_data->current_elem->textOffset) != '\0');
+                                + p_data->current_elem->text_offset) != '\0');
         if (moreToRead)
         {
-            yyc = *(p_data->current_elem->text + p_data->current_elem->textOffset++);
+            yyc = *(p_data->current_elem->text + p_data->current_elem->text_offset++);
             pmh_PRINTF("\e[47;30m"); pmh_PUTCHAR(yyc); pmh_PRINTF("\e[0m");
             pmh_IF(yyc == '\n') pmh_PRINTF("\e[47m \e[0m");
         }
