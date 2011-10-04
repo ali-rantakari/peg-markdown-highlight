@@ -1,9 +1,8 @@
 *.o
 *.log
 *.dSYM
-peg/leg
-peg/peg
 pmh_parser.c
+pmh_parser_core.c
 tester
 multithread_tester
 highlighter
