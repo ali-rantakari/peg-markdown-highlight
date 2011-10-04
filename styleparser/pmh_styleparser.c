@@ -46,11 +46,6 @@ int our_vasprintf(char **strptr, const char *fmt, va_list argptr)
 
 
 
-// Set custom symbol name prefix to avoid name collisions with the main
-// PEG Markdown Highlight parser:
-#define YY_NAME(N) style_yy##N
-
-
 // Parsing context data
 typedef struct
 {
