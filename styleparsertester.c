@@ -1,3 +1,12 @@
+/* PEG Markdown Highlight
+ * Copyright 2011 Ali Rantakari -- http://hasseg.org
+ * Licensed under the GPL2+ and MIT licenses (see LICENSE for more info).
+ * 
+ * styleparsertester.c
+ * 
+ * Program for testing the stylesheet parser. Reads stylesheet input from stdin
+ * and prints out the parsing results in a human-readable format.
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
