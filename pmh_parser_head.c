@@ -130,6 +130,73 @@ static void parse_references(parser_data *p_data);
 
 
 
+
+static char **get_element_type_names()
+{
+    static char **elem_type_names = NULL;
+    if (elem_type_names == NULL)
+    {
+        elem_type_names = (char **)malloc(sizeof(char*) * pmh_NUM_LANG_TYPES);
+        int i;
+        for (i = 0; i < pmh_NUM_LANG_TYPES; i++)
+            elem_type_names[i] = NULL;
+        elem_type_names[pmh_LINK] = "LINK";
+        elem_type_names[pmh_AUTO_LINK_URL] = "AUTO_LINK_URL";
+        elem_type_names[pmh_AUTO_LINK_EMAIL] = "AUTO_LINK_EMAIL";
+        elem_type_names[pmh_IMAGE] = "IMAGE";
+        elem_type_names[pmh_CODE] = "CODE";
+        elem_type_names[pmh_HTML] = "HTML";
+        elem_type_names[pmh_HTML_ENTITY] = "HTML_ENTITY";
+        elem_type_names[pmh_EMPH] = "EMPH";
+        elem_type_names[pmh_STRONG] = "STRONG";
+        elem_type_names[pmh_LIST_BULLET] = "LIST_BULLET";
+        elem_type_names[pmh_LIST_ENUMERATOR] = "LIST_ENUMERATOR";
+        elem_type_names[pmh_COMMENT] = "COMMENT";
+        elem_type_names[pmh_H1] = "H1";
+        elem_type_names[pmh_H2] = "H2";
+        elem_type_names[pmh_H3] = "H3";
+        elem_type_names[pmh_H4] = "H4";
+        elem_type_names[pmh_H5] = "H5";
+        elem_type_names[pmh_H6] = "H6";
+        elem_type_names[pmh_BLOCKQUOTE] = "BLOCKQUOTE";
+        elem_type_names[pmh_VERBATIM] = "VERBATIM";
+        elem_type_names[pmh_HTMLBLOCK] = "HTMLBLOCK";
+        elem_type_names[pmh_HRULE] = "HRULE";
+        elem_type_names[pmh_REFERENCE] = "REFERENCE";
+        elem_type_names[pmh_NOTE] = "NOTE";
+    }
+    return elem_type_names;
+}
+
+pmh_element_type pmh_element_type_from_name(char *name)
+{
+    char **elem_type_names = get_element_type_names();
+    
+    int i;
+    for (i = 0; i < pmh_NUM_LANG_TYPES; i++)
+    {
+        char *i_name = elem_type_names[i];
+        if (i_name == NULL)
+            continue;
+        if (strcmp(i_name, name) == 0)
+            return i;
+    }
+    
+    return pmh_NO_TYPE;
+}
+
+char *pmh_element_name_from_type(pmh_element_type type)
+{
+    char **elem_type_names = get_element_type_names();
+    char* ret = elem_type_names[type];
+    if (ret == NULL)
+        return "unknown type";
+    return ret;
+}
+
+
+
+
 /*
 Remove pmh_RAW elements with zero length; return pointer
 to new head.
@@ -494,40 +561,6 @@ void pmh_sort_elements_by_pos(pmh_element *element_lists[])
 
 
 
-char *pmh_type_name(pmh_element_type type)
-{
-    switch (type)
-    {
-        case pmh_SEPARATOR:          return "SEPARATOR"; break;
-        case pmh_EXTRA_TEXT:         return "EXTRA_TEXT"; break;
-        case pmh_NO_TYPE:            return "NO TYPE"; break;
-        case pmh_RAW_LIST:           return "RAW_LIST"; break;
-        case pmh_RAW:                return "RAW"; break;
-        
-        case pmh_LINK:               return "LINK"; break;
-        case pmh_IMAGE:              return "IMAGE"; break;
-        case pmh_CODE:               return "CODE"; break;
-        case pmh_HTML:               return "HTML"; break;
-        case pmh_EMPH:               return "EMPH"; break;
-        case pmh_STRONG:             return "STRONG"; break;
-        case pmh_LIST_BULLET:        return "LIST_BULLET"; break;
-        case pmh_LIST_ENUMERATOR:    return "LIST_ENUMERATOR"; break;
-        case pmh_H1:                 return "H1"; break;
-        case pmh_H2:                 return "H2"; break;
-        case pmh_H3:                 return "H3"; break;
-        case pmh_H4:                 return "H4"; break;
-        case pmh_H5:                 return "H5"; break;
-        case pmh_H6:                 return "H6"; break;
-        case pmh_BLOCKQUOTE:         return "BLOCKQUOTE"; break;
-        case pmh_VERBATIM:           return "VERBATIM"; break;
-        case pmh_HTMLBLOCK:          return "HTMLBLOCK"; break;
-        case pmh_HRULE:              return "HRULE"; break;
-        case pmh_REFERENCE:          return "REFERENCE"; break;
-        case pmh_NOTE:               return "NOTE"; break;
-        default:                 return "?";
-    }
-}
-
 /* return true if extension is selected */
 static bool extension(parser_data *p_data, int ext)
 {
@@ -598,7 +631,7 @@ static pmh_realelement *mk_element(parser_data *p_data, pmh_element_type type,
     p_data->head_elems[pmh_ALL] = result;
     result->all_elems_next = old_all_elements_head;
     
-    //pmh_PRINTF("  mk_element: %s [%ld - %ld]\n", pmh_type_name(type), pos, end);
+    //pmh_PRINTF("  mk_element: %s [%ld - %ld]\n", pmh_element_name_from_type(type), pos, end);
     
     return result;
 }
@@ -709,10 +742,10 @@ static void add(parser_data *p_data, pmh_realelement *elem)
     if (elem->type != pmh_RAW_LIST)
     {
         pmh_PRINTF("  add: %s [%ld - %ld]\n",
-                   pmh_type_name(elem->type), elem->pos, elem->end);
+                   pmh_element_name_from_type(elem->type), elem->pos, elem->end);
         elem = fix_offsets(p_data, elem);
         pmh_PRINTF("     > %s [%ld - %ld]\n",
-                   pmh_type_name(elem->type), elem->pos, elem->end);
+                   pmh_element_name_from_type(elem->type), elem->pos, elem->end);
     }
     else
     {

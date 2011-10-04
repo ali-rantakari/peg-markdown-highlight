@@ -64,7 +64,7 @@ void pmh_sort_elements_by_pos(pmh_element *element_lists[]);
 void pmh_free_elements(pmh_element **elems);
 
 /**
-* \brief Get name of type
+* \brief Get element type name
 * 
 * \param[in]  type  The type value to get the name for.
 * 
@@ -72,5 +72,16 @@ void pmh_free_elements(pmh_element **elems);
 * 
 * \sa pmh_element_type
 */
-char *pmh_type_name(pmh_element_type type);
+char *pmh_element_name_from_type(pmh_element_type type);
+
+/**
+* \brief Get element type from a name
+* 
+* \param[in]  name  The name of the type.
+* 
+* \return The element type corresponding to the given name.
+* 
+* \sa pmh_element_type
+*/
+pmh_element_type pmh_element_type_from_name(char *name);
 
