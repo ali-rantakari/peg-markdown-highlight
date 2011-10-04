@@ -76,7 +76,7 @@ typedef struct
     
     /* Linked list of {start, end} offset pairs determining which parts */
     /* of charbuf to actually parse: */
-    pmh_realelement *elem;
+    pmh_realelement *current_elem;
     pmh_realelement *elem_head;
     
     /* Current parsing offset within charbuf: */
@@ -107,7 +107,7 @@ parser_data *mk_parser_data(char *charbuf,
     p_data->extensions = extensions;
     p_data->charbuf = charbuf;
     p_data->offset = offset;
-    p_data->elem_head = p_data->elem = parsing_elems;
+    p_data->elem_head = p_data->current_elem = parsing_elems;
     p_data->references = references;
     p_data->parsing_only_references = false;
     if (head_elems != NULL)
@@ -372,7 +372,7 @@ void pmh_markdown_to_elements(char *text, int extensions,
         
         // Reset parser state to beginning of input
         p_data->offset = 0;
-        p_data->elem = p_data->elem_head;
+        p_data->current_elem = p_data->elem_head;
         
         // Parse whole document
         parse_markdown(p_data);
@@ -617,10 +617,10 @@ pmh_realelement * mk_etext(parser_data *p_data, char *string)
 /*
 Given an element where the offsets {pos, end} represent
 locations in the *parsed text* (defined by the linked list of pmh_RAW and
-pmh_EXTRA_TEXT elements in p_data->elem), fix these offsets to represent
+pmh_EXTRA_TEXT elements in p_data->current_elem), fix these offsets to represent
 corresponding offsets in the original input (p_data->charbuf). Also split
 the given pmh_realelement into multiple parts if its offsets span multiple
-p_data->elem elements. Return the (list of) elements with real offsets.
+p_data->current_elem elements. Return the (list of) elements with real offsets.
 */
 pmh_realelement *fix_offsets(parser_data *p_data, pmh_realelement *elem)
 {
@@ -772,31 +772,31 @@ void add_raw(parser_data *p_data, long pos, long end)
 
 void yy_input_func(char *buf, int *result, int max_size, parser_data *p_data)
 {
-    if (p_data->elem == NULL)
+    if (p_data->current_elem == NULL)
     {
         (*result) = 0;
         return;
     }
     
-    if (p_data->elem->type == pmh_EXTRA_TEXT)
+    if (p_data->current_elem->type == pmh_EXTRA_TEXT)
     {
         int yyc;
-        bool moreToRead = (p_data->elem->text
-                           && *(p_data->elem->text
-                                + p_data->elem->textOffset) != '\0');
+        bool moreToRead = (p_data->current_elem->text
+                           && *(p_data->current_elem->text
+                                + p_data->current_elem->textOffset) != '\0');
         if (moreToRead)
         {
-            yyc = *(p_data->elem->text + p_data->elem->textOffset++);
+            yyc = *(p_data->current_elem->text + p_data->current_elem->textOffset++);
             pmh_PRINTF("\e[47;30m"); pmh_PUTCHAR(yyc); pmh_PRINTF("\e[0m");
             pmh_IF(yyc == '\n') pmh_PRINTF("\e[47m \e[0m");
         }
         else
         {
             yyc = EOF;
-            p_data->elem = p_data->elem->next;
+            p_data->current_elem = p_data->current_elem->next;
             pmh_PRINTF("\e[41m \e[0m");
-            if (p_data->elem != NULL)
-                p_data->offset = p_data->elem->pos;
+            if (p_data->current_elem != NULL)
+                p_data->offset = p_data->current_elem->pos;
         }
         (*result) = (EOF == yyc) ? 0 : (*(buf) = yyc, 1);
         return;
@@ -809,12 +809,12 @@ void yy_input_func(char *buf, int *result, int max_size, parser_data *p_data)
     pmh_PRINTF("\e[43;30m"); pmh_PUTCHAR(*buf); pmh_PRINTF("\e[0m");
     pmh_IF(*buf == '\n') pmh_PRINTF("\e[42m \e[0m");
     
-    if (p_data->offset >= p_data->elem->end)
+    if (p_data->offset >= p_data->current_elem->end)
     {
-        p_data->elem = p_data->elem->next;
+        p_data->current_elem = p_data->current_elem->next;
         pmh_PRINTF("\e[41m \e[0m");
-        if (p_data->elem != NULL)
-            p_data->offset = p_data->elem->pos;
+        if (p_data->current_elem != NULL)
+            p_data->offset = p_data->current_elem->pos;
     }
 }
 
