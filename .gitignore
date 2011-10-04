@@ -3,8 +3,7 @@
 *.dSYM
 peg/leg
 peg/peg
-markdown_parser.c
-markdown_parser_core.c
+pmh_parser.c
 tester
 multithread_tester
 highlighter
