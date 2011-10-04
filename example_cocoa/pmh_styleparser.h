@@ -1,1 +1,1 @@
-../styleparser/pmh_styleparser.h
+../pmh_styleparser.h

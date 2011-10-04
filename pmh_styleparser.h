@@ -133,3 +133,7 @@ pmh_style_collection *pmh_parse_styles(char *input,
 void pmh_free_style_collection(pmh_style_collection *collection);
 
 
+char *pmh_attr_name_from_type(pmh_attr_type type);
+
+pmh_attr_type pmh_attr_type_from_name(char *name);
+

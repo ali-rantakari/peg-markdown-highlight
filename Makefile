@@ -5,6 +5,7 @@ TESTER=tester
 MULTITHREAD_TESTER=multithread_tester
 TEST_CLIENT=testclient
 HIGHLIGHTER=highlighter
+STYLEPARSERTESTER=styleparsertester
 CFLAGS ?= -Wall -Wswitch -Wshadow -Wsign-compare -Werror -O3 -std=gnu89
 OBJC_CFLAGS=-framework Foundation -framework AppKit
 
@@ -58,22 +59,39 @@ $(BENCH) : bench.c pmh_parser.o
 	@echo '------- building bench'
 	$(CC) $(CFLAGS) -o $@ pmh_parser.o $<
 
-docs: pmh_parser.h pmh_definitions.h styleparser/pmh_styleparser.h tools/markdown.css styleparser/stylesheet_syntax.md doxygen/doxygen.cfg doxygen/doxygen.h doxygen/doxygen_footer.html example_cocoa/HGMarkdownHighlighter.h
+pmh_styleparser.o : pmh_styleparser.c pmh_styleparser.h pmh_definitions.h
+	@echo '------- building pmh_styleparser.o'
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+$(STYLEPARSERTESTER) : styleparsertester.c pmh_styleparser.o pmh_parser.o
+	@echo '------- building styleparsertester'
+	$(CC) $(CFLAGS) -o $@ pmh_styleparser.o pmh_parser.o $<
+
+docs: pmh_parser.h pmh_definitions.h styleparser/pmh_styleparser.h tools/markdown.css stylesheet_syntax.md doxygen/doxygen.cfg doxygen/doxygen.h doxygen/doxygen_footer.html example_cocoa/HGMarkdownHighlighter.h
 	doxygen doxygen/doxygen.cfg
-	tools/compile_markdown.sh styleparser/stylesheet_syntax.md "PEG Markdown Highlight Stylesheet Syntax" > docs/html/stylesheet_syntax.html
+	tools/compile_markdown.sh stylesheet_syntax.md "PEG Markdown Highlight Stylesheet Syntax" > docs/html/stylesheet_syntax.html
 	cp tools/markdown.css docs/html/.
 	touch docs
+
+analyze: pmh_parser.c
+	clang --analyze pmh_parser.c
+
+analyze-styleparser:
+	clang --analyze pmh_styleparser.c
+
+leak-check: $(TESTER)
+	valgrind --leak-check=full --dsymutil=yes ./$(TESTER) 100 todo.md
+
+leak-check-styleparser: $(STYLEPARSERTESTER)
+	valgrind --leak-check=full --dsymutil=yes ./$(STYLEPARSERTESTER) < styles/teststyle.style
 
 .PHONY: clean test
 
 clean:
-	rm -f pmh_parser_core.c pmh_parser.c *.o $(TESTER) $(TEST_CLIENT) $(HIGHLIGHTER) $(BENCH) $(MULTITHREAD_TESTER); \
+	rm -f pmh_parser_core.c pmh_parser.c *.o $(TESTER) $(TEST_CLIENT) $(HIGHLIGHTER) $(BENCH) $(MULTITHREAD_TESTER) $(STYLEPARSERTESTER); \
 	rm -rf *.dSYM; \
 	make -C $(GREGDIR) clean
 
 distclean: clean
 	make -C $(GREGDIR) spotless
-
-leak-check: $(TESTER)
-	valgrind --leak-check=full ./$(TESTER) 100 todo.md
 

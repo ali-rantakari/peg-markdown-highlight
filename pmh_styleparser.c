@@ -7,12 +7,14 @@
  * Parser for custom syntax highlighting stylesheets.
  */
 
-#include "pmh_styleparser.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
 #include <ctype.h>
+
+#include "pmh_styleparser.h"
+#include "pmh_parser.h"
 
 
 #if pmh_DEBUG_OUTPUT
@@ -23,7 +25,7 @@
 
 
 // vasprintf is not in the C standard nor in POSIX so we provide our own
-int our_vasprintf(char **strptr, const char *fmt, va_list argptr)
+static int our_vasprintf(char **strptr, const char *fmt, va_list argptr)
 {
     int ret;
     va_list argptr2;
@@ -64,7 +66,8 @@ typedef struct raw_attribute
     struct raw_attribute *next;
 } raw_attribute;
 
-raw_attribute *new_raw_attribute(char *name, char *value, int line_number)
+static raw_attribute *new_raw_attribute(char *name, char *value,
+                                        int line_number)
 {
     raw_attribute *v = (raw_attribute *)malloc(sizeof(raw_attribute));
     v->name = name;
@@ -74,7 +77,7 @@ raw_attribute *new_raw_attribute(char *name, char *value, int line_number)
     return v;
 }
 
-void free_raw_attributes(raw_attribute *list)
+static void free_raw_attributes(raw_attribute *list)
 {
     raw_attribute *cur = list;
     while (cur != NULL)
@@ -88,7 +91,8 @@ void free_raw_attributes(raw_attribute *list)
 }
 
 
-void report_error(style_parser_data *p_data, int line_number, char *str, ...)
+static void report_error(style_parser_data *p_data,
+                         int line_number, char *str, ...)
 {
     if (p_data->error_callback == NULL)
         return;
@@ -104,7 +108,7 @@ void report_error(style_parser_data *p_data, int line_number, char *str, ...)
 
 
 
-char *trim_str(char *str)
+static char *trim_str(char *str)
 {
     while (isspace(*str))
         str++;
@@ -117,7 +121,7 @@ char *trim_str(char *str)
     return str;
 }
 
-char *trim_str_dup(char *str)
+static char *trim_str_dup(char *str)
 {
     size_t start = 0;
     while (isspace(*(str + start)))
@@ -134,7 +138,7 @@ char *trim_str_dup(char *str)
     return ret;
 }
 
-char *strcpy_lower(char *str)
+static char *strcpy_lower(char *str)
 {
     char *low = strdup(str);
     int i;
@@ -144,7 +148,7 @@ char *strcpy_lower(char *str)
     return low;
 }
 
-char *standardize_str(char *str)
+static char *standardize_str(char *str)
 {
     return strcpy_lower(trim_str(str));
 }
@@ -152,13 +156,14 @@ char *standardize_str(char *str)
 
 
 
-pmh_attr_argb_color *new_argb_color(int r, int g, int b, int a)
+static pmh_attr_argb_color *new_argb_color(int r, int g, int b, int a)
 {
-    pmh_attr_argb_color *c = (pmh_attr_argb_color *)malloc(sizeof(pmh_attr_argb_color));
+    pmh_attr_argb_color *c = (pmh_attr_argb_color *)
+                             malloc(sizeof(pmh_attr_argb_color));
     c->red = r; c->green = g; c->blue = b; c->alpha = a;
     return c;
 }
-pmh_attr_argb_color *new_argb_from_hex(long hex, bool has_alpha)
+static pmh_attr_argb_color *new_argb_from_hex(long hex, bool has_alpha)
 {
     // 0xaarrggbb
     int a = has_alpha ? ((hex >> 24) & 0xFF) : 255;
@@ -167,8 +172,9 @@ pmh_attr_argb_color *new_argb_from_hex(long hex, bool has_alpha)
     int b = (hex & 0xFF);
     return new_argb_color(r,g,b,a);
 }
-pmh_attr_argb_color *new_argb_from_hex_str(style_parser_data *p_data,
-                                       int attr_line_number, char *str)
+static pmh_attr_argb_color *new_argb_from_hex_str(style_parser_data *p_data,
+                                                  int attr_line_number,
+                                                  char *str)
 {
     // "aarrggbb"
     int len = strlen(str);
@@ -192,12 +198,12 @@ pmh_attr_argb_color *new_argb_from_hex_str(style_parser_data *p_data,
     return new_argb_from_hex(num, (len == 8));
 }
 
-pmh_attr_value *new_attr_value()
+static pmh_attr_value *new_attr_value()
 {
     return (pmh_attr_value *)malloc(sizeof(pmh_attr_value));
 }
 
-pmh_attr_font_styles *new_font_styles()
+static pmh_attr_font_styles *new_font_styles()
 {
     pmh_attr_font_styles *ret = (pmh_attr_font_styles *)
                             malloc(sizeof(pmh_attr_font_styles));
@@ -207,7 +213,7 @@ pmh_attr_font_styles *new_font_styles()
     return ret;
 }
 
-pmh_style_attribute *new_attr(char *name, pmh_attr_type type)
+static pmh_style_attribute *new_attr(char *name, pmh_attr_type type)
 {
     pmh_style_attribute *attr = (pmh_style_attribute *)malloc(sizeof(pmh_style_attribute));
     attr->name = strdup(name);
@@ -216,7 +222,7 @@ pmh_style_attribute *new_attr(char *name, pmh_attr_type type)
     return attr;
 }
 
-void free_style_attributes(pmh_style_attribute *list)
+static void free_style_attributes(pmh_style_attribute *list)
 {
     pmh_style_attribute *cur = list;
     while (cur != NULL)
@@ -245,71 +251,6 @@ void free_style_attributes(pmh_style_attribute *list)
 
 
 
-
-
-
-char **get_element_type_names()
-{
-    static char **elem_type_names = NULL;
-    if (elem_type_names == NULL)
-    {
-        elem_type_names = (char **)malloc(sizeof(char*) * pmh_NUM_LANG_TYPES);
-        int i;
-        for (i = 0; i < pmh_NUM_LANG_TYPES; i++)
-            elem_type_names[i] = NULL;
-        elem_type_names[pmh_LINK] = "LINK";
-        elem_type_names[pmh_AUTO_LINK_URL] = "AUTO_LINK_URL";
-        elem_type_names[pmh_AUTO_LINK_EMAIL] = "AUTO_LINK_EMAIL";
-        elem_type_names[pmh_IMAGE] = "IMAGE";
-        elem_type_names[pmh_CODE] = "CODE";
-        elem_type_names[pmh_HTML] = "HTML";
-        elem_type_names[pmh_HTML_ENTITY] = "HTML_ENTITY";
-        elem_type_names[pmh_EMPH] = "EMPH";
-        elem_type_names[pmh_STRONG] = "STRONG";
-        elem_type_names[pmh_LIST_BULLET] = "LIST_BULLET";
-        elem_type_names[pmh_LIST_ENUMERATOR] = "LIST_ENUMERATOR";
-        elem_type_names[pmh_COMMENT] = "COMMENT";
-        elem_type_names[pmh_H1] = "H1";
-        elem_type_names[pmh_H2] = "H2";
-        elem_type_names[pmh_H3] = "H3";
-        elem_type_names[pmh_H4] = "H4";
-        elem_type_names[pmh_H5] = "H5";
-        elem_type_names[pmh_H6] = "H6";
-        elem_type_names[pmh_BLOCKQUOTE] = "BLOCKQUOTE";
-        elem_type_names[pmh_VERBATIM] = "VERBATIM";
-        elem_type_names[pmh_HTMLBLOCK] = "HTMLBLOCK";
-        elem_type_names[pmh_HRULE] = "HRULE";
-        elem_type_names[pmh_REFERENCE] = "REFERENCE";
-        elem_type_names[pmh_NOTE] = "NOTE";
-    }
-    return elem_type_names;
-}
-
-pmh_element_type pmh_element_type_from_name(char *name)
-{
-    char **elem_type_names = get_element_type_names();
-    
-    int i;
-    for (i = 0; i < pmh_NUM_LANG_TYPES; i++)
-    {
-        char *i_name = elem_type_names[i];
-        if (i_name == NULL)
-            continue;
-        if (strcmp(i_name, name) == 0)
-            return i;
-    }
-    
-    return pmh_NO_TYPE;
-}
-
-char *pmh_element_name_from_type(pmh_element_type type)
-{
-    char **elem_type_names = get_element_type_names();
-    char* ret = elem_type_names[type];
-    if (ret == NULL)
-        return "unknown type";
-    return ret;
-}
 
 
 #define IF_ATTR_NAME(x) if (strcmp(x, name) == 0)
@@ -358,7 +299,7 @@ typedef struct multi_value
     struct multi_value *next;
 } multi_value;
 
-multi_value *split_multi_value(char *input, char separator)
+static multi_value *split_multi_value(char *input, char separator)
 {
     multi_value *head = NULL;
     multi_value *tail = NULL;
@@ -393,7 +334,7 @@ multi_value *split_multi_value(char *input, char separator)
     return head;
 }
 
-void free_multi_value(multi_value *val)
+static void free_multi_value(multi_value *val)
 {
     multi_value *cur = val;
     while (cur != NULL)
@@ -411,9 +352,9 @@ void free_multi_value(multi_value *val)
 
 #define EQUALS(a,b) (strcmp(a, b) == 0)
 
-pmh_style_attribute *interpret_attributes(style_parser_data *p_data,
-                                      pmh_element_type lang_element_type,
-                                      raw_attribute *raw_attributes)
+static pmh_style_attribute *interpret_attributes(style_parser_data *p_data,
+                                                 pmh_element_type lang_element_type,
+                                                 raw_attribute *raw_attributes)
 {
     pmh_style_attribute *attrs = NULL;
     
@@ -498,10 +439,10 @@ pmh_style_attribute *interpret_attributes(style_parser_data *p_data,
 }
 
 
-void interpret_and_add_style(style_parser_data *p_data,
-                             char *style_rule_name,
-                             int style_rule_line_number,
-                             raw_attribute *raw_attributes)
+static void interpret_and_add_style(style_parser_data *p_data,
+                                    char *style_rule_name,
+                                    int style_rule_line_number,
+                                    raw_attribute *raw_attributes)
 {
     bool isEditorType = false;
     bool isCurrentLineType = false;
@@ -541,17 +482,17 @@ void interpret_and_add_style(style_parser_data *p_data,
 
 
 
-bool char_is_whitespace(char c)
+static bool char_is_whitespace(char c)
 {
     return (c == ' ' || c == '\t');
 }
 
-bool char_begins_linecomment(char c)
+static bool char_begins_linecomment(char c)
 {
     return (c == '#');
 }
 
-bool line_is_comment(multi_value *line)
+static bool line_is_comment(multi_value *line)
 {
     char *c;
     for (c = line->value; *c != '\0'; c++)
@@ -562,7 +503,7 @@ bool line_is_comment(multi_value *line)
     return false;
 }
 
-bool line_is_empty(multi_value *line)
+static bool line_is_empty(multi_value *line)
 {
     char *c;
     for (c = line->value; *c != '\0'; c++)
@@ -581,7 +522,7 @@ typedef struct block
     struct block *next;
 } block;
 
-block *new_block()
+static block *new_block()
 {
     block *ret = (block *)malloc(sizeof(block));
     ret->next = NULL;
@@ -589,7 +530,7 @@ block *new_block()
     return ret;
 }
 
-void free_blocks(block *val)
+static void free_blocks(block *val)
 {
     block *cur = val;
     while (cur != NULL)
@@ -602,7 +543,7 @@ void free_blocks(block *val)
     }
 }
 
-block *get_blocks(char *input)
+static block *get_blocks(char *input)
 {
     block *head = NULL;
     block *tail = NULL;
@@ -687,7 +628,7 @@ block *get_blocks(char *input)
 #define IS_ATTRIBUTE_VALUE_CHAR(c)  \
     ( (c) != '\0' && !char_begins_linecomment(c) )
 
-char *get_style_rule_name(multi_value *line)
+static char *get_style_rule_name(multi_value *line)
 {
     char *str = line->value;
     
@@ -712,8 +653,8 @@ char *get_style_rule_name(multi_value *line)
     return value;
 }
 
-bool parse_attribute_line(style_parser_data *p_data, multi_value *line,
-                          char **out_attr_name, char **out_attr_value)
+static bool parse_attribute_line(style_parser_data *p_data, multi_value *line,
+                                 char **out_attr_name, char **out_attr_value)
 {
     char *str = line->value;
     
@@ -784,7 +725,7 @@ bool parse_attribute_line(style_parser_data *p_data, multi_value *line,
 
 // - Removes UTF-8 BOM
 // - Standardizes line endings to \n
-char *strcpy_preformat_style(char *str)
+static char *strcpy_preformat_style(char *str)
 {
     char *new_str = (char *)malloc(sizeof(char) * strlen(str) + 1);
     
@@ -822,7 +763,7 @@ char *strcpy_preformat_style(char *str)
 
 
 
-void _sty_parse(style_parser_data *p_data)
+static void _sty_parse(style_parser_data *p_data)
 {
     // We don't have to worry about leaking the original p_data->input;
     // the user of the library is responsible for that:
@@ -907,13 +848,14 @@ void _sty_parse(style_parser_data *p_data)
 
 
 
-pmh_style_collection *new_style_collection()
+static pmh_style_collection *new_style_collection()
 {
     pmh_style_collection *sc = (pmh_style_collection *)
-                           malloc(sizeof(pmh_style_collection));
+                               malloc(sizeof(pmh_style_collection));
     
     sc->element_styles = (pmh_style_attribute**)
-                         malloc(sizeof(pmh_style_attribute*) * pmh_NUM_LANG_TYPES);
+                         malloc(sizeof(pmh_style_attribute*)
+                                * pmh_NUM_LANG_TYPES);
     int i;
     for (i = 0; i < pmh_NUM_LANG_TYPES; i++)
         sc->element_styles[i] = NULL;
@@ -937,7 +879,7 @@ void pmh_free_style_collection(pmh_style_collection *coll)
     free(coll);
 }
 
-style_parser_data *new_style_parser_data(char *input)
+static style_parser_data *new_style_parser_data(char *input)
 {
     style_parser_data *p_data = (style_parser_data*)
                                 malloc(sizeof(style_parser_data));

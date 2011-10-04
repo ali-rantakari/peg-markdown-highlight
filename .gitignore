@@ -8,6 +8,7 @@ tester
 multithread_tester
 highlighter
 testclient
+styleparsertester
 bench
 docs
 #*#
