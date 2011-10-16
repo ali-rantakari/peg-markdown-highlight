@@ -359,8 +359,10 @@ HtmlBlockInTags = HtmlBlockAddress
                 | HtmlBlockTr
                 | HtmlBlockScript
 
-HtmlBlock = ( HtmlBlockInTags | HtmlComment | HtmlBlockSelfClosing )
+HtmlBlock = < s:LocMarker
+              ( HtmlBlockInTags | HtmlComment | HtmlBlockSelfClosing ) >
             BlankLine+
+            { ADD(elem_s(pmh_HTMLBLOCK)); }
 
 HtmlBlockSelfClosing = '<' Spnl HtmlBlockType Spnl HtmlAttribute* '/' Spnl '>'
 
@@ -374,8 +376,9 @@ HtmlBlockType = "address" | "blockquote" | "center" | "dir" | "div" | "dl" | "fi
 StyleOpen =     '<' Spnl ("style" | "STYLE") Spnl HtmlAttribute* '>'
 StyleClose =    '<' Spnl '/' ("style" | "STYLE") Spnl '>'
 InStyleTags =   StyleOpen (!StyleClose .)* StyleClose
-StyleBlock =    InStyleTags
+StyleBlock =    < s:LocMarker InStyleTags >
                 BlankLine*
+                { ADD(elem_s(pmh_HTMLBLOCK)); }
 
 Inlines  =  ( !Endline Inline
               | Endline &Inline )+ Endline?
@@ -592,7 +595,8 @@ Code = < ( s:Ticks1 Sp ( ( !'`' Nonspacechar )+ | !Ticks1 '`'+ | !( Sp Ticks1 ) 
        ) >
        { ADD(elem_s(pmh_CODE)); }
 
-RawHtml =   (HtmlComment | HtmlBlockScript | HtmlTag)
+RawHtml =   < s:LocMarker (HtmlComment | HtmlBlockScript | HtmlTag) >
+            { ADD(elem_s(pmh_HTML)); }
 
 BlankLine =     Sp Newline
 

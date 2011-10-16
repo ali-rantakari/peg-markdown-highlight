@@ -82,6 +82,8 @@ void apply_highlighting(NSMutableAttributedString *attrStr, pmh_element *elem[])
                 case pmh_LINK:      bgColor = [NSColor blackColor];
                                     fgColor = [NSColor cyanColor]; break;
                 case pmh_BLOCKQUOTE:fgColor = [NSColor magentaColor]; break;
+                case pmh_HTMLBLOCK: fgColor = [NSColor magentaColor]; break;
+                case pmh_HTML:      fgColor = [NSColor cyanColor]; break;
                 default: break;
             }
             
