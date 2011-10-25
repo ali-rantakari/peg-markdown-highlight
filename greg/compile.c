@@ -532,7 +532,7 @@ YY_LOCAL(int) yyText(GREG *G, int begin, int end)\n\
     yyleng= 0;\n\
   else\n\
     {\n\
-      while (G->textlen < (yyleng - 1))\n\
+      while (G->textlen < (yyleng + 1))\n\
         {\n\
           G->textlen *= 2;\n\
           G->text= (char *)YY_REALLOC(G->text, G->textlen, G->data);\n\
