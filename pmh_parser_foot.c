@@ -11,12 +11,12 @@
 
 static void _parse(parser_data *p_data, yyrule start_rule)
 {
-    GREG *g = yyparse_new(p_data);
+    GREG *g = YY_NAME(parse_new)(p_data);
     if (start_rule == NULL)
-        yyparse(g);
+        YY_NAME(parse)(g);
     else
-        yyparse_from(g, start_rule);
-    yyparse_free(g);
+        YY_NAME(parse_from)(g, start_rule);
+    YY_NAME(parse_free)(g);
     
     pmh_PRINTF("\n\n");
 }
