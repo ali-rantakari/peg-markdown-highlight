@@ -535,7 +535,7 @@ AutoLinkUrl =  < s:LocMarker { s->type = pmh_AUTO_LINK_URL; }
 
 AutoLinkEmail = < s:LocMarker { s->type = pmh_AUTO_LINK_EMAIL; }
                 '<'
-                  < [-A-Za-z0-9+_.]+ '@' ( !Newline !'>' . )+ >
+                  ( "mailto:" )? < [-A-Za-z0-9+_./!%~$]+ '@' ( !Newline !'>' . )+ >
                   { s->address = strdup(yytext); }
                 '>' >
                {
