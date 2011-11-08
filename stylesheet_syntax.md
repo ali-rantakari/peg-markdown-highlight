@@ -107,6 +107,7 @@ The following is a list of the names of predefined attributes, and the values th
     - See the *Color Attribute Values* subsection for information about valid values for this attribute.
 - `font-size`
     - An integer value for the font size, *in points* (i.e. not in pixels). The number may have a textual suffix such as `pt`.
+    - If the value begins with `+` or `-`, it is considered *relative* to some base font size (as defined by the host application). For example, the value `3` defines the font size as 3 (absolute) while `+3` defines it as +3 (relative), i.e. 3 point sizes larger than the base font size.
 - `font-family`
     - A comma-separated list of one or more arbitrary font family names. *(It is up to the application that uses the PEG Markdown Highlight library to resolve this string to actual fonts on the system.)*
 - `font-style`
