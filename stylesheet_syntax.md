@@ -12,19 +12,69 @@ Example
 
 Here is a quick, simple example of a stylesheet:
 
-    # The first comment lines describe the
-    # stylesheet.
-    
-    editor:
-      foreground: ff0000 # red text
-      background: 000000
-    
-    H1:
-      font-size: 14
-      font-style: bold, underlined
-    
-    EMPH:
-      font-style: italic
+<style>
+.codetable { border-collapse: collapse; }
+.codetable .left { text-align: right; padding-right: 10px; }
+.codetable .right { text-align: left; padding-left: 10px; }
+.codetable .content { font-family: monospace; background: #eee; padding: 0 5px; }
+.codetable .comment { color: #174EB3; }
+.codetable .rule { color: #491B8F; }
+.codetable .attrname { color: #48B317; }
+.codetable .attrvalue { color: #A65C1F; }
+</style>
+
+<table class="codetable">
+<tr>
+    <td class="left"></td>
+    <td class="content"># The first comment lines</td>
+    <td class="right"></td>
+</tr>
+<tr>
+    <td class="left"></td>
+    <td class="content"># describe the stylesheet.</td>
+    <td class="right"></td>
+</tr>
+<tr>
+    <td class="left"></td>
+    <td class="content">&nbsp;</td>
+    <td class="right"></td>
+</tr>
+<tr>
+    <td class="left"><span class="rule">Style rule &rarr;</span></td>
+    <td class="content"><span class="rule">editor:</span></td>
+    <td class="right"></td>
+</tr>
+<tr>
+    <td class="left"></td>
+    <td class="content">&nbsp;&nbsp;foreground: ff0000 <span class="comment"># red text</span></td>
+    <td class="right"><span class="comment">&larr; Comment</span></td>
+</tr>
+<tr>
+    <td class="left"><span class="attrname">Attribute name &rarr;</span></td>
+    <td class="content">&nbsp;&nbsp;<span class="attrname">font-family</span>: <span class="attrvalue">Consolas</span></td>
+    <td class="right"><span class="attrvalue">&larr; Attribute value</span></td>
+</tr>
+<tr>
+    <td class="left"></td>
+    <td class="content">&nbsp;</td>
+    <td class="right"></td>
+</tr>
+<tr>
+    <td class="left"></td>
+    <td class="content">EMPH:</td>
+    <td class="right"></td>
+</tr>
+<tr>
+    <td class="left"></td>
+    <td class="content">&nbsp;&nbsp;font-size: 14</td>
+    <td class="right"></td>
+</tr>
+<tr>
+    <td class="left"></td>
+    <td class="content">&nbsp;&nbsp;font-style: bold, underlined</td>
+    <td class="right"></td>
+</tr>
+</table>
 
 
 Style Rules
