@@ -35,6 +35,14 @@ typedef struct
     bool underlined;
 } pmh_attr_font_styles;
 
+/** \brief Font size attribute value. */
+typedef struct
+{
+    int size_pt;        /**< The font point size */
+    bool is_relative;   /**< Whether the size is relative (i.e. size_pt points
+                             larger than the default font) */
+} pmh_attr_font_size;
+
 /** \brief Style attribute types. */
 typedef enum
 {
@@ -59,7 +67,7 @@ typedef union
 {
     pmh_attr_argb_color *argb_color;    /**< ARGB color */
     pmh_attr_font_styles *font_styles;  /**< Font styles */
-    int font_size_pt;                   /**< Font size */
+    pmh_attr_font_size *font_size;      /**< Font size */
     char *font_family;                  /**< Font family */
     char *string;                       /**< Arbitrary custom string value
                                              (use this if the attribute's type

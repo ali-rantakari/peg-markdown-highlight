@@ -206,10 +206,19 @@ static pmh_attr_value *new_attr_value()
 static pmh_attr_font_styles *new_font_styles()
 {
     pmh_attr_font_styles *ret = (pmh_attr_font_styles *)
-                            malloc(sizeof(pmh_attr_font_styles));
+                                malloc(sizeof(pmh_attr_font_styles));
     ret->italic = false;
     ret->bold = false;
     ret->underlined = false;
+    return ret;
+}
+
+static pmh_attr_font_size *new_font_size()
+{
+    pmh_attr_font_size *ret = (pmh_attr_font_size *)
+                              malloc(sizeof(pmh_attr_font_size));
+    ret->is_relative = false;
+    ret->size_pt = 0;
     return ret;
 }
 
@@ -239,6 +248,8 @@ static void free_style_attributes(pmh_style_attribute *list)
                 free(cur->value->font_family);
             else if (cur->type == pmh_attr_type_font_style)
                 free(cur->value->font_styles);
+            else if (cur->type == pmh_attr_type_font_size_pt)
+                free(cur->value->font_size);
             else if (cur->type == pmh_attr_type_other)
                 free(cur->value->string);
             free(cur->value);
@@ -381,8 +392,14 @@ static pmh_style_attribute *interpret_attributes(style_parser_data *p_data,
         }
         else if (atype == pmh_attr_type_font_size_pt)
         {
+            pmh_attr_font_size *fs = new_font_size();
+            attr->value->font_size = fs;
+            
+            char *trimmed_value = trim_str_dup(cur->value);
+            
+            fs->is_relative = (*trimmed_value == '+' || *trimmed_value == '-');
             char *endptr = NULL;
-            attr->value->font_size_pt = (int)strtol(cur->value, &endptr, 10);
+            fs->size_pt = (int)strtol(cur->value, &endptr, 10);
             if (endptr == cur->value) {
                 report_error(p_data, cur->line_number,
                              "Value '%s' is invalid for attribute '%s'",
@@ -390,6 +407,8 @@ static pmh_style_attribute *interpret_attributes(style_parser_data *p_data,
                 free_style_attributes(attr);
                 attr = NULL;
             }
+            
+            free(trimmed_value);
         }
         else if (atype == pmh_attr_type_font_family)
         {

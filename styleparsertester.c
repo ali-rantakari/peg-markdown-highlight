@@ -69,7 +69,14 @@ void print_styles(pmh_style_attribute *list)
             printf("\n");
         }
         else if (list->type == pmh_attr_type_font_size_pt)
-            printf("%i pt\n", list->value->font_size_pt);
+        {
+            bool rel = list->value->font_size->is_relative;
+            int size = list->value->font_size->size_pt;
+            printf("%s%i pt (%s)\n",
+                   (rel ? ((0 < size) ? "+" : "") : ""),
+                   size,
+                   (rel ? "relative" : "absolute"));
+        }
         else if (list->type == pmh_attr_type_font_family)
             printf("\"%s\"\n", list->value->font_family);
         else if (list->type == pmh_attr_type_other)
