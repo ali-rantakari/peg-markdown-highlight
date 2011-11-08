@@ -16,6 +16,7 @@
 		C938C8061322C0F100C18368 /* huge.md in Resources */ = {isa = PBXBuildFile; fileRef = C938C8051322C0F100C18368 /* huge.md */; };
 		C9445EFF13F999B90049EB62 /* pmh_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = C9445EFD13F999B90049EB62 /* pmh_parser.c */; };
 		C96A013D1438E51F00DFF295 /* pmh_styleparser.c in Sources */ = {isa = PBXBuildFile; fileRef = C96A013B1438E51F00DFF295 /* pmh_styleparser.c */; };
+		C96EEC401469AED4004CF805 /* fontsizes.style in Resources */ = {isa = PBXBuildFile; fileRef = C96EEC3F1469AED4004CF805 /* fontsizes.style */; };
 		C977520F143B9AF70071AAA5 /* error.style in Resources */ = {isa = PBXBuildFile; fileRef = C977520B143B9AF70071AAA5 /* error.style */; };
 		C9775210143B9AF70071AAA5 /* playground.style in Resources */ = {isa = PBXBuildFile; fileRef = C977520C143B9AF70071AAA5 /* playground.style */; };
 		C9775211143B9AF70071AAA5 /* solarized-dark.style in Resources */ = {isa = PBXBuildFile; fileRef = C977520D143B9AF70071AAA5 /* solarized-dark.style */; };
@@ -45,6 +46,7 @@
 		C9445EFE13F999B90049EB62 /* pmh_parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pmh_parser.h; sourceTree = "<group>"; };
 		C96A013B1438E51F00DFF295 /* pmh_styleparser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pmh_styleparser.c; sourceTree = "<group>"; };
 		C96A013C1438E51F00DFF295 /* pmh_styleparser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pmh_styleparser.h; sourceTree = "<group>"; };
+		C96EEC3F1469AED4004CF805 /* fontsizes.style */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = fontsizes.style; path = ../styles/fontsizes.style; sourceTree = SOURCE_ROOT; };
 		C977520B143B9AF70071AAA5 /* error.style */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = error.style; path = ../styles/error.style; sourceTree = SOURCE_ROOT; };
 		C977520C143B9AF70071AAA5 /* playground.style */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = playground.style; path = ../styles/playground.style; sourceTree = SOURCE_ROOT; };
 		C977520D143B9AF70071AAA5 /* solarized-dark.style */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "solarized-dark.style"; path = "../styles/solarized-dark.style"; sourceTree = SOURCE_ROOT; };
@@ -126,6 +128,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				C96EEC3F1469AED4004CF805 /* fontsizes.style */,
 				C977520B143B9AF70071AAA5 /* error.style */,
 				C977520C143B9AF70071AAA5 /* playground.style */,
 				C977520D143B9AF70071AAA5 /* solarized-dark.style */,
@@ -222,6 +225,7 @@
 				C9775210143B9AF70071AAA5 /* playground.style in Resources */,
 				C9775211143B9AF70071AAA5 /* solarized-dark.style in Resources */,
 				C9775212143B9AF70071AAA5 /* solarized-light.style in Resources */,
+				C96EEC401469AED4004CF805 /* fontsizes.style in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
