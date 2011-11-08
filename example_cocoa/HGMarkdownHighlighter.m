@@ -505,6 +505,10 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 							    withObject:styleParsingErrors];
 	}
 	
+	NSFont *baseFont = [self.defaultTypingAttributes objectForKey:NSFontAttributeName];
+	if (baseFont == nil)
+		baseFont = [self.targetTextView font];
+	
 	NSMutableArray *stylesArr = [NSMutableArray array];
 	
 	// Set language element styles
@@ -515,7 +519,8 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 		if (cur == NULL)
 			continue;
 		HGMarkdownHighlightingStyle *style = [[[HGMarkdownHighlightingStyle alloc]
-											   initWithStyleAttributes:cur] autorelease];
+											   initWithStyleAttributes:cur
+											   baseFont:baseFont] autorelease];
 		[stylesArr addObject:style];
 	}
 	
@@ -581,7 +586,8 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 		if (style_coll->editor_current_line_styles != NULL)
 		{
 			self.currentLineStyle = [[[HGMarkdownHighlightingStyle alloc]
-									  initWithStyleAttributes:style_coll->editor_current_line_styles]
+									  initWithStyleAttributes:style_coll->editor_current_line_styles
+									  baseFont:baseFont]
 									 autorelease];
 		}
 		else

@@ -69,7 +69,7 @@
 	fontTraitsToAdd:(NSFontTraitMask)traits;
 
 /** \brief Init a new instance based on styles from the stylesheet parser. */
-- (id) initWithStyleAttributes:(pmh_style_attribute *)attributes;
+- (id) initWithStyleAttributes:(pmh_style_attribute *)attributes baseFont:(NSFont *)baseFont;
 
 /** \brief The Markdown language element type these styles pertain to. */
 @property pmh_element_type elementType;

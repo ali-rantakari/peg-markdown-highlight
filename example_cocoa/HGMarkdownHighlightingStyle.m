@@ -7,6 +7,7 @@
 
 #import "HGMarkdownHighlightingStyle.h"
 
+#define kMinFontSize 4
 
 @implementation HGMarkdownHighlightingStyle
 
@@ -35,6 +36,7 @@
 }
 
 - (id) initWithStyleAttributes:(pmh_style_attribute *)attributes
+					  baseFont:(NSFont *)baseFont
 {
 	if (!(self = [super init]))
 		return nil;
@@ -45,7 +47,8 @@
 	
 	NSMutableDictionary *toAdd = [NSMutableDictionary dictionary];
 	NSString *fontName = nil;
-	CGFloat fontSize = -1;
+	CGFloat fontSize = 0;
+	BOOL fontSizeIsRelative = NO;
 	
 	while (cur != NULL)
 	{
@@ -69,7 +72,10 @@
 		}
 		
 		else if (cur->type == pmh_attr_type_font_size_pt)
-			fontSize = (CGFloat)cur->value->font_size_pt;
+		{
+			fontSize = (CGFloat)cur->value->font_size->size_pt;
+			fontSizeIsRelative = (cur->value->font_size->is_relative == true);
+		}
 		
 		else if (cur->type == pmh_attr_type_font_family)
 			fontName = [NSString stringWithUTF8String:cur->value->font_family];
@@ -77,11 +83,22 @@
 		cur = cur->next;
 	}
 	
-	if (fontName != nil || 0 < fontSize)
+	if (fontName != nil || fontSize != 0)
 	{
 		if (fontName == nil)
-			fontName = @"Helvetica";
-		[toAdd setObject:[NSFont fontWithName:fontName size:fontSize]
+			fontName = [baseFont familyName];
+		
+		CGFloat actualFontSize;
+		if (fontSize != 0)
+		{
+			actualFontSize = fontSizeIsRelative ? ([baseFont pointSize] + fontSize) : fontSize;
+			if (actualFontSize < kMinFontSize)
+				actualFontSize = kMinFontSize;
+		}
+		else
+			actualFontSize = [baseFont pointSize];
+		
+		[toAdd setObject:[NSFont fontWithName:fontName size:actualFontSize]
 				  forKey:NSFontAttributeName];
 	}
 	
