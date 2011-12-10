@@ -303,11 +303,14 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 				&& cursor->address != NULL)
 			{
 				NSString *linkAddress = [NSString stringWithUTF8String:cursor->address];
-				if (style.elementType == pmh_AUTO_LINK_EMAIL && ![linkAddress hasPrefix:@"mailto:"])
-					linkAddress = [@"mailto:" stringByAppendingString:linkAddress];
-				[attrStr addAttribute:NSLinkAttributeName
-								value:linkAddress
-								range:hlRange];
+				if (linkAddress != nil)
+				{
+					if (style.elementType == pmh_AUTO_LINK_EMAIL && ![linkAddress hasPrefix:@"mailto:"])
+						linkAddress = [@"mailto:" stringByAppendingString:linkAddress];
+					[attrStr addAttribute:NSLinkAttributeName
+									value:linkAddress
+									range:hlRange];
+				}
 			}
 			
 			for (NSString *attrName in style.attributesToRemove)
