@@ -432,7 +432,7 @@ static int strcpy_preformat(char *str, char **out,
                             unsigned long **out_strip_positions,
                             size_t *out_strip_positions_len)
 {
-    size_t strip_positions_size = 2;
+    size_t strip_positions_size = 1024;
     size_t strip_positions_pos = 0;
     unsigned long *strip_positions = (unsigned long *)
                                      calloc(strip_positions_size,
