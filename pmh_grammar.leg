@@ -24,6 +24,9 @@
 #define FREE_LABEL(l) { free(l->label); l->label = NULL; }
 #define FREE_ADDRESS(l) { free(l->address); l->address = NULL; }
 
+// This gives us the text matched with < > as it appears in the original input:
+#define COPY_YYTEXT_ORIG() copy_input_span((parser_data *)G->data, thunk->begin, thunk->end)
+
 %}
 
 Doc =       ( Block )*
@@ -510,8 +513,8 @@ ExplicitLink =  < s:Label Spnl '(' Sp l:Source Spnl Title Sp ')' >
                 }
 
 Source  = { $$ = mk_notype; }
-          ( '<' < SourceContents > { $$->address = strdup(yytext); } '>'
-          | < SourceContents > { $$->address = strdup(yytext); } )
+          ( '<' < SourceContents > { $$->address = COPY_YYTEXT_ORIG(); } '>'
+          | < SourceContents > { $$->address = COPY_YYTEXT_ORIG(); } )
 
 SourceContents = ( ( !'(' !')' !'>' Nonspacechar )+ | '(' SourceContents ')')*
 
@@ -526,7 +529,7 @@ AutoLink = AutoLinkUrl | AutoLinkEmail
 AutoLinkUrl =  < s:LocMarker { s->type = pmh_AUTO_LINK_URL; }
                '<'
                  < [A-Za-z]+ "://" ( !Newline !'>' . )+ >
-                 { s->address = strdup(yytext); }
+                 { s->address = COPY_YYTEXT_ORIG(); }
                '>' >
                {
                 s->end = thunk->end;
@@ -536,7 +539,7 @@ AutoLinkUrl =  < s:LocMarker { s->type = pmh_AUTO_LINK_URL; }
 AutoLinkEmail = < s:LocMarker { s->type = pmh_AUTO_LINK_EMAIL; }
                 '<'
                   ( "mailto:" )? < [-A-Za-z0-9+_./!%~$]+ '@' ( !Newline !'>' . )+ >
-                  { s->address = strdup(yytext); }
+                  { s->address = COPY_YYTEXT_ORIG(); }
                 '>' >
                {
                 s->end = thunk->end;
@@ -557,7 +560,7 @@ Reference = < s:LocMarker
 Label = < s:LocMarker
         '[' ( !'^' &{ EXT(pmh_EXT_NOTES) } | &. &{ !EXT(pmh_EXT_NOTES) } )
         < ( !']' Inline )* >
-        { s->label = strdup(yytext); }
+        { s->label = COPY_YYTEXT_ORIG(); }
         ']' >
         {
             s->pos = s->pos;
@@ -566,7 +569,7 @@ Label = < s:LocMarker
         }
 
 RefSrc = < Nonspacechar+ >
-		 { $$ = mk_notype; $$->address = strdup(yytext); }
+		 { $$ = mk_notype; $$->address = COPY_YYTEXT_ORIG(); }
 
 RefTitle =  ( RefTitleSingle | RefTitleDouble | RefTitleParens | EmptyTitle )
 
