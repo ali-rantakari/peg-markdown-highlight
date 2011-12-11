@@ -780,8 +780,9 @@ static pmh_realelement *fix_offsets(parser_data *p_data, pmh_realelement *elem)
             previous_end = cursor->end;
         
         if (found_start) {
-            pmh_realelement *new_elem = mk_element(p_data, tail->type,
-                                                   this_pos, cursor->end);
+            pmh_realelement *new_elem = copy_element(p_data, tail);
+            new_elem->pos = this_pos;
+            new_elem->end = cursor->end;
             new_elem->next = tail;
             if (prev != NULL)
                 prev->next = new_elem;
