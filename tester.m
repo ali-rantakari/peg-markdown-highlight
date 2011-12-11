@@ -143,21 +143,26 @@ NSAttributedString *highlight(NSString *str, NSMutableAttributedString *attrStr)
     apply_highlighting(attrStr, result);
     
     pmh_free_elements(result);
-    
     return attrStr;
 }
 
 
-void print_result(pmh_element *elem[])
+void print_result_debug_info(pmh_element *elem[])
 {
+    fprintf(stderr, "\n");
+    
     for (int i = 0; i < pmh_NUM_TYPES; i++)
     {
         pmh_element *cursor = elem[i];
         while (cursor != NULL)
         {
-#if pmh_DEBUG_OUTPUT
-            fprintf(stderr, "[%ld-%ld] 0x%x: %s\n", cursor->pos, cursor->end, (int)cursor, pmh_type_name(cursor->type));
-#endif
+            fprintf(stderr, "[%ld-%ld] 0x%x: %s\n", cursor->pos, cursor->end, (int)cursor, pmh_element_name_from_type(cursor->type));
+            
+            if (cursor->label != NULL)
+                fprintf(stderr, "  label: '%s'\n", cursor->label);
+            if (cursor->address != NULL)
+                fprintf(stderr, "  address: '%s'\n", cursor->address);
+            
             cursor = cursor->next;
         }
     }
@@ -200,7 +205,7 @@ int main(int argc, char * argv[])
         {
             pmh_element **result;
             pmh_markdown_to_elements((char *)[contents UTF8String], pmh_EXT_NONE, &result);
-            print_result(result);
+            print_result_debug_info(result);
         }
         else
         {
