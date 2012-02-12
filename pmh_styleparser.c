@@ -163,7 +163,7 @@ static pmh_attr_argb_color *new_argb_color(int r, int g, int b, int a)
     c->red = r; c->green = g; c->blue = b; c->alpha = a;
     return c;
 }
-static pmh_attr_argb_color *new_argb_from_hex(long hex, bool has_alpha)
+static pmh_attr_argb_color *new_argb_from_hex(long long hex, bool has_alpha)
 {
     // 0xaarrggbb
     int a = has_alpha ? ((hex >> 24) & 0xFF) : 255;
@@ -186,7 +186,7 @@ static pmh_attr_argb_color *new_argb_from_hex_str(style_parser_data *p_data,
         return NULL;
     }
     char *endptr = NULL;
-    long num = strtol(str, &endptr, 16);
+    long long num = strtoll(str, &endptr, 16);
     if (*endptr != '\0') {
         report_error(p_data, attr_line_number,
                      "Value '%s' is not a valid color value: the character "
