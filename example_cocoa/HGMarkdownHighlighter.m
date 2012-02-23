@@ -335,9 +335,16 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 	
 	if (cachedElements == NULL)
 		return;
-	[self applyHighlighting:cachedElements withRange:visibleRange];
-	if (self.resetTypingAttributes)
-		[self.targetTextView setTypingAttributes:self.defaultTypingAttributes];
+    
+    @try {
+        [self applyHighlighting:cachedElements withRange:visibleCharRange];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"Exception in -applyHighlighting:withRange: %@", exception);
+    }
+    
+    if (self.resetTypingAttributes)
+        [self.targetTextView setTypingAttributes:self.defaultTypingAttributes];
 }
 
 - (void) clearHighlighting
