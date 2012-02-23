@@ -52,7 +52,7 @@
  * \sa HGMarkdownHighlightingStyle
  * \sa element_type
  */
-@property(copy) NSArray *styles;
+@property(nonatomic, copy) NSArray *styles;
 
 /** \brief The style for highlighting the current line.
   * 
@@ -67,7 +67,7 @@
 @property NSTimeInterval waitInterval;
 
 /** \brief The NSTextView to highlight. */
-@property(retain) NSTextView *targetTextView;
+@property(nonatomic, retain) NSTextView *targetTextView;
 
 /** \brief Whether to parse and highlight after each change.
  * 
