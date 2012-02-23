@@ -331,8 +331,10 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 - (void) applyVisibleRangeHighlighting
 {
 	NSRect visibleRect = [[[self.targetTextView enclosingScrollView] contentView] documentVisibleRect];
-	NSRange visibleRange = [[self.targetTextView layoutManager] glyphRangeForBoundingRect:visibleRect inTextContainer:[self.targetTextView textContainer]];
-	
+    NSLayoutManager *layoutManager = [self.targetTextView layoutManager];
+	NSRange visibleGlyphRange = [layoutManager glyphRangeForBoundingRect:visibleRect inTextContainer:[self.targetTextView textContainer]];
+	NSRange visibleCharRange = [layoutManager characterRangeForGlyphRange:visibleGlyphRange actualGlyphRange:NULL];
+    
 	if (cachedElements == NULL)
 		return;
     
