@@ -294,8 +294,9 @@
 				GCC_WARN_UNUSED_VALUE = YES;
 				INFOPLIST_FILE = "MDHExample-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				PRODUCT_NAME = MDHExample;
-				SDKROOT = macosx10.5;
+				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -310,7 +311,9 @@
 				GCC_PREFIX_HEADER = MDHExample_Prefix.pch;
 				INFOPLIST_FILE = "MDHExample-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				PRODUCT_NAME = MDHExample;
+				SDKROOT = macosx;
 			};
 			name = Release;
 		};
