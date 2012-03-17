@@ -507,7 +507,8 @@ ReferenceLinkSingle =  < s:Label (Spnl "[]")? >
 ExplicitLink =  < s:Label Spnl '(' Sp l:Source Spnl Title Sp ')' >
                 {
                     $$ = elem_s(pmh_LINK);
-                    $$->address = strdup(l->address);
+                    if (l->address != NULL)
+                        $$->address = strdup(l->address);
                     FREE_LABEL(s);
                     FREE_ADDRESS(l);
                 }
