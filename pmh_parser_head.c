@@ -859,8 +859,6 @@ static void add(parser_data *p_data, pmh_realelement *elem)
 static char *copy_input_span(parser_data *p_data,
                              unsigned long pos, unsigned long end)
 {
-    //printf("copy_input_span: %ld - %ld\n", pos, end);
-    
     if (end <= pos)
         return NULL;
     
@@ -872,7 +870,6 @@ static char *copy_input_span(parser_data *p_data,
     pmh_realelement *cursor = fixed_dummies;
     while (cursor != NULL)
     {
-        //printf("  in charbuf: %ld - %ld\n", cursor->pos, cursor->end);
         if (cursor->end <= cursor->pos)
         {
             cursor = cursor->next;
@@ -888,7 +885,6 @@ static char *copy_input_span(parser_data *p_data,
         for (i = 0; i < p_data->strip_positions_len; i++)
         {
             unsigned long strip_position = p_data->strip_positions[i];
-            //printf("  strip pos #%ld: %ld\n", i, strip_position);
             if (strip_position <= adjusted_pos)
                 adjusted_pos++;
             if (strip_position <= adjusted_end)
@@ -896,8 +892,6 @@ static char *copy_input_span(parser_data *p_data,
             else
                 break;
         }
-        
-        //printf("    adjusted: %ld - %ld\n", adjusted_pos, adjusted_end);
         
         // Copy span from original input:
         size_t adjusted_len = adjusted_end - adjusted_pos;
@@ -923,7 +917,6 @@ static char *copy_input_span(parser_data *p_data,
         cursor = cursor->next;
     }
     
-    //printf("   returning: '%s'\n", ret);
     return ret;
 }
 
