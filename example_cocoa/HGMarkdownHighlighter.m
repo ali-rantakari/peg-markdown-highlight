@@ -467,12 +467,13 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 	if (self.updateTimer != nil)
 		[self.updateTimer invalidate], self.updateTimer = nil;
 	self.updateTimer = [NSTimer
-				   scheduledTimerWithTimeInterval:self.waitInterval
+				   timerWithTimeInterval:self.waitInterval
 				   target:self
 				   selector:@selector(textViewUpdateTimerFire:)
 				   userInfo:nil
 				   repeats:NO
 				   ];
+    [[NSRunLoop currentRunLoop] addTimer:self.updateTimer forMode:NSRunLoopCommonModes];
 }
 
 - (void) textViewDidScroll:(NSNotification *)notification
