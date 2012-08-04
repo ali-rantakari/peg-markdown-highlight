@@ -26,8 +26,30 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 }
 
 
-// 'private members' category
-@interface HGMarkdownHighlighter()
+// 'private members' class extension
+@interface HGMarkdownHighlighter ()
+{
+	NSTimeInterval waitInterval;
+	NSTextView *targetTextView;
+	int extensions;
+	BOOL isActive;
+	BOOL parseAndHighlightAutomatically;
+	BOOL resetTypingAttributes;
+	BOOL makeLinksClickable;
+	NSArray *styles;
+	HGMarkdownHighlightingStyle *currentLineStyle;
+    
+	NSFontTraitMask clearFontTraitMask;
+	NSColor *defaultTextColor;
+	NSDictionary *defaultTypingAttributes;
+	NSTimer *updateTimer;
+	NSThread *workerThread;
+	pmh_element **cachedElements;
+	NSString *currentHighlightText;
+	BOOL workerThreadResultsInvalid;
+	BOOL styleDependenciesPending;
+	NSMutableArray *styleParsingErrors;
+}
 
 @property(retain) NSTimer *updateTimer;
 @property(copy) NSColor *defaultTextColor;
@@ -130,7 +152,7 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 - (pmh_element **) parse
 {
 	pmh_element **result = NULL;
-	pmh_markdown_to_elements(currentHighlightText, self.extensions, &result);
+	pmh_markdown_to_elements((char *)[currentHighlightText UTF8String], self.extensions, &result);
 	pmh_sort_elements_by_pos(result);
 	return result;
 }
@@ -157,9 +179,7 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 	 removeObserver:self
 	 name:NSThreadWillExitNotification
 	 object:self.workerThread];
-	if (currentHighlightText != NULL)
-		free(currentHighlightText);
-	currentHighlightText = NULL;
+	[currentHighlightText release], currentHighlightText = nil;
 	self.workerThread = nil;
 	if (workerThreadResultsInvalid)
 		[self
@@ -186,11 +206,8 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 	 name:NSThreadWillExitNotification
 	 object:self.workerThread];
 	
-	if (currentHighlightText != NULL)
-		free(currentHighlightText);
-	char *textViewContents = (char *)[[self.targetTextView string] UTF8String];
-	currentHighlightText = malloc(sizeof(char)*strlen(textViewContents)+1);
-	strcpy(currentHighlightText, textViewContents);
+	[currentHighlightText release];
+    currentHighlightText = [[self.targetTextView string] copy];
 	
 	workerThreadResultsInvalid = NO;
 	[self.workerThread start];

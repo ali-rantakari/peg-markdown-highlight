@@ -16,29 +16,6 @@
  * contents based on the Markdown syntax.
  */
 @interface HGMarkdownHighlighter : NSObject
-{
-	NSTimeInterval waitInterval;
-	NSTextView *targetTextView;
-	int extensions;
-	BOOL isActive;
-	BOOL parseAndHighlightAutomatically;
-	BOOL resetTypingAttributes;
-	BOOL makeLinksClickable;
-	NSArray *styles;
-	HGMarkdownHighlightingStyle *currentLineStyle;
-
-@private
-	NSFontTraitMask clearFontTraitMask;
-	NSColor *defaultTextColor;
-	NSDictionary *defaultTypingAttributes;
-	NSTimer *updateTimer;
-	NSThread *workerThread;
-	pmh_element **cachedElements;
-	char *currentHighlightText;
-	BOOL workerThreadResultsInvalid;
-	BOOL styleDependenciesPending;
-	NSMutableArray *styleParsingErrors;
-}
 
 /** \brief The order and styles for higlighting different elements.
  * 
