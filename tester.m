@@ -15,6 +15,65 @@
 #import "pmh_parser.h"
 
 
+// Convert unicode code point offsets (this is what we get from the parser) to
+// NSString character offsets (NSString uses UTF-16 units as characters, so
+// sometimes two characters (a "surrogate pair") are needed to represent one
+// code point):
+void convertOffsets(pmh_element **elements, NSString *str)
+{
+    // Walk through the whole string only once, and gather all surrogate pair indexes
+    // (technically, the indexes of the high characters (which come before the low
+    // characters) in each pair):
+    NSMutableArray *surrogatePairIndexes = [NSMutableArray arrayWithCapacity:(str.length / 4)];
+    NSUInteger strLen = str.length;
+    NSUInteger i = 0;
+    while (i < strLen)
+    {
+        if (CFStringIsSurrogateHighCharacter([str characterAtIndex:i]))
+            [surrogatePairIndexes addObject:[NSNumber numberWithUnsignedInteger:i]];
+        i++;
+    }
+    
+    // If the text does not contain any surrogate pairs, we're done (the indexes
+    // are already correct):
+    if (surrogatePairIndexes.count == 0)
+        return;
+    
+    // Use our list of surrogate pair indexes to shift the indexes of all
+    // language elements:
+    for (int langType = 0; langType < pmh_NUM_LANG_TYPES; langType++)
+    {
+        pmh_element *cursor = elements[langType];
+        while (cursor != NULL)
+        {
+            NSUInteger posShift = 0;
+            NSUInteger endShift = 0;
+            NSUInteger passedPairs = 0;
+            for (NSNumber *pairIndex in surrogatePairIndexes)
+            {
+                NSUInteger u = [pairIndex unsignedIntegerValue] - passedPairs;
+                if (u < cursor->pos)
+                {
+                    posShift++;
+                    endShift++;
+                }
+                else if (u < cursor->end)
+                {
+                    endShift++;
+                }
+                else
+                    break;
+                passedPairs++;
+            }
+            cursor->pos += posShift;
+            cursor->end += endShift;
+            cursor = cursor->next;
+        }
+    }
+}
+
+
+
 void apply_highlighting(NSMutableAttributedString *attrStr, pmh_element *elem[])
 {
     unsigned long sourceLength = [attrStr length];
@@ -137,6 +196,7 @@ NSAttributedString *highlight(NSString *str, NSMutableAttributedString *attrStr)
     
     char *md_source = (char *)[str UTF8String];
     pmh_markdown_to_elements(md_source, pmh_EXT_NONE, &result);
+    convertOffsets(result, str);
     
     if (attrStr == nil)
         attrStr = [[[NSMutableAttributedString alloc] initWithString:str] autorelease];
@@ -240,7 +300,9 @@ int main(int argc, char * argv[])
         }
     }
     else
+    {
         Print([ansiHelper ansiEscapedStringWithAttributedString:highlight(contents, nil)]);
+    }
     
     [autoReleasePool release];
     return(0);

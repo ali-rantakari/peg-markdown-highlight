@@ -158,12 +158,70 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 }
 
 
+// Convert unicode code point offsets (this is what we get from the parser) to
+// NSString character offsets (NSString uses UTF-16 units as characters, so
+// sometimes two characters (a "surrogate pair") are needed to represent one
+// code point):
+- (void) convertOffsets:(pmh_element **)elements
+{
+    // Walk through the whole string only once, and gather all surrogate pair indexes
+    // (technically, the indexes of the high characters (which come before the low
+    // characters) in each pair):
+    NSMutableArray *surrogatePairIndexes = [NSMutableArray arrayWithCapacity:(currentHighlightText.length / 4)];
+    NSUInteger strLen = currentHighlightText.length;
+    NSUInteger i = 0;
+    while (i < strLen)
+    {
+        if (CFStringIsSurrogateHighCharacter([currentHighlightText characterAtIndex:i]))
+            [surrogatePairIndexes addObject:[NSNumber numberWithUnsignedInteger:i]];
+        i++;
+    }
+    
+    // If the text does not contain any surrogate pairs, we're done (the indexes
+    // are already correct):
+    if (surrogatePairIndexes.count == 0)
+        return;
+    
+    // Use our list of surrogate pair indexes to shift the indexes of all
+    // language elements:
+    for (int langType = 0; langType < pmh_NUM_LANG_TYPES; langType++)
+    {
+        pmh_element *cursor = elements[langType];
+        while (cursor != NULL)
+        {
+            NSUInteger posShift = 0;
+            NSUInteger endShift = 0;
+            NSUInteger passedPairs = 0;
+            for (NSNumber *pairIndex in surrogatePairIndexes)
+            {
+                NSUInteger u = [pairIndex unsignedIntegerValue] - passedPairs;
+                if (u < cursor->pos)
+                {
+                    posShift++;
+                    endShift++;
+                }
+                else if (u < cursor->end)
+                {
+                    endShift++;
+                }
+                else
+                    break;
+                passedPairs++;
+            }
+            cursor->pos += posShift;
+            cursor->end += endShift;
+            cursor = cursor->next;
+        }
+    }
+}
+
 
 - (void) threadParseAndHighlight
 {
 	NSAutoreleasePool *autoReleasePool = [[NSAutoreleasePool alloc] init];
 	
 	pmh_element **result = [self parse];
+    [self convertOffsets:result];
 	
 	[self
 	 performSelectorOnMainThread:@selector(parserDidParse:)
