@@ -15,7 +15,7 @@ This project contains:
 - A simple example on how to highlight a `QTextEdit` in a Qt application.
 - A parser for stylesheets that define syntax highlighting styles
 
-_Copyright 2011 Ali Rantakari_ -- <http://hasseg.org>
+_Copyright 2011-2012 Ali Rantakari_ -- <http://hasseg.org>
 
 This program uses the PEG grammar from John MacFarlane's `peg-markdown` project,
 and the `greg` parser generator by Why The Lucky Stiff and Amos Wenger (`greg`
