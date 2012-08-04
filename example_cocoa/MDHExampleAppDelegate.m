@@ -93,10 +93,32 @@
 		[stylePopUpButton addItemWithTitle:[[file lastPathComponent] stringByDeletingPathExtension]];
 }
 
+- (void) disableFancyFeaturesInTextView:(NSTextView *)tv
+{
+    if ([tv respondsToSelector:@selector(setAutomaticTextReplacementEnabled:)])
+        [tv setAutomaticTextReplacementEnabled:NO];
+    if ([tv respondsToSelector:@selector(setAutomaticSpellingCorrectionEnabled:)])
+        [tv setAutomaticSpellingCorrectionEnabled:NO];
+    [tv setSmartInsertDeleteEnabled:NO];
+}
+
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
 	[self populateStylesPopUpButton];
-	
+    
+    // Make sure to disable automatic text replacement (and other fancy
+    // features) in the second text view; since it won't update automatically,
+    // the highlighting will get messed up when the automatic text replacement
+    // kicks in and starts messing with the text after the initial
+    // highlighting has already been done:
+    [self disableFancyFeaturesInTextView:textView2];
+    
+    // The first text view should work with automatic text replacement since
+    // it updates automatically when the text changes, but unfortunately
+    // this will make the highlighted sections "jump" in an ugly way. So
+    // let's disable it by default:
+    [self disableFancyFeaturesInTextView:textView1];
+    
 	[textView1 setFont:[NSFont fontWithName:@"courier" size:12]];
 	
 	NSString *s = [NSString
