@@ -29,26 +29,12 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 // 'private members' class extension
 @interface HGMarkdownHighlighter ()
 {
-	NSTimeInterval waitInterval;
-	NSTextView *targetTextView;
-	int extensions;
-	BOOL isActive;
-	BOOL parseAndHighlightAutomatically;
-	BOOL resetTypingAttributes;
-	BOOL makeLinksClickable;
-	NSArray *styles;
-	HGMarkdownHighlightingStyle *currentLineStyle;
-    
-	NSFontTraitMask clearFontTraitMask;
-	NSColor *defaultTextColor;
-	NSDictionary *defaultTypingAttributes;
-	NSTimer *updateTimer;
-	NSThread *workerThread;
-	pmh_element **cachedElements;
-	NSString *currentHighlightText;
-	BOOL workerThreadResultsInvalid;
-	BOOL styleDependenciesPending;
-	NSMutableArray *styleParsingErrors;
+	NSFontTraitMask _clearFontTraitMask;
+	pmh_element **_cachedElements;
+	NSString *_currentHighlightText;
+	BOOL _workerThreadResultsInvalid;
+	BOOL _styleDependenciesPending;
+	NSMutableArray *_styleParsingErrors;
 }
 
 @property(strong) NSTimer *updateTimer;
@@ -63,44 +49,20 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 
 @implementation HGMarkdownHighlighter
 
-@synthesize waitInterval;
-@synthesize targetTextView;
-@synthesize updateTimer;
-@synthesize isActive;
-@synthesize parseAndHighlightAutomatically;
-@synthesize extensions;
-@synthesize styles;
-@synthesize defaultTextColor;
-@synthesize workerThread;
-@synthesize defaultTypingAttributes;
-@synthesize resetTypingAttributes;
-@synthesize makeLinksClickable;
-@synthesize currentLineStyle;
-
-
 - (id) init
 {
 	if (!(self = [super init]))
 		return nil;
 	
-	cachedElements = NULL;
-	currentHighlightText = NULL;
-	styleDependenciesPending = NO;
-	styleParsingErrors = [NSMutableArray array];
+	_cachedElements = NULL;
+	_currentHighlightText = NULL;
+	_styleDependenciesPending = NO;
+	_styleParsingErrors = [NSMutableArray array];
 	
-	self.defaultTypingAttributes = nil;
-	self.workerThread = nil;
-	self.defaultTextColor = nil;
-	self.styles = nil;
-	self.currentLineStyle = nil;
-	self.isActive = NO;
-	self.resetTypingAttributes = YES;
-	self.makeLinksClickable = NO;
-	self.parseAndHighlightAutomatically = YES;
-	self.updateTimer = nil;
-	self.targetTextView = nil;
-	self.waitInterval = 1;
-	self.extensions = pmh_EXT_NONE;
+	_resetTypingAttributes = YES;
+	_parseAndHighlightAutomatically = YES;
+	_waitInterval = 1;
+	_extensions = pmh_EXT_NONE;
 	
 	return self;
 }
@@ -132,12 +94,6 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 	return self;
 }
 
-- (void) dealloc
-{
-	self.targetTextView = nil;
-	self.styles = nil;
-	styleParsingErrors = nil;
-}
 
 
 #pragma mark -
@@ -146,7 +102,7 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 - (pmh_element **) parse
 {
 	pmh_element **result = NULL;
-	pmh_markdown_to_elements((char *)[currentHighlightText UTF8String], self.extensions, &result);
+	pmh_markdown_to_elements((char *)[_currentHighlightText UTF8String], self.extensions, &result);
 	pmh_sort_elements_by_pos(result);
 	return result;
 }
@@ -161,12 +117,12 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
     // Walk through the whole string only once, and gather all surrogate pair indexes
     // (technically, the indexes of the high characters (which come before the low
     // characters) in each pair):
-    NSMutableArray *surrogatePairIndexes = [NSMutableArray arrayWithCapacity:(currentHighlightText.length / 4)];
-    NSUInteger strLen = currentHighlightText.length;
+    NSMutableArray *surrogatePairIndexes = [NSMutableArray arrayWithCapacity:(_currentHighlightText.length / 4)];
+    NSUInteger strLen = _currentHighlightText.length;
     NSUInteger i = 0;
     while (i < strLen)
     {
-        if (CFStringIsSurrogateHighCharacter([currentHighlightText characterAtIndex:i]))
+        if (CFStringIsSurrogateHighCharacter([_currentHighlightText characterAtIndex:i]))
             [surrogatePairIndexes addObject:[NSNumber numberWithUnsignedInteger:i]];
         i++;
     }
@@ -231,9 +187,9 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 	 removeObserver:self
 	 name:NSThreadWillExitNotification
 	 object:self.workerThread];
-	currentHighlightText = nil;
+	_currentHighlightText = nil;
 	self.workerThread = nil;
-	if (workerThreadResultsInvalid)
+	if (_workerThreadResultsInvalid)
 		[self
 		 performSelectorOnMainThread:@selector(requestParsing)
 		 withObject:nil
@@ -243,7 +199,7 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 - (void) requestParsing
 {
 	if (self.workerThread != nil) {
-		workerThreadResultsInvalid = YES;
+		_workerThreadResultsInvalid = YES;
 		return;
 	}
 	
@@ -258,9 +214,9 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 	 name:NSThreadWillExitNotification
 	 object:self.workerThread];
 	
-    currentHighlightText = [[self.targetTextView string] copy];
+    _currentHighlightText = [[self.targetTextView string] copy];
 	
-	workerThreadResultsInvalid = NO;
+	_workerThreadResultsInvalid = NO;
 	[self.workerThread start];
 }
 
@@ -293,9 +249,9 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 
 - (void) clearHighlightingForRange:(NSRange)range
 {
-	NSTextStorage *textStorage = [self.targetTextView textStorage];
+	NSTextStorage *textStorage = [_targetTextView textStorage];
 	
-	[textStorage applyFontTraits:clearFontTraitMask range:range];
+	[textStorage applyFontTraits:_clearFontTraitMask range:range];
 	[textStorage removeAttribute:NSBackgroundColorAttributeName range:range];
 	[textStorage removeAttribute:NSLinkAttributeName range:range];
 	if (self.defaultTextColor != nil)
@@ -306,9 +262,9 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 
 - (void) readClearTextStylesFromTextView
 {
-	clearFontTraitMask = [self getClearFontTraitMask:
-						  [[NSFontManager sharedFontManager]
-						   traitsOfFont:[self.targetTextView font]]];
+	_clearFontTraitMask = [self getClearFontTraitMask:
+	 				 	  [[NSFontManager sharedFontManager]
+	  					   traitsOfFont:[self.targetTextView font]]];
 	
 	self.defaultTextColor = [self.targetTextView textColor];
 	
@@ -403,11 +359,11 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 	NSRange visibleGlyphRange = [layoutManager glyphRangeForBoundingRect:visibleRect inTextContainer:[self.targetTextView textContainer]];
 	NSRange visibleCharRange = [layoutManager characterRangeForGlyphRange:visibleGlyphRange actualGlyphRange:NULL];
     
-	if (cachedElements == NULL)
+	if (_cachedElements == NULL)
 		return;
     
     @try {
-        [self applyHighlighting:cachedElements withRange:visibleCharRange];
+        [self applyHighlighting:_cachedElements withRange:visibleCharRange];
     }
     @catch (NSException *exception) {
         NSLog(@"Exception in -applyHighlighting:withRange: %@", exception);
@@ -425,11 +381,11 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 
 - (void) cacheElementList:(pmh_element **)list
 {
-	if (cachedElements != NULL) {
-		pmh_free_elements(cachedElements);
-		cachedElements = NULL;
+	if (_cachedElements != NULL) {
+		pmh_free_elements(_cachedElements);
+		_cachedElements = NULL;
 	}
-	cachedElements = list;
+	_cachedElements = list;
 }
 
 - (void) clearElementsCache
@@ -441,7 +397,7 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 
 - (void) parserDidParse:(NSValue *)resultPointer
 {
-	if (workerThreadResultsInvalid)
+	if (_workerThreadResultsInvalid)
 		return;
 	[self cacheElementList:(pmh_element **)[resultPointer pointerValue]];
 	[self applyVisibleRangeHighlighting];
@@ -471,7 +427,7 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 
 - (void) textViewDidScroll:(NSNotification *)notification
 {
-	if (cachedElements == NULL)
+	if (_cachedElements == NULL)
 		return;
 	[self applyVisibleRangeHighlighting];
 }
@@ -526,19 +482,19 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 		[self.targetTextView setLinkTextAttributes:linkAttrs];
 		break;
 	}
-	styleDependenciesPending = NO;
+	_styleDependenciesPending = NO;
 }
 
 - (void) setStyles:(NSArray *)newStyles
 {
 	NSArray *stylesToApply = (newStyles != nil) ? newStyles : [self getDefaultStyles];
 	
-	styles = [stylesToApply copy];
+	_styles = [stylesToApply copy];
 	
 	if (self.targetTextView != nil)
 		[self applyStyleDependenciesToTargetTextView];
 	else
-		styleDependenciesPending = YES;
+		_styleDependenciesPending = YES;
 }
 
 - (NSDictionary *) getDefaultSelectedTextAttributes
@@ -561,7 +517,7 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 		int lineNumber = [(NSNumber *)[errorInfo objectForKey:kStyleParsingErrorInfoKey_LineNumber] intValue];
 		messageToAdd = [NSString stringWithFormat:@"(Line %i): %@", lineNumber, errorMessage];
 	}
-	[styleParsingErrors addObject:messageToAdd];
+	[_styleParsingErrors addObject:messageToAdd];
 }
 
 - (void) applyStylesFromStylesheet:(NSString *)stylesheet
@@ -578,15 +534,15 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 		style_coll = pmh_parse_styles(c_stylesheet, NULL, NULL);
 	else
 	{
-		[styleParsingErrors removeAllObjects];
+		[_styleParsingErrors removeAllObjects];
 		style_coll = pmh_parse_styles(c_stylesheet, &styleparsing_error_callback, (__bridge void *)(self));
-		if ([styleParsingErrors count] > 0)
+		if ([_styleParsingErrors count] > 0)
         {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
 			[errorDelegate
              performSelector:errorSelector
-             withObject:styleParsingErrors];
+             withObject:_styleParsingErrors];
 #pragma clang diagnostic pop
         }
 	}
@@ -688,12 +644,12 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 
 - (void) setTargetTextView:(NSTextView *)newTextView
 {
-	if (targetTextView == newTextView)
+	if (_targetTextView == newTextView)
 		return;
 	
-	targetTextView = newTextView;
+	_targetTextView = newTextView;
 	
-	if (targetTextView != nil)
+	if (_targetTextView != nil)
 		[self readClearTextStylesFromTextView];
 }
 
@@ -714,7 +670,7 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 	
 	if (self.styles == nil)
 		self.styles = [self getDefaultStyles];
-	if (styleDependenciesPending)
+	if (_styleDependenciesPending)
 		[self applyStyleDependenciesToTargetTextView];
 	
 	[self requestParsing];

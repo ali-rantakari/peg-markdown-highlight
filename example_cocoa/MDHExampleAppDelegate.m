@@ -15,18 +15,6 @@
 
 @implementation MDHExampleAppDelegate
 
-@synthesize window;
-@synthesize textView1;
-@synthesize textView2;
-
-- (id) init
-{
-	if (!(self = [super init]))
-		return nil;
-	
-	return self;
-}
-
 
 - (void) awakeFromNib
 {
@@ -57,9 +45,9 @@
 {
 	if ([styleName isEqualToString:@"Default"])
 	{
-		[textView1 setTextColor:nil];
-		[textView1 setBackgroundColor:nil];
-		[textView1 setInsertionPointColor:nil];
+		[_textView1 setTextColor:nil];
+		[_textView1 setBackgroundColor:nil];
+		[_textView1 setInsertionPointColor:nil];
 		hl1.styles = nil;
 		[hl1 readClearTextStylesFromTextView];
 	}
@@ -107,15 +95,15 @@
     // the highlighting will get messed up when the automatic text replacement
     // kicks in and starts messing with the text after the initial
     // highlighting has already been done:
-    [self disableFancyFeaturesInTextView:textView2];
+    [self disableFancyFeaturesInTextView:_textView2];
     
     // The first text view should work with automatic text replacement since
     // it updates automatically when the text changes, but unfortunately
     // this will make the highlighted sections "jump" in an ugly way. So
     // let's disable it by default:
-    [self disableFancyFeaturesInTextView:textView1];
+    [self disableFancyFeaturesInTextView:_textView1];
     
-	[textView1 setFont:[NSFont fontWithName:@"courier" size:12]];
+	[_textView1 setFont:[NSFont fontWithName:@"courier" size:12]];
 	
 	NSString *s = [NSString
 				   stringWithContentsOfFile:[[NSBundle mainBundle]
@@ -123,17 +111,17 @@
 											 ofType:@"md"]
 				   encoding:NSUTF8StringEncoding
 				   error:NULL];
-	[textView1 insertText:s];
-	[textView2 insertText:s];
+	[_textView1 insertText:s];
+	[_textView2 insertText:s];
 	
-	hl1 = [[HGMarkdownHighlighter alloc] initWithTextView:textView1
+	hl1 = [[HGMarkdownHighlighter alloc] initWithTextView:_textView1
 											 waitInterval:[delaySlider intValue]];
 	hl1.makeLinksClickable = YES;
 	[self styleSelected:self];
 	[hl1 activate];
 	
 	hl2 = [[HGMarkdownHighlighter alloc] init];
-	hl2.targetTextView = textView2;
+	hl2.targetTextView = _textView2;
 	hl2.parseAndHighlightAutomatically = NO;
 	[hl2 activate];
 }
