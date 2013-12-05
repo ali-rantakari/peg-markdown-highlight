@@ -12,10 +12,6 @@
 
 @interface MDHExampleAppDelegate : NSObject
 {
-    NSWindow *window;
-	NSTextView *textView1;
-	NSTextView *textView2;
-	
 	IBOutlet NSTextField *delayLabel;
 	IBOutlet NSSlider *delaySlider;
 	IBOutlet NSPopUpButton *stylePopUpButton;
@@ -24,9 +20,9 @@
 	HGMarkdownHighlighter *hl2;
 }
 
-@property (assign) IBOutlet NSWindow *window;
-@property (assign) IBOutlet NSTextView *textView1;
-@property (assign) IBOutlet NSTextView *textView2;
+@property (unsafe_unretained) IBOutlet NSWindow *window;
+@property (unsafe_unretained) IBOutlet NSTextView *textView1;
+@property (unsafe_unretained) IBOutlet NSTextView *textView2;
 
 - (IBAction) delaySliderMove:(id)sender;
 - (IBAction) manualHighlightButtonPress:(id)sender;

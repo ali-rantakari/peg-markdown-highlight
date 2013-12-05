@@ -38,13 +38,13 @@
   * 
   * \sa applyStylesFromStylesheet:withErrorDelegate:selector:
   */
-@property(retain) HGMarkdownHighlightingStyle *currentLineStyle;
+@property(strong) HGMarkdownHighlightingStyle *currentLineStyle;
 
 /** \brief The delay between editing text and it getting highlighted. */
 @property NSTimeInterval waitInterval;
 
 /** \brief The NSTextView to highlight. */
-@property(nonatomic, retain) NSTextView *targetTextView;
+@property(nonatomic, strong) NSTextView *targetTextView;
 
 /** \brief Whether to parse and highlight after each change.
  * 

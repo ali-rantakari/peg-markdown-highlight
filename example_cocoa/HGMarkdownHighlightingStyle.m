@@ -108,12 +108,6 @@
 	return self;
 }
 
-- (void) dealloc
-{
-	self.attributesToAdd = nil;
-	self.attributesToRemove = nil;
-	[super dealloc];
-}
 
 @synthesize elementType;
 @synthesize attributesToAdd;

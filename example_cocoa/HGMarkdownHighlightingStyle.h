@@ -10,7 +10,7 @@
 #import "pmh_styleparser.h"
 
 
-#define HG_MKSTYLE(elem, add, remove, traits)	[[[HGMarkdownHighlightingStyle alloc] initWithType:(elem) attributesToAdd:(add) toRemove:(remove) fontTraitsToAdd:(traits)] autorelease]
+#define HG_MKSTYLE(elem, add, remove, traits)	[[HGMarkdownHighlightingStyle alloc] initWithType:(elem) attributesToAdd:(add) toRemove:(remove) fontTraitsToAdd:(traits)]
 #define HG_D(...)	[NSDictionary dictionaryWithObjectsAndKeys:__VA_ARGS__, nil]
 #define HG_A(...)	[NSArray arrayWithObjects:__VA_ARGS__, nil]
 

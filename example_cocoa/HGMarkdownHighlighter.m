@@ -17,12 +17,12 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 	NSString *errMsg = [NSString stringWithUTF8String:error_message];
 	if (errMsg == nil)
 		NSLog(@"Cannot interpret error message as UTF-8: '%s'", error_message);
-	NSDictionary *errInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-							 errMsg, kStyleParsingErrorInfoKey_ErrorMessage,
-							 [NSNumber numberWithInt:line_number], kStyleParsingErrorInfoKey_LineNumber,
-							 nil];
-	[((HGMarkdownHighlighter *)context_data) performSelector:@selector(handleStyleParsingError:)
-												  withObject:errInfo];
+    
+	[(__bridge HGMarkdownHighlighter *)context_data
+     performSelector:@selector(handleStyleParsingError:)
+     withObject:@{kStyleParsingErrorInfoKey_ErrorMessage: errMsg,
+                  kStyleParsingErrorInfoKey_LineNumber: @(line_number)
+                  }];
 }
 
 
@@ -51,10 +51,10 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 	NSMutableArray *styleParsingErrors;
 }
 
-@property(retain) NSTimer *updateTimer;
+@property(strong) NSTimer *updateTimer;
 @property(copy) NSColor *defaultTextColor;
-@property(retain) NSThread *workerThread;
-@property(retain) NSDictionary *defaultTypingAttributes;
+@property(strong) NSThread *workerThread;
+@property(strong) NSDictionary *defaultTypingAttributes;
 
 - (NSFontTraitMask) getClearFontTraitMask:(NSFontTraitMask)currentFontTraitMask;
 
@@ -86,7 +86,7 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 	cachedElements = NULL;
 	currentHighlightText = NULL;
 	styleDependenciesPending = NO;
-	styleParsingErrors = [[NSMutableArray array] retain];
+	styleParsingErrors = [NSMutableArray array];
 	
 	self.defaultTypingAttributes = nil;
 	self.workerThread = nil;
@@ -134,15 +134,9 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 
 - (void) dealloc
 {
-	self.defaultTypingAttributes = nil;
-	self.workerThread = nil;
-	self.defaultTextColor = nil;
 	self.targetTextView = nil;
-	self.updateTimer = nil;
 	self.styles = nil;
-	self.currentLineStyle = nil;
-	[styleParsingErrors release], styleParsingErrors = nil;
-	[super dealloc];
+	styleParsingErrors = nil;
 }
 
 
@@ -218,17 +212,17 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 
 - (void) threadParseAndHighlight
 {
-	NSAutoreleasePool *autoReleasePool = [[NSAutoreleasePool alloc] init];
+	@autoreleasepool {
 	
-	pmh_element **result = [self parse];
+		pmh_element **result = [self parse];
     [self convertOffsets:result];
+		
+		[self
+		 performSelectorOnMainThread:@selector(parserDidParse:)
+		 withObject:[NSValue valueWithPointer:result]
+		 waitUntilDone:YES];
 	
-	[self
-	 performSelectorOnMainThread:@selector(parserDidParse:)
-	 withObject:[NSValue valueWithPointer:result]
-	 waitUntilDone:YES];
-	
-	[autoReleasePool drain];
+	}
 }
 
 - (void) threadDidExit:(NSNotification *)notification
@@ -237,7 +231,7 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 	 removeObserver:self
 	 name:NSThreadWillExitNotification
 	 object:self.workerThread];
-	[currentHighlightText release], currentHighlightText = nil;
+	currentHighlightText = nil;
 	self.workerThread = nil;
 	if (workerThreadResultsInvalid)
 		[self
@@ -264,7 +258,6 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 	 name:NSThreadWillExitNotification
 	 object:self.workerThread];
 	
-	[currentHighlightText release];
     currentHighlightText = [[self.targetTextView string] copy];
 	
 	workerThreadResultsInvalid = NO;
@@ -280,14 +273,14 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 {
 	static NSDictionary *oppositeFontTraits = nil;	
 	if (oppositeFontTraits == nil)
-		oppositeFontTraits = [[NSDictionary dictionaryWithObjectsAndKeys:
+		oppositeFontTraits = [NSDictionary dictionaryWithObjectsAndKeys:
 							   [NSNumber numberWithUnsignedInt:NSItalicFontMask], [NSNumber numberWithUnsignedInt:NSUnitalicFontMask],
 							   [NSNumber numberWithUnsignedInt:NSUnitalicFontMask], [NSNumber numberWithUnsignedInt:NSItalicFontMask],
 							   [NSNumber numberWithUnsignedInt:NSUnboldFontMask], [NSNumber numberWithUnsignedInt:NSBoldFontMask],
 							   [NSNumber numberWithUnsignedInt:NSBoldFontMask], [NSNumber numberWithUnsignedInt:NSUnboldFontMask],
 							   [NSNumber numberWithUnsignedInt:NSCondensedFontMask], [NSNumber numberWithUnsignedInt:NSExpandedFontMask],
 							   [NSNumber numberWithUnsignedInt:NSExpandedFontMask], [NSNumber numberWithUnsignedInt:NSCondensedFontMask],
-							   nil] retain];
+							   nil];
 	NSFontTraitMask traitsToApply = 0;
 	for (NSNumber *trait in oppositeFontTraits)
 	{
@@ -490,7 +483,7 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 	if (defaultStyles != nil)
 		return defaultStyles;
 	
-	defaultStyles = [[NSArray arrayWithObjects:
+	defaultStyles = [NSArray arrayWithObjects:
 		HG_MKSTYLE(pmh_H1, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil, NSBoldFontMask),
 		HG_MKSTYLE(pmh_H2, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil, NSBoldFontMask),
 		HG_MKSTYLE(pmh_H3, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil, NSBoldFontMask),
@@ -512,7 +505,7 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 		HG_MKSTYLE(pmh_COMMENT, HG_D(HG_MED_GRAY,HG_FORE), nil, 0),
 		HG_MKSTYLE(pmh_VERBATIM, HG_D(HG_DARK(HG_GREEN),HG_FORE, HG_LIGHT(HG_GREEN),HG_BACK), nil, 0),
 		HG_MKSTYLE(pmh_BLOCKQUOTE, HG_D(HG_DARK(HG_MAGENTA),HG_FORE), HG_A(HG_BACK), NSUnboldFontMask),
-		nil] retain];
+		nil];
 	
 	return defaultStyles;
 }
@@ -528,7 +521,7 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 	{
 		if (style.elementType != pmh_LINK)
 			continue;
-		NSMutableDictionary *linkAttrs = [[style.attributesToAdd mutableCopy] autorelease];
+		NSMutableDictionary *linkAttrs = [style.attributesToAdd mutableCopy];
 		[linkAttrs setObject:[NSCursor pointingHandCursor] forKey:NSCursorAttributeName];
 		[self.targetTextView setLinkTextAttributes:linkAttrs];
 		break;
@@ -540,7 +533,6 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 {
 	NSArray *stylesToApply = (newStyles != nil) ? newStyles : [self getDefaultStyles];
 	
-	[styles autorelease];
 	styles = [stylesToApply copy];
 	
 	if (self.targetTextView != nil)
@@ -553,8 +545,8 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 {
 	static NSDictionary *cachedValue = nil;
 	if (cachedValue == nil)
-		cachedValue = [[[[[NSTextView alloc] initWithFrame:NSMakeRect(1,1,1,1)] autorelease]
-						selectedTextAttributes] retain];
+		cachedValue = [[[NSTextView alloc] initWithFrame:NSMakeRect(1,1,1,1)]
+						selectedTextAttributes];
 	return cachedValue;
 }
 
@@ -587,10 +579,16 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 	else
 	{
 		[styleParsingErrors removeAllObjects];
-		style_coll = pmh_parse_styles(c_stylesheet, &styleparsing_error_callback, self);
+		style_coll = pmh_parse_styles(c_stylesheet, &styleparsing_error_callback, (__bridge void *)(self));
 		if ([styleParsingErrors count] > 0)
-			[errorDelegate performSelector:errorSelector
-							    withObject:styleParsingErrors];
+        {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+			[errorDelegate
+             performSelector:errorSelector
+             withObject:styleParsingErrors];
+#pragma clang diagnostic pop
+        }
 	}
 	
 	NSFont *baseFont = [self.defaultTypingAttributes objectForKey:NSFontAttributeName];
@@ -606,9 +604,9 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 		pmh_style_attribute *cur = style_coll->element_styles[i];
 		if (cur == NULL)
 			continue;
-		HGMarkdownHighlightingStyle *style = [[[HGMarkdownHighlightingStyle alloc]
+		HGMarkdownHighlightingStyle *style = [[HGMarkdownHighlightingStyle alloc]
 											   initWithStyleAttributes:cur
-											   baseFont:baseFont] autorelease];
+											   baseFont:baseFont];
 		[stylesArr addObject:style];
 	}
 	
@@ -673,10 +671,9 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 		// Current line styles
 		if (style_coll->editor_current_line_styles != NULL)
 		{
-			self.currentLineStyle = [[[HGMarkdownHighlightingStyle alloc]
+			self.currentLineStyle = [[HGMarkdownHighlightingStyle alloc]
 									  initWithStyleAttributes:style_coll->editor_current_line_styles
-									  baseFont:baseFont]
-									 autorelease];
+									  baseFont:baseFont];
 		}
 		else
 			self.currentLineStyle = nil;
@@ -694,8 +691,7 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 	if (targetTextView == newTextView)
 		return;
 	
-	[targetTextView release];
-	targetTextView = [newTextView retain];
+	targetTextView = newTextView;
 	
 	if (targetTextView != nil)
 		[self readClearTextStylesFromTextView];
