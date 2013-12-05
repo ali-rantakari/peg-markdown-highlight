@@ -27,10 +27,10 @@
 	if (!(self = [super init]))
 		return nil;
 	
-	self.elementType = elemType;
-	self.attributesToAdd = toAdd;
-	self.attributesToRemove = toRemove;
-	self.fontTraitsToAdd = traits;
+	_elementType = elemType;
+	_attributesToAdd = toAdd;
+	_attributesToRemove = toRemove;
+	_fontTraitsToAdd = traits;
 	
 	return self;
 }
@@ -107,11 +107,5 @@
 	
 	return self;
 }
-
-
-@synthesize elementType;
-@synthesize attributesToAdd;
-@synthesize attributesToRemove;
-@synthesize fontTraitsToAdd;
 
 @end

@@ -53,12 +53,6 @@
  * the highlighting styles.
  */
 @interface HGMarkdownHighlightingStyle : NSObject
-{
-	NSDictionary *attributesToAdd;
-	NSArray *attributesToRemove;
-	NSFontTraitMask fontTraitsToAdd;
-	pmh_element_type elementType;
-}
 
 + (NSColor *) colorFromARGBColor:(pmh_attr_argb_color *)argb_color;
 
