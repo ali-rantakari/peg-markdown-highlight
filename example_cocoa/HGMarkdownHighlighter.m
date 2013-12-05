@@ -513,8 +513,7 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 }
 
 - (void) applyStylesFromStylesheet:(NSString *)stylesheet
-				 withErrorDelegate:(id)errorDelegate
-					 errorSelector:(SEL)errorSelector
+                  withErrorHandler:(HGStyleParsingErrorCallback)errorHandler
 {
 	if (stylesheet == nil)
 		return;
@@ -522,21 +521,14 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 	char *c_stylesheet = (char *)[stylesheet UTF8String];
 	pmh_style_collection *style_coll = NULL;
 	
-	if (errorDelegate == nil)
+	if (errorHandler == nil)
 		style_coll = pmh_parse_styles(c_stylesheet, NULL, NULL);
 	else
 	{
 		[_styleParsingErrors removeAllObjects];
 		style_coll = pmh_parse_styles(c_stylesheet, &styleparsing_error_callback, (__bridge void *)(self));
 		if ([_styleParsingErrors count] > 0)
-        {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
-			[errorDelegate
-             performSelector:errorSelector
-             withObject:_styleParsingErrors];
-#pragma clang diagnostic pop
-        }
+            errorHandler(_styleParsingErrors);
 	}
 	
 	NSFont *baseFont = (self.defaultTypingAttributes)[NSFontAttributeName];
