@@ -67,7 +67,7 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 	return self;
 }
 
-- (id) initWithTextView:(NSTextView *)textView
+- (instancetype) initWithTextView:(NSTextView *)textView
 {
 	if (!(self = [self init]))
 		return nil;
@@ -75,7 +75,7 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 	return self;
 }
 
-- (id) initWithTextView:(NSTextView *)textView
+- (instancetype) initWithTextView:(NSTextView *)textView
 		   waitInterval:(NSTimeInterval)interval
 {
 	if (!(self = [self initWithTextView:textView]))
@@ -84,7 +84,7 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 	return self;
 }
 
-- (id) initWithTextView:(NSTextView *)textView
+- (instancetype) initWithTextView:(NSTextView *)textView
 		   waitInterval:(NSTimeInterval)interval
 				 styles:(NSArray *)inStyles
 {

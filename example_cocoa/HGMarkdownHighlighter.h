@@ -88,11 +88,11 @@
 
 
 /** \brief Init new instance while setting targetTextView. */
-- (id) initWithTextView:(NSTextView *)textView;
+- (instancetype) initWithTextView:(NSTextView *)textView;
 /** \brief Init new instance while setting targetTextView and waitInterval. */
-- (id) initWithTextView:(NSTextView *)textView waitInterval:(NSTimeInterval)interval;
+- (instancetype) initWithTextView:(NSTextView *)textView waitInterval:(NSTimeInterval)interval;
 /** \brief Init new instance while setting targetTextView, waitInterval and styles. */
-- (id) initWithTextView:(NSTextView *)textView waitInterval:(NSTimeInterval)interval styles:(NSArray *)inStyles;
+- (instancetype) initWithTextView:(NSTextView *)textView waitInterval:(NSTimeInterval)interval styles:(NSArray *)inStyles;
 
 /** \brief Read and store the representation of "clear" text
  *         from the current state of the NSTextView.

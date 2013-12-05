@@ -19,10 +19,10 @@
 								 alpha:(argb_color->alpha / 255.0)];
 }
 
-- (id) initWithType:(pmh_element_type)elemType
-	attributesToAdd:(NSDictionary *)toAdd
-		   toRemove:(NSArray *)toRemove
-	fontTraitsToAdd:(NSFontTraitMask)traits
+- (instancetype) initWithType:(pmh_element_type)elemType
+              attributesToAdd:(NSDictionary *)toAdd
+                     toRemove:(NSArray *)toRemove
+              fontTraitsToAdd:(NSFontTraitMask)traits
 {
 	if (!(self = [super init]))
 		return nil;
@@ -35,8 +35,8 @@
 	return self;
 }
 
-- (id) initWithStyleAttributes:(pmh_style_attribute *)attributes
-					  baseFont:(NSFont *)baseFont
+- (instancetype) initWithStyleAttributes:(pmh_style_attribute *)attributes
+                                baseFont:(NSFont *)baseFont
 {
 	if (!(self = [super init]))
 		return nil;

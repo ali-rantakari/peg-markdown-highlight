@@ -63,13 +63,13 @@
 + (NSColor *) colorFromARGBColor:(pmh_attr_argb_color *)argb_color;
 
 /** \brief Init a new instance. */
-- (id) initWithType:(pmh_element_type)elemType
-	attributesToAdd:(NSDictionary *)toAdd
-		   toRemove:(NSArray *)toRemove
-	fontTraitsToAdd:(NSFontTraitMask)traits;
+- (instancetype) initWithType:(pmh_element_type)elemType
+              attributesToAdd:(NSDictionary *)toAdd
+                     toRemove:(NSArray *)toRemove
+              fontTraitsToAdd:(NSFontTraitMask)traits;
 
 /** \brief Init a new instance based on styles from the stylesheet parser. */
-- (id) initWithStyleAttributes:(pmh_style_attribute *)attributes baseFont:(NSFont *)baseFont;
+- (instancetype) initWithStyleAttributes:(pmh_style_attribute *)attributes baseFont:(NSFont *)baseFont;
 
 /** \brief The Markdown language element type these styles pertain to. */
 @property pmh_element_type elementType;
