@@ -53,12 +53,10 @@
 	while (cur != NULL)
 	{
 		if (cur->type == pmh_attr_type_foreground_color)
-			[toAdd setObject:[HGMarkdownHighlightingStyle colorFromARGBColor:cur->value->argb_color]
-					  forKey:NSForegroundColorAttributeName];
+			toAdd[NSForegroundColorAttributeName] = [HGMarkdownHighlightingStyle colorFromARGBColor:cur->value->argb_color];
 		
 		else if (cur->type == pmh_attr_type_background_color)
-			[toAdd setObject:[HGMarkdownHighlightingStyle colorFromARGBColor:cur->value->argb_color]
-					  forKey:NSBackgroundColorAttributeName];
+			toAdd[NSBackgroundColorAttributeName] = [HGMarkdownHighlightingStyle colorFromARGBColor:cur->value->argb_color];
 		
 		else if (cur->type == pmh_attr_type_font_style)
 		{
@@ -67,8 +65,7 @@
 			if (cur->value->font_styles->bold)
 				self.fontTraitsToAdd |= NSBoldFontMask;
 			if (cur->value->font_styles->underlined)
-				[toAdd setObject:[NSNumber numberWithInt:NSUnderlineStyleSingle]
-						  forKey:NSUnderlineStyleAttributeName];
+				toAdd[NSUnderlineStyleAttributeName] = @(NSUnderlineStyleSingle);
 		}
 		
 		else if (cur->type == pmh_attr_type_font_size_pt)
@@ -78,7 +75,7 @@
 		}
 		
 		else if (cur->type == pmh_attr_type_font_family)
-			fontName = [NSString stringWithUTF8String:cur->value->font_family];
+			fontName = @(cur->value->font_family);
 		
 		cur = cur->next;
 	}
@@ -98,8 +95,7 @@
 		else
 			actualFontSize = [baseFont pointSize];
 		
-		[toAdd setObject:[NSFont fontWithName:fontName size:actualFontSize]
-				  forKey:NSFontAttributeName];
+		toAdd[NSFontAttributeName] = [NSFont fontWithName:fontName size:actualFontSize];
 	}
 	
 	self.attributesToAdd = toAdd;

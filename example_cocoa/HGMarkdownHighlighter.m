@@ -14,7 +14,7 @@
 
 void styleparsing_error_callback(char *error_message, int line_number, void *context_data)
 {
-	NSString *errMsg = [NSString stringWithUTF8String:error_message];
+	NSString *errMsg = @(error_message);
 	if (errMsg == nil)
 		NSLog(@"Cannot interpret error message as UTF-8: '%s'", error_message);
     
@@ -123,7 +123,7 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
     while (i < strLen)
     {
         if (CFStringIsSurrogateHighCharacter([_currentHighlightText characterAtIndex:i]))
-            [surrogatePairIndexes addObject:[NSNumber numberWithUnsignedInteger:i]];
+            [surrogatePairIndexes addObject:@(i)];
         i++;
     }
     
@@ -229,20 +229,18 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 {
 	static NSDictionary *oppositeFontTraits = nil;	
 	if (oppositeFontTraits == nil)
-		oppositeFontTraits = [NSDictionary dictionaryWithObjectsAndKeys:
-							   [NSNumber numberWithUnsignedInt:NSItalicFontMask], [NSNumber numberWithUnsignedInt:NSUnitalicFontMask],
-							   [NSNumber numberWithUnsignedInt:NSUnitalicFontMask], [NSNumber numberWithUnsignedInt:NSItalicFontMask],
-							   [NSNumber numberWithUnsignedInt:NSUnboldFontMask], [NSNumber numberWithUnsignedInt:NSBoldFontMask],
-							   [NSNumber numberWithUnsignedInt:NSBoldFontMask], [NSNumber numberWithUnsignedInt:NSUnboldFontMask],
-							   [NSNumber numberWithUnsignedInt:NSCondensedFontMask], [NSNumber numberWithUnsignedInt:NSExpandedFontMask],
-							   [NSNumber numberWithUnsignedInt:NSExpandedFontMask], [NSNumber numberWithUnsignedInt:NSCondensedFontMask],
-							   nil];
+		oppositeFontTraits = @{@(NSUnitalicFontMask): @(NSItalicFontMask),
+							   @(NSItalicFontMask): @(NSUnitalicFontMask),
+							   @(NSBoldFontMask): @(NSUnboldFontMask),
+							   @(NSUnboldFontMask): @(NSBoldFontMask),
+							   @(NSExpandedFontMask): @(NSCondensedFontMask),
+							   @(NSCondensedFontMask): @(NSExpandedFontMask)};
 	NSFontTraitMask traitsToApply = 0;
 	for (NSNumber *trait in oppositeFontTraits)
 	{
 		if ((currentFontTraitMask & [trait unsignedIntValue]) != 0)
 			continue;
-		traitsToApply |= [(NSNumber *)[oppositeFontTraits objectForKey:trait] unsignedIntValue];
+		traitsToApply |= [(NSNumber *)oppositeFontTraits[trait] unsignedIntValue];
 	}
 	return traitsToApply;
 }
@@ -270,17 +268,13 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 	
 	NSMutableDictionary *typingAttrs = [NSMutableDictionary dictionary];
 	if ([self.targetTextView backgroundColor] != nil)
-		[typingAttrs setObject:[self.targetTextView backgroundColor]
-						forKey:NSBackgroundColorAttributeName];
+		typingAttrs[NSBackgroundColorAttributeName] = [self.targetTextView backgroundColor];
 	if ([self.targetTextView textColor] != nil)
-		[typingAttrs setObject:[self.targetTextView textColor]
-						forKey:NSForegroundColorAttributeName];
+		typingAttrs[NSForegroundColorAttributeName] = [self.targetTextView textColor];
 	if ([self.targetTextView font] != nil)
-		[typingAttrs setObject:[self.targetTextView font]
-						forKey:NSFontAttributeName];
+		typingAttrs[NSFontAttributeName] = [self.targetTextView font];
 	if ([self.targetTextView defaultParagraphStyle] != nil)
-		[typingAttrs setObject:[self.targetTextView defaultParagraphStyle]
-						forKey:NSParagraphStyleAttributeName];
+		typingAttrs[NSParagraphStyleAttributeName] = [self.targetTextView defaultParagraphStyle];
 	self.defaultTypingAttributes = typingAttrs;
 }
 
@@ -326,7 +320,7 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 					|| style.elementType == pmh_AUTO_LINK_EMAIL)
 				&& cursor->address != NULL)
 			{
-				NSString *linkAddress = [NSString stringWithUTF8String:cursor->address];
+				NSString *linkAddress = @(cursor->address);
 				if (linkAddress != nil)
 				{
 					if (style.elementType == pmh_AUTO_LINK_EMAIL && ![linkAddress hasPrefix:@"mailto:"])
@@ -439,8 +433,7 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 	if (defaultStyles != nil)
 		return defaultStyles;
 	
-	defaultStyles = [NSArray arrayWithObjects:
-		HG_MKSTYLE(pmh_H1, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil, NSBoldFontMask),
+	defaultStyles = @[HG_MKSTYLE(pmh_H1, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil, NSBoldFontMask),
 		HG_MKSTYLE(pmh_H2, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil, NSBoldFontMask),
 		HG_MKSTYLE(pmh_H3, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil, NSBoldFontMask),
 		HG_MKSTYLE(pmh_H4, HG_D(HG_DARK(HG_BLUE),HG_FORE, HG_LIGHT(HG_BLUE),HG_BACK), nil, NSBoldFontMask),
@@ -460,8 +453,7 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 		HG_MKSTYLE(pmh_HTML_ENTITY, HG_D(HG_MED_GRAY,HG_FORE), nil, 0),
 		HG_MKSTYLE(pmh_COMMENT, HG_D(HG_MED_GRAY,HG_FORE), nil, 0),
 		HG_MKSTYLE(pmh_VERBATIM, HG_D(HG_DARK(HG_GREEN),HG_FORE, HG_LIGHT(HG_GREEN),HG_BACK), nil, 0),
-		HG_MKSTYLE(pmh_BLOCKQUOTE, HG_D(HG_DARK(HG_MAGENTA),HG_FORE), HG_A(HG_BACK), NSUnboldFontMask),
-		nil];
+		HG_MKSTYLE(pmh_BLOCKQUOTE, HG_D(HG_DARK(HG_MAGENTA),HG_FORE), HG_A(HG_BACK), NSUnboldFontMask)];
 	
 	return defaultStyles;
 }
@@ -478,7 +470,7 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 		if (style.elementType != pmh_LINK)
 			continue;
 		NSMutableDictionary *linkAttrs = [style.attributesToAdd mutableCopy];
-		[linkAttrs setObject:[NSCursor pointingHandCursor] forKey:NSCursorAttributeName];
+		linkAttrs[NSCursorAttributeName] = [NSCursor pointingHandCursor];
 		[self.targetTextView setLinkTextAttributes:linkAttrs];
 		break;
 	}
@@ -508,13 +500,13 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 
 - (void) handleStyleParsingError:(NSDictionary *)errorInfo
 {
-	NSString *errorMessage = (NSString *)[errorInfo objectForKey:kStyleParsingErrorInfoKey_ErrorMessage];
+	NSString *errorMessage = (NSString *)errorInfo[kStyleParsingErrorInfoKey_ErrorMessage];
 	NSString *messageToAdd = nil;
 	if (errorMessage == nil)
 		messageToAdd = @"<broken error message>";
 	else
 	{
-		int lineNumber = [(NSNumber *)[errorInfo objectForKey:kStyleParsingErrorInfoKey_LineNumber] intValue];
+		int lineNumber = [(NSNumber *)errorInfo[kStyleParsingErrorInfoKey_LineNumber] intValue];
 		messageToAdd = [NSString stringWithFormat:@"(Line %i): %@", lineNumber, errorMessage];
 	}
 	[_styleParsingErrors addObject:messageToAdd];
@@ -547,7 +539,7 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
         }
 	}
 	
-	NSFont *baseFont = [self.defaultTypingAttributes objectForKey:NSFontAttributeName];
+	NSFont *baseFont = (self.defaultTypingAttributes)[NSFontAttributeName];
 	if (baseFont == nil)
 		baseFont = [self.targetTextView font];
 	
@@ -603,18 +595,15 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 				// Cocoa (as of Mac OS 10.6.6) supports only foreground color,
 				// background color and underlining attributes for selections:
 				if (cur->type == pmh_attr_type_background_color)
-					[selAttrs setObject:[HGMarkdownHighlightingStyle
-										 colorFromARGBColor:cur->value->argb_color]
-								 forKey:NSBackgroundColorAttributeName];
+					selAttrs[NSBackgroundColorAttributeName] = [HGMarkdownHighlightingStyle
+										 colorFromARGBColor:cur->value->argb_color];
 				else if (cur->type == pmh_attr_type_foreground_color)
-					[selAttrs setObject:[HGMarkdownHighlightingStyle
-										 colorFromARGBColor:cur->value->argb_color]
-								 forKey:NSForegroundColorAttributeName];
+					selAttrs[NSForegroundColorAttributeName] = [HGMarkdownHighlightingStyle
+										 colorFromARGBColor:cur->value->argb_color];
 				else if (cur->type == pmh_attr_type_font_style)
 				{
 					if (cur->value->font_styles->underlined)
-						[selAttrs setObject:[NSNumber numberWithInt:NSUnderlineStyleSingle]
-									 forKey:NSUnderlineStyleAttributeName];
+						selAttrs[NSUnderlineStyleAttributeName] = @(NSUnderlineStyleSingle);
 				}
 				cur = cur->next;
 			}
