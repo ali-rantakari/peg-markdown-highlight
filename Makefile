@@ -6,7 +6,7 @@ MULTITHREAD_TESTER=multithread_tester
 TEST_CLIENT=testclient
 HIGHLIGHTER=highlighter
 STYLEPARSERTESTER=styleparsertester
-CFLAGS ?= -Wall -Wswitch -Wshadow -Wsign-compare -Werror -O3 -std=gnu89
+CFLAGS ?= -Wall -Wextra -Wswitch -Wshadow -Wsign-compare -Werror -O3 -std=gnu89
 OBJC_CFLAGS=-framework Foundation -framework AppKit
 
 GREGDIR=greg
