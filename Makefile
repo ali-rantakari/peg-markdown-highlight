@@ -1,4 +1,4 @@
-ALL : tester testclient highlighter
+ALL : highlighter
 
 BENCH=bench
 TESTER=tester
