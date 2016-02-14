@@ -27,9 +27,9 @@
 {
 	if ([styleName isEqualToString:@"Default"])
 	{
-		[_textView1 setTextColor:nil];
-		[_textView1 setBackgroundColor:nil];
-		[_textView1 setInsertionPointColor:nil];
+        _textView1.textColor = nil;
+        _textView1.backgroundColor = [NSColor clearColor];
+        _textView1.insertionPointColor = [NSColor blackColor];
 		hl1.styles = nil;
 		[hl1 readClearTextStylesFromTextView];
 	}
