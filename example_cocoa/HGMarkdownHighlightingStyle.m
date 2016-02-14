@@ -53,11 +53,13 @@
 	while (cur != NULL)
 	{
 		if (cur->type == pmh_attr_type_foreground_color)
-			toAdd[NSForegroundColorAttributeName] = [HGMarkdownHighlightingStyle colorFromARGBColor:cur->value->argb_color];
-		
+        {
+            toAdd[NSForegroundColorAttributeName] = [HGMarkdownHighlightingStyle colorFromARGBColor:cur->value->argb_color];
+        }
 		else if (cur->type == pmh_attr_type_background_color)
-			toAdd[NSBackgroundColorAttributeName] = [HGMarkdownHighlightingStyle colorFromARGBColor:cur->value->argb_color];
-		
+        {
+            toAdd[NSBackgroundColorAttributeName] = [HGMarkdownHighlightingStyle colorFromARGBColor:cur->value->argb_color];
+        }
 		else if (cur->type == pmh_attr_type_font_style)
 		{
 			if (cur->value->font_styles->italic)
@@ -67,15 +69,15 @@
 			if (cur->value->font_styles->underlined)
 				toAdd[NSUnderlineStyleAttributeName] = @(NSUnderlineStyleSingle);
 		}
-		
 		else if (cur->type == pmh_attr_type_font_size_pt)
 		{
 			fontSize = (CGFloat)cur->value->font_size->size_pt;
 			fontSizeIsRelative = (cur->value->font_size->is_relative == true);
 		}
-		
 		else if (cur->type == pmh_attr_type_font_family)
-			fontName = @(cur->value->font_family);
+        {
+            fontName = @(cur->value->font_family);
+        }
 		
 		cur = cur->next;
 	}
@@ -93,7 +95,9 @@
 				actualFontSize = kMinFontSize;
 		}
 		else
-			actualFontSize = [baseFont pointSize];
+        {
+            actualFontSize = [baseFont pointSize];
+        }
 		
 		toAdd[NSFontAttributeName] = [NSFont fontWithName:fontName size:actualFontSize];
 	}

@@ -155,7 +155,9 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
                     endShift++;
                 }
                 else
+                {
                     break;
+                }
                 passedPairs++;
             }
             cursor->pos += posShift;
@@ -169,15 +171,13 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 - (void) threadParseAndHighlight
 {
 	@autoreleasepool {
-	
-		pmh_element **result = [self parse];
-    [self convertOffsets:result];
-		
-		[self
-		 performSelectorOnMainThread:@selector(parserDidParse:)
-		 withObject:[NSValue valueWithPointer:result]
-		 waitUntilDone:YES];
-	
+        pmh_element **result = [self parse];
+        [self convertOffsets:result];
+        
+        [self
+         performSelectorOnMainThread:@selector(parserDidParse:)
+         withObject:[NSValue valueWithPointer:result]
+         waitUntilDone:YES];
 	}
 }
 
@@ -190,10 +190,12 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 	_currentHighlightText = nil;
 	self.workerThread = nil;
 	if (_workerThreadResultsInvalid)
-		[self
-		 performSelectorOnMainThread:@selector(requestParsing)
-		 withObject:nil
-		 waitUntilDone:NO];
+    {
+        [self
+         performSelectorOnMainThread:@selector(requestParsing)
+         withObject:nil
+         waitUntilDone:NO];
+    }
 }
 
 - (void) requestParsing
@@ -493,8 +495,10 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 {
 	static NSDictionary *cachedValue = nil;
 	if (cachedValue == nil)
-		cachedValue = [[[NSTextView alloc] initWithFrame:NSMakeRect(1,1,1,1)]
-						selectedTextAttributes];
+    {
+        cachedValue = [[[NSTextView alloc] initWithFrame:NSMakeRect(1,1,1,1)]
+                       selectedTextAttributes];
+    }
 	return cachedValue;
 }
 
@@ -503,7 +507,9 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 	NSString *errorMessage = (NSString *)errorInfo[kStyleParsingErrorInfoKey_ErrorMessage];
 	NSString *messageToAdd = nil;
 	if (errorMessage == nil)
-		messageToAdd = @"<broken error message>";
+    {
+        messageToAdd = @"<broken error message>";
+    }
 	else
 	{
 		int lineNumber = [(NSNumber *)errorInfo[kStyleParsingErrorInfoKey_LineNumber] intValue];
@@ -522,7 +528,9 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 	pmh_style_collection *style_coll = NULL;
 	
 	if (errorHandler == nil)
-		style_coll = pmh_parse_styles(c_stylesheet, NULL, NULL);
+    {
+        style_coll = pmh_parse_styles(c_stylesheet, NULL, NULL);
+    }
 	else
 	{
 		[_styleParsingErrors removeAllObjects];
@@ -564,14 +572,20 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 			while (cur != NULL)
 			{
 				if (cur->type == pmh_attr_type_background_color)
-					[self.targetTextView setBackgroundColor:[HGMarkdownHighlightingStyle
-															 colorFromARGBColor:cur->value->argb_color]];
+                {
+                    [self.targetTextView setBackgroundColor:[HGMarkdownHighlightingStyle
+                                                             colorFromARGBColor:cur->value->argb_color]];
+                }
 				else if (cur->type == pmh_attr_type_foreground_color)
-					[self.targetTextView setTextColor:[HGMarkdownHighlightingStyle
-													   colorFromARGBColor:cur->value->argb_color]];
+                {
+                    [self.targetTextView setTextColor:[HGMarkdownHighlightingStyle
+                                                       colorFromARGBColor:cur->value->argb_color]];
+                }
 				else if (cur->type == pmh_attr_type_caret_color)
-					[self.targetTextView setInsertionPointColor:[HGMarkdownHighlightingStyle
-																 colorFromARGBColor:cur->value->argb_color]];
+                {
+                    [self.targetTextView setInsertionPointColor:[HGMarkdownHighlightingStyle
+                                                                 colorFromARGBColor:cur->value->argb_color]];
+                }
 				cur = cur->next;
 			}
 		}
@@ -587,11 +601,15 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 				// Cocoa (as of Mac OS 10.6.6) supports only foreground color,
 				// background color and underlining attributes for selections:
 				if (cur->type == pmh_attr_type_background_color)
-					selAttrs[NSBackgroundColorAttributeName] = [HGMarkdownHighlightingStyle
-										 colorFromARGBColor:cur->value->argb_color];
+                {
+                    selAttrs[NSBackgroundColorAttributeName] = [HGMarkdownHighlightingStyle
+                                                                colorFromARGBColor:cur->value->argb_color];
+                }
 				else if (cur->type == pmh_attr_type_foreground_color)
-					selAttrs[NSForegroundColorAttributeName] = [HGMarkdownHighlightingStyle
-										 colorFromARGBColor:cur->value->argb_color];
+                {
+                    selAttrs[NSForegroundColorAttributeName] = [HGMarkdownHighlightingStyle
+                                                                colorFromARGBColor:cur->value->argb_color];
+                }
 				else if (cur->type == pmh_attr_type_font_style)
 				{
 					if (cur->value->font_styles->underlined)
@@ -603,7 +621,9 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 			[self.targetTextView setSelectedTextAttributes:selAttrs];
 		}
 		else
-			[self.targetTextView setSelectedTextAttributes:[self getDefaultSelectedTextAttributes]];
+        {
+            [self.targetTextView setSelectedTextAttributes:[self getDefaultSelectedTextAttributes]];
+        }
 		
 		// Current line styles
 		if (style_coll->editor_current_line_styles != NULL)
@@ -613,7 +633,9 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 									  baseFont:baseFont];
 		}
 		else
-			self.currentLineStyle = nil;
+        {
+            self.currentLineStyle = nil;
+        }
 			
 		[self readClearTextStylesFromTextView];
 	}
@@ -656,12 +678,14 @@ void styleparsing_error_callback(char *error_message, int line_number, void *con
 	
 	[self requestParsing];
 	
-	if (self.parseAndHighlightAutomatically)
-		[[NSNotificationCenter defaultCenter]
-		 addObserver:self
-		 selector:@selector(textViewTextDidChange:)
-		 name:NSTextDidChangeNotification
-		 object:self.targetTextView];
+    if (self.parseAndHighlightAutomatically)
+    {
+        [[NSNotificationCenter defaultCenter]
+         addObserver:self
+         selector:@selector(textViewTextDidChange:)
+         name:NSTextDidChangeNotification
+         object:self.targetTextView];
+    }
 	
 	NSScrollView *scrollView = [self.targetTextView enclosingScrollView];
 	if (scrollView != nil)
