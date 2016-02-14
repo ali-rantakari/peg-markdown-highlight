@@ -684,12 +684,10 @@ static pmh_realelement *mk_element(parser_data *p_data, pmh_element_type type,
                                    long pos, long end)
 {
     pmh_realelement *result = (pmh_realelement *)malloc(sizeof(pmh_realelement));
+    memset(result, 0, sizeof(*result));
     result->type = type;
     result->pos = pos;
     result->end = end;
-    result->next = NULL;
-    result->text_offset = 0;
-    result->label = result->address = result->text = NULL;
     
     pmh_realelement *old_all_elements_head = p_data->head_elems[pmh_ALL];
     p_data->head_elems[pmh_ALL] = result;
