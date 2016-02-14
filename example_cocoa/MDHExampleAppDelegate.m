@@ -25,10 +25,12 @@
 
 - (void) setTextView1Styles:(NSString *)styleName
 {
+    _textView1.font = [NSFont fontWithName:@"Courier" size:12];
+    
 	if ([styleName isEqualToString:@"Default"])
 	{
-        _textView1.textColor = nil;
-        _textView1.backgroundColor = [NSColor clearColor];
+        _textView1.textColor = [NSColor blackColor];
+        _textView1.backgroundColor = [NSColor whiteColor];
         _textView1.insertionPointColor = [NSColor blackColor];
 		hl1.styles = nil;
 		[hl1 readClearTextStylesFromTextView];
@@ -78,7 +80,15 @@
 {
     tv.automaticTextReplacementEnabled = NO;
     tv.automaticSpellingCorrectionEnabled = NO;
+    tv.automaticDashSubstitutionEnabled = NO;
+    tv.automaticQuoteSubstitutionEnabled = NO;
+    tv.automaticLinkDetectionEnabled = NO;
     tv.smartInsertDeleteEnabled = NO;
+    
+    if ([tv respondsToSelector:@selector(setContinuousSpellCheckingEnabled:)])
+        tv.continuousSpellCheckingEnabled = NO;
+    
+    tv.enabledTextCheckingTypes = 0;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
@@ -98,16 +108,15 @@
     // let's disable it by default:
     [self disableFancyFeaturesInTextView:_textView1];
     
-	[_textView1 setFont:[NSFont fontWithName:@"courier" size:12]];
-	
 	NSString *s = [NSString
 				   stringWithContentsOfFile:[[NSBundle mainBundle]
 											 pathForResource:@"huge"
 											 ofType:@"md"]
 				   encoding:NSUTF8StringEncoding
 				   error:NULL];
-	[_textView1 insertText:s];
-	[_textView2 insertText:s];
+    NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:s];
+    [_textView1.textStorage appendAttributedString:attrString];
+    [_textView2.textStorage appendAttributedString:attrString];
 	
 	hl1 = [[HGMarkdownHighlighter alloc] initWithTextView:_textView1
 											 waitInterval:[delaySlider intValue]];
