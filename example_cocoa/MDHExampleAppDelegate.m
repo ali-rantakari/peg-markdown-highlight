@@ -76,11 +76,9 @@
 
 - (void) disableFancyFeaturesInTextView:(NSTextView *)tv
 {
-    if ([tv respondsToSelector:@selector(setAutomaticTextReplacementEnabled:)])
-        [tv setAutomaticTextReplacementEnabled:NO];
-    if ([tv respondsToSelector:@selector(setAutomaticSpellingCorrectionEnabled:)])
-        [tv setAutomaticSpellingCorrectionEnabled:NO];
-    [tv setSmartInsertDeleteEnabled:NO];
+    tv.automaticTextReplacementEnabled = NO;
+    tv.automaticSpellingCorrectionEnabled = NO;
+    tv.smartInsertDeleteEnabled = NO;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
