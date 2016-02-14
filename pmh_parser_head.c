@@ -32,6 +32,11 @@
 #endif
 
 
+char *strdup_or_null(char *s)
+{
+    return (s == NULL) ? NULL : strdup(s);
+}
+
 
 // Internal language element occurrence structure, containing
 // both public and private members:
@@ -701,9 +706,9 @@ static pmh_realelement *mk_element(parser_data *p_data, pmh_element_type type,
 static pmh_realelement *copy_element(parser_data *p_data, pmh_realelement *elem)
 {
     pmh_realelement *result = mk_element(p_data, elem->type, elem->pos, elem->end);
-    result->label = (elem->label == NULL) ? NULL : strdup(elem->label);
-    result->text = (elem->text == NULL) ? NULL : strdup(elem->text);
-    result->address = (elem->address == NULL) ? NULL : strdup(elem->address);
+    result->label = strdup_or_null(elem->label);
+    result->text = strdup_or_null(elem->text);
+    result->address = strdup_or_null(elem->address);
     return result;
 }
 
@@ -713,7 +718,7 @@ static pmh_realelement *mk_etext(parser_data *p_data, char *string)
     pmh_realelement *result;
     assert(string != NULL);
     result = mk_element(p_data, pmh_EXTRA_TEXT, 0,0);
-    result->text = strdup(string);
+    result->text = strdup_or_null(string);
     return result;
 }
 
