@@ -1,5 +1,5 @@
 /* PEG Markdown Highlight
- * Copyright 2011-2013 Ali Rantakari -- http://hasseg.org
+ * Copyright 2011-2016 Ali Rantakari -- http://hasseg.org
  * Licensed under the GPL2+ and MIT licenses (see LICENSE for more info).
  * 
  * styleparser.c
