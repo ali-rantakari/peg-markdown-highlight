@@ -194,7 +194,7 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0500;
+				LastUpgradeCheck = 0710;
 			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "MDHExample" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -294,7 +294,8 @@
 				GCC_WARN_UNUSED_VALUE = YES;
 				INFOPLIST_FILE = "MDHExample-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
-				MACOSX_DEPLOYMENT_TARGET = 10.6.8;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				PRODUCT_BUNDLE_IDENTIFIER = "org.hasseg.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = MDHExample;
 				SDKROOT = macosx;
 			};
@@ -313,7 +314,8 @@
 				GCC_PREFIX_HEADER = MDHExample_Prefix.pch;
 				INFOPLIST_FILE = "MDHExample-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
-				MACOSX_DEPLOYMENT_TARGET = 10.6.8;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				PRODUCT_BUNDLE_IDENTIFIER = "org.hasseg.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = MDHExample;
 				SDKROOT = macosx;
 			};
@@ -322,6 +324,7 @@
 		C01FCF4F08A954540054247B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
