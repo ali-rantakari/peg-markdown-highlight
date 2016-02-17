@@ -190,7 +190,7 @@ void HGMarkdownHighlighter::parse()
     }
 
     QString content = document->toPlainText();
-    QByteArray ba = content.toLatin1();
+    QByteArray ba = content.toUtf8();
     char *content_cstring = strdup((char *)ba.data());
 
     if (workerThread != NULL)
