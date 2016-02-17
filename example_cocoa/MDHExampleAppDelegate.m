@@ -121,6 +121,7 @@
 	hl1 = [[HGMarkdownHighlighter alloc] initWithTextView:_textView1
 											 waitInterval:[delaySlider intValue]];
 	hl1.makeLinksClickable = YES;
+    hl1.extensions = pmh_EXT_STRIKE;
 	[self styleSelected:self];
 	[hl1 activate];
 	
