@@ -75,3 +75,6 @@ foreground: 859900 # green
 BLOCKQUOTE
 foreground: d33682 # magenta
 
+STRIKE
+strike-color: 586e75 # base01
+

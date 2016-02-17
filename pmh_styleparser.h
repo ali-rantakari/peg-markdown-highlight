@@ -52,6 +52,7 @@ typedef enum
     pmh_attr_type_font_size_pt,     /**< Font size (in points) */
     pmh_attr_type_font_family,      /**< Font family */
     pmh_attr_type_font_style,       /**< Font style */
+    pmh_attr_type_strike_color,     /**< Strike-through color */
     pmh_attr_type_other             /**< Arbitrary custom attribute */
 } pmh_attr_type;
 

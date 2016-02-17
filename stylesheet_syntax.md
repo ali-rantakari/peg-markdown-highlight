@@ -118,6 +118,7 @@ Each begins with the ***name* of the rule**, which is always on its own line, an
     - **`HTMLBLOCK`:** Block of HTML
     - **`COMMENT`:** (HTML) Comment
     - **`NOTE`:** Note
+    - **`STRIKE`:** Strike-through
 
 The name may be optionally followed by an assignment operator (either `:` or `=`):
 
@@ -154,6 +155,8 @@ The following is a list of the names of predefined attributes, and the values th
 - `background-color` *(alias: `background`)*
     - See the *Color Attribute Values* subsection for information about valid values for this attribute.
 - `caret-color` *(alias: `caret`)*
+    - See the *Color Attribute Values* subsection for information about valid values for this attribute.
+- `strike-color` *(alias: `strike`)*
     - See the *Color Attribute Values* subsection for information about valid values for this attribute.
 - `font-size`
     - An integer value for the font size, *in points* (i.e. not in pixels). The number may have a textual suffix such as `pt`.
