@@ -397,6 +397,7 @@ Inline  = Str
         | Space
         | Strong
         | Emph
+        | Strike
         | Image
         | Link
         | NoteReference
@@ -467,6 +468,13 @@ StrongUl   =    < s:LocMarker
                 ( !"__" Inline )+
                 "__" >
                 { ADD(elem_s(pmh_STRONG)); }
+
+Strike = &{ EXT(pmh_EXT_STRIKE) }
+         < s:LocMarker
+         "~~" !Whitespace
+         ( !"~~" Inline )+
+         "~~" >
+         { ADD(elem_s(pmh_STRIKE)); }
 
 Image = '!' ( ExplicitLink | ReferenceLink )
         {
@@ -618,7 +626,7 @@ Nonspacechar =  !Spacechar !Newline .
 Newline =       '\n' | '\r' '\n'?
 Sp =            Spacechar*
 Spnl =          Sp (Newline Sp)?
-SpecialChar =   '*' | '_' | '`' | '&' | '[' | ']' | '(' | ')' | '<' | '!' | '#' | '\\' | '\'' | '"' | ExtendedSpecialChar
+SpecialChar =   '~' | '*' | '_' | '`' | '&' | '[' | ']' | '(' | ')' | '<' | '!' | '#' | '\\' | '\'' | '"' | ExtendedSpecialChar
 NormalChar =    !( SpecialChar | Spacechar | Newline ) .
 # Not used anywhere in grammar:
 #NonAlphanumeric = [\000-\057\072-\100\133-\140\173-\177]

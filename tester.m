@@ -98,8 +98,9 @@ void apply_highlighting(NSMutableAttributedString *attrStr, pmh_element *elem[])
         pmh_NOTE,
         pmh_HTML_ENTITY,
         pmh_BLOCKQUOTE,
+        pmh_STRIKE,
     };
-    int order_len = 24;
+    int order_len = 25;
     
     int i;
     for (i = 0; i < order_len; i++)
@@ -143,6 +144,7 @@ void apply_highlighting(NSMutableAttributedString *attrStr, pmh_element *elem[])
                 case pmh_BLOCKQUOTE:fgColor = [NSColor magentaColor]; break;
                 case pmh_HTMLBLOCK: fgColor = [NSColor magentaColor]; break;
                 case pmh_HTML:      fgColor = [NSColor cyanColor]; break;
+                case pmh_STRIKE:    fgColor = [NSColor blackColor]; bgColor = [NSColor grayColor]; break;
                 default: break;
             }
             
@@ -195,7 +197,7 @@ NSAttributedString *highlight(NSString *str, NSMutableAttributedString *attrStr)
     pmh_element **result;
     
     char *md_source = (char *)[str UTF8String];
-    pmh_markdown_to_elements(md_source, pmh_EXT_NONE, &result);
+    pmh_markdown_to_elements(md_source, pmh_EXT_STRIKE, &result);
     convertOffsets(result, str);
     
     if (attrStr == nil)
@@ -264,7 +266,7 @@ int main(int argc, char * argv[])
         if (strcmp(argv[1], "-d") == 0)
         {
             pmh_element **result;
-            pmh_markdown_to_elements((char *)[contents UTF8String], pmh_EXT_NONE, &result);
+            pmh_markdown_to_elements((char *)[contents UTF8String], pmh_EXT_STRIKE, &result);
             print_result_debug_info(result);
         }
         else
