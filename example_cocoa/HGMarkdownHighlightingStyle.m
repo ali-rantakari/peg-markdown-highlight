@@ -104,7 +104,14 @@
             actualFontSize = [baseFont pointSize];
         }
 		
-		toAdd[NSFontAttributeName] = [NSFont fontWithName:fontName size:actualFontSize];
+        NSFont *font = [NSFont fontWithName:fontName size:actualFontSize];
+        if (font == nil)
+            font = [NSFont fontWithName:baseFont.familyName size:actualFontSize];
+        if (font == nil)
+            font = [NSFont systemFontOfSize:actualFontSize];
+        
+        if (font)
+            toAdd[NSFontAttributeName] = font;
 	}
 	
 	self.attributesToAdd = toAdd;
